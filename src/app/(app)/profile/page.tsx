@@ -66,7 +66,7 @@ export default function Profile() {
 
       <section className="mt-6 grid grid-cols-3 gap-3">
         {tools.map(({ href, label, value, icon: Icon, tone }) => (
-          <Link key={href} href={href} className="card flex flex-col items-center p-3.5 text-center transition hover:border-brand-200">
+          <Link key={href} href={href} className="card flex flex-col items-center p-3.5 text-center lift hover:border-brand-200">
             <span className={`grid h-10 w-10 place-items-center rounded-xl ${tone}`}><Icon className="h-5 w-5" /></span>
             <span className="mt-2 text-[13px] font-semibold">{label}</span>
             <span className="max-w-full truncate text-[11px] text-muted">{value}</span>

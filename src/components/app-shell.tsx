@@ -34,7 +34,7 @@ function Sidebar() {
               key={href}
               href={href}
               aria-current={active ? "page" : undefined}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] transition-colors ${active ? "bg-brand-50 font-semibold text-brand-700" : "text-ink hover:bg-canvas"}`}
+              className={`press flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] transition-colors ${active ? "bg-brand-50 font-semibold text-brand-700" : "text-ink hover:bg-canvas"}`}
             >
               <Icon className="h-5 w-5" strokeWidth={active ? 2.4 : 1.9} />
               <span className="flex-1">{label}</span>
@@ -133,7 +133,7 @@ function BottomNav() {
                 href={href}
                 aria-label={label}
                 aria-current={active ? "page" : undefined}
-                className={`relative grid h-14 w-14 place-items-center ${active ? "text-brand-700" : "text-ink"}`}
+                className={`press relative grid h-14 w-14 place-items-center transition-colors ${active ? "text-brand-700" : "text-ink"}`}
               >
                 <Icon className="h-[25px] w-[25px]" strokeWidth={active ? 2.5 : 1.8} />
                 {href === "/inbox" && unread > 0 && <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-brand-500" />}
@@ -178,8 +178,14 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   if (!ready || !session) {
     return (
-      <div className="grid min-h-dvh place-items-center" aria-busy="true">
-        <LogoMark className="h-10 w-10 animate-pulse" />
+      <div className="mx-auto min-h-dvh w-full max-w-xl space-y-4 px-4 pt-6" aria-busy="true" aria-label="Loading">
+        <div className="flex items-center gap-3">
+          <div className="skeleton h-10 w-10 rounded-full" />
+          <div className="skeleton h-4 w-40" />
+        </div>
+        <div className="skeleton aspect-[4/3] w-full rounded-[var(--radius-card)]" />
+        <div className="skeleton h-4 w-2/3" />
+        <div className="skeleton h-4 w-1/3" />
       </div>
     );
   }

@@ -15,7 +15,7 @@ export function GrowthCard() {
   const earned = useBadges().filter((b) => b.earned).length;
   const label = kind === "income" ? "Income" : "Spending";
   return (
-    <Link href="/money" className="card block p-4 transition hover:border-brand-200">
+    <Link href="/money" className="card block p-4 lift hover:border-brand-200">
       <div className="mb-2 flex items-center justify-between">
         <h2 className="font-semibold">{kind === "income" ? "Your Growth" : "Your Spending"}</h2>
         <ChevronRight className="h-4 w-4 text-muted" />
@@ -91,7 +91,7 @@ export function TabletQuickCards() {
   return (
     <div className="space-y-3">
       {items.map(({ href, label, value, icon: Icon, tone }) => (
-        <Link key={href} href={href} className="card flex items-center gap-3 p-3.5 transition hover:border-brand-200">
+        <Link key={href} href={href} className="card flex items-center gap-3 p-3.5 lift hover:border-brand-200">
           <span className={`grid h-10 w-10 place-items-center rounded-xl ${tone}`}>
             <Icon className="h-5 w-5" />
           </span>

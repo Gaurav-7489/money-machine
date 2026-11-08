@@ -63,7 +63,7 @@ function ExploreInner() {
             role="tab"
             aria-selected={filter === f}
             onClick={() => setFilter(f)}
-            className={`h-8 shrink-0 rounded-full px-3.5 text-[13px] font-medium transition ${filter === f ? "bg-brand-600 text-white" : "border border-line bg-white text-ink hover:bg-canvas"}`}
+            className={`press h-8 shrink-0 rounded-full px-3.5 text-[13px] font-medium ${filter === f ? "bg-brand-600 text-white" : "border border-line bg-white text-ink hover:bg-canvas"}`}
           >
             {f}
           </button>
@@ -71,11 +71,11 @@ function ExploreInner() {
       </div>
 
       {profiles.length > 0 && (
-        <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {profiles.map((p) => {
+        <ul key={filter + needle} className="stagger mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {profiles.map((p, i) => {
             const isFollowing = following.includes(p.handle);
             return (
-              <li key={p.handle} className="card flex flex-col items-center p-4 text-center">
+              <li key={p.handle} style={{ ["--i" as string]: i }} className="card lift flex flex-col items-center p-4 text-center">
                 <SampleTag className="self-end" />
                 <Avatar name={p.name} tone={p.tone} size="lg" square={p.kind === "business"} />
                 <p className="mt-2 flex max-w-full items-center gap-1 text-sm font-semibold">
@@ -87,7 +87,7 @@ function ExploreInner() {
                   <button
                     onClick={() => toggle("following", p.handle)}
                     aria-pressed={isFollowing}
-                    className={`h-8 flex-1 rounded-full text-[13px] font-semibold transition ${isFollowing ? "border border-line bg-white text-ink" : "bg-brand-50 text-brand-700 hover:bg-brand-100"}`}
+                    className={`press h-8 flex-1 rounded-full text-[13px] font-semibold ${isFollowing ? "border border-line bg-white text-ink" : "bg-brand-50 text-brand-700 hover:bg-brand-100"}`}
                   >
                     {isFollowing ? "Following" : p.kind === "creator" ? "Connect" : "Follow"}
                   </button>
@@ -104,7 +104,7 @@ function ExploreInner() {
           <ul className="space-y-3">
             {opps.map((p) => (
               <li key={p.id}>
-                <Link href={`/affiliates#${p.id}`} className="card flex items-center gap-3 p-3.5 hover:border-brand-200">
+                <Link href={`/affiliates#${p.id}`} className="card lift flex items-center gap-3 p-3.5 hover:border-brand-200">
                   <Avatar name={p.brand} tone={profileByHandle(p.ownerHandle)?.tone ?? "violet"} square />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-semibold">{p.name}</span>

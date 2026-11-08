@@ -13,13 +13,13 @@ export default function Badges() {
     <div className="mx-auto max-w-2xl">
       <PageHeader title="Badges" back="/profile" />
       {featured && (
-        <section className="card flex flex-col items-center bg-gradient-to-br from-cream via-white to-violet-50 p-6 text-center">
+        <section className="card animate-scale-in flex flex-col items-center bg-gradient-to-br from-cream via-white to-violet-50 p-6 text-center">
           <BadgeMedal icon={featured.badge.icon} earned={featured.earned} size="lg" />
           <p className="mt-3 text-lg font-bold">{featured.badge.name}</p>
           <p className="text-sm text-muted">{featured.earned ? `Earned · ${featured.badge.description}` : `Next up · ${featured.badge.description}`}</p>
           {!featured.earned && (
             <div className="mt-3 h-2 w-48 overflow-hidden rounded-full bg-white ring-1 ring-line">
-              <div className="h-full rounded-full bg-brand-500" style={{ width: `${(featured.current / featured.target) * 100}%` }} />
+              <div className="h-full rounded-full bg-brand-500 transition-[width] duration-700" style={{ width: `${(featured.current / featured.target) * 100}%` }} />
             </div>
           )}
         </section>
@@ -28,9 +28,9 @@ export default function Badges() {
       <h2 className="mb-3 mt-6 font-semibold">
         Your Badges <span className="text-sm font-normal text-muted">· {earned.length} of {badges.length} earned</span>
       </h2>
-      <ul className="grid grid-cols-3 gap-3 sm:grid-cols-3">
-        {badges.map(({ badge, earned: isEarned, current, target }) => (
-          <li key={badge.id} className="card flex flex-col items-center p-4 text-center">
+      <ul className="stagger grid grid-cols-3 gap-3">
+        {badges.map(({ badge, earned: isEarned, current, target }, i) => (
+          <li key={badge.id} style={{ ["--i" as string]: i }} className="card flex flex-col items-center p-4 text-center">
             <BadgeMedal icon={badge.icon} earned={isEarned} />
             <p className="mt-2 text-[13px] font-semibold leading-tight">{badge.name}</p>
             <p className="mt-0.5 text-[11px] leading-snug text-muted">{badge.description}</p>

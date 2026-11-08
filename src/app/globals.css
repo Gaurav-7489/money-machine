@@ -26,9 +26,28 @@
 
   --radius-card: 1.25rem;
   --shadow-card: 0 1px 2px rgb(15 26 23 / 0.04), 0 8px 24px -12px rgb(15 26 23 / 0.08);
+  --shadow-lift: 0 2px 4px rgb(15 26 23 / 0.04), 0 18px 40px -16px rgb(14 122 92 / 0.22);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --animate-fade-up: fade-up 0.6s var(--ease-out-expo) both;
+  --animate-fade-in: fade-in 0.5s ease-out both;
+  --animate-scale-in: scale-in 0.45s var(--ease-out-expo) both;
+  --animate-pop: pop 0.45s var(--ease-spring);
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+
+  @keyframes fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scale-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+  @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.32); } 100% { transform: scale(1); } }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  @keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
 }
 
-html { -webkit-tap-highlight-color: transparent; }
+html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body {
   background: var(--color-canvas);
   color: var(--color-ink);
@@ -43,6 +62,44 @@ body {
   box-shadow: var(--shadow-card);
 }
 
+/* ── Motion ───────────────────────────────────────────────────────────── */
+/* Page enter (used by route templates) */
+.page-enter { animation: var(--animate-fade-up); animation-duration: 0.5s; }
+
+/* Staggered children: set --i on each child */
+.stagger > * { animation: var(--animate-fade-up); animation-delay: calc(var(--i, 0) * 60ms); }
+
+/* Scroll reveal: elements start hidden only when JS is available */
+.js [data-reveal] { opacity: 0; transform: translateY(22px); transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo); transition-delay: var(--d, 0ms); }
+.js [data-reveal].is-visible { opacity: 1; transform: none; }
+
+/* Interactive lift for link cards */
+.lift { transition: transform 0.35s var(--ease-out-expo), box-shadow 0.35s var(--ease-out-expo), border-color 0.2s; }
+@media (hover: hover) { .lift:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); } }
+.lift:active { transform: scale(0.985); }
+
+/* Press feedback for buttons */
+.press { transition: transform 0.18s var(--ease-out-expo), background-color 0.2s, color 0.2s, box-shadow 0.2s; }
+.press:active { transform: scale(0.96); }
+
+/* Dialog / sheet */
+dialog[open] { animation: var(--animate-scale-in); }
+dialog[open]::backdrop { animation: var(--animate-fade-in); }
+@media (max-width: 767px) {
+  dialog[open] { animation: sheet-up 0.45s var(--ease-out-expo) both; }
+}
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: none; } }
+
+/* Tab indicator */
+.tab-indicator { animation: tab-in 0.35s var(--ease-out-expo) both; transform-origin: center; }
+@keyframes tab-in { from { transform: scaleX(0.3); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Skeleton shimmer */
+.skeleton { background: linear-gradient(90deg, #eef2f1 25%, #f7faf9 50%, #eef2f1 75%); background-size: 200% 100%; animation: var(--animate-shimmer); border-radius: 0.75rem; }
+
+/* Text gradient for display headings */
+.text-gradient { background: linear-gradient(120deg, #0e7a5c 10%, #14a77d 45%, #2de3c8 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 
@@ -52,5 +109,13 @@ body {
 :focus-visible { outline: 2px solid var(--color-brand-500); outline-offset: 2px; border-radius: 0.5rem; }
 
 @media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+  *, *::before, *::after, dialog[open], dialog[open]::backdrop { animation: none !important; transition: none !important; }
+  .js [data-reveal] { opacity: 1; transform: none; }
+}
+
+/* Smooth FAQ open where supported */
+@supports (interpolate-size: allow-keywords) {
+  :root { interpolate-size: allow-keywords; }
+  details.faq::details-content { height: 0; overflow: clip; transition: height 0.4s var(--ease-out-expo), content-visibility 0.4s allow-discrete; }
+  details.faq[open]::details-content { height: auto; }
 }

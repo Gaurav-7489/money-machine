@@ -45,10 +45,10 @@ function Opportunities() {
   const programs = usePrograms().filter((p) => p.status === "active");
   if (programs.length === 0) return <EmptyState icon={<Sparkles className="h-5 w-5" />} title="No open opportunities" body="New affiliate programs will appear here." />;
   return (
-    <ul className="space-y-3">
-      {programs.map((p) => (
-        <li key={p.id}>
-          <Link href={`/affiliates#${p.id}`} className="card flex items-center gap-3 p-4 transition hover:border-brand-200">
+    <ul className="stagger space-y-3">
+      {programs.map((p, i) => (
+        <li key={p.id} style={{ ["--i" as string]: i }}>
+          <Link href={`/affiliates#${p.id}`} className="card flex items-center gap-3 p-4 lift hover:border-brand-200">
             <Avatar name={p.brand} tone={profileByHandle(p.ownerHandle)?.tone ?? "violet"} size="md" square />
             <span className="min-w-0 flex-1">
               <span className="flex items-center gap-2 font-semibold">
@@ -86,23 +86,27 @@ export default function Home() {
               className={`relative flex-1 pb-3 text-sm transition md:flex-none md:px-5 ${tab === t ? "font-semibold text-ink" : "text-muted hover:text-ink"}`}
             >
               {t}
-              {tab === t && <span className="absolute inset-x-4 -bottom-px h-0.5 rounded-full bg-brand-600" />}
+              {tab === t && <span className="tab-indicator absolute inset-x-4 -bottom-px h-0.5 rounded-full bg-brand-600" />}
             </button>
           ))}
         </div>
 
         {tab === "For You" && (
-          <div className="space-y-5">
-            {feed.map((p) => (
-              <PostCard key={p.id} post={p} />
+          <div key="foryou" className="stagger space-y-5">
+            {feed.map((p, i) => (
+              <div key={p.id} style={{ ["--i" as string]: Math.min(i, 6) }}>
+                <PostCard post={p} />
+              </div>
             ))}
           </div>
         )}
         {tab === "Following" &&
           (followingFeed.length ? (
-            <div className="space-y-5">
-              {followingFeed.map((p) => (
-                <PostCard key={p.id} post={p} />
+            <div key="following" className="stagger space-y-5">
+              {followingFeed.map((p, i) => (
+                <div key={p.id} style={{ ["--i" as string]: Math.min(i, 6) }}>
+                  <PostCard post={p} />
+                </div>
               ))}
             </div>
           ) : (

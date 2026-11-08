@@ -71,9 +71,9 @@ export function PostCard({ post }: { post: FeedPost }) {
           onClick={() => toggle("liked", post.id)}
           aria-pressed={isLiked}
           aria-label={isLiked ? "Unlike" : "Like"}
-          className="flex items-center gap-1.5 text-sm font-medium"
+          className="press flex items-center gap-1.5 text-sm font-medium"
         >
-          <Heart className={`h-[22px] w-[22px] transition ${isLiked ? "fill-rose-500 text-rose-500" : ""}`} />
+          <Heart className={`h-[22px] w-[22px] transition-colors ${isLiked ? "animate-pop fill-rose-500 text-rose-500" : ""}`} />
           {formatCompact(post.likes + (isLiked ? 1 : 0))}
         </button>
         <span className="flex items-center gap-1.5 text-sm font-medium" aria-label={`${post.comments} comments`}>
@@ -84,7 +84,7 @@ export function PostCard({ post }: { post: FeedPost }) {
           <Send className="h-[21px] w-[21px]" />
         </button>
         <button onClick={() => toggle("saved", post.id)} aria-pressed={isSaved} aria-label={isSaved ? "Remove from saved" : "Save"} className="ml-auto">
-          <Bookmark className={`h-[22px] w-[22px] ${isSaved ? "fill-ink" : ""}`} />
+          <Bookmark className={`h-[22px] w-[22px] transition-colors ${isSaved ? "animate-pop fill-ink" : ""}`} />
         </button>
       </div>
       <div className="px-4 pb-4 pt-2 text-sm">

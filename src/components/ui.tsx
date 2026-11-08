@@ -14,7 +14,7 @@ const VARIANTS: Record<Variant, string> = {
 };
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50";
+  "press inline-flex items-center justify-center gap-2 rounded-full font-semibold disabled:cursor-not-allowed disabled:opacity-50";
 const sizes = { sm: "h-8 px-3.5 text-[13px]", md: "h-11 px-5 text-sm", lg: "h-12 px-6 text-[15px]" };
 
 export function Button({
@@ -82,7 +82,7 @@ export function PageHeader({ title, back, action }: { title: string; back?: stri
 
 export function EmptyState({ icon, title, body, action }: { icon: ReactNode; title: string; body: string; action?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center px-6 py-10 text-center">
+    <div className="animate-fade-up flex flex-col items-center px-6 py-10 text-center">
       <div className="mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-600">{icon}</div>
       <p className="font-semibold">{title}</p>
       <p className="mt-1 max-w-xs text-sm text-muted">{body}</p>
@@ -163,7 +163,7 @@ export function Toast({ message, onDone }: { message: string | null; onDone: () 
   if (!message) return null;
   return (
     <div role="status" className="fixed inset-x-0 bottom-24 z-50 flex justify-center px-4 md:bottom-8">
-      <div className="rounded-full bg-ink px-4 py-2.5 text-sm font-medium text-white shadow-xl">{message}</div>
+      <div className="animate-fade-up rounded-full bg-ink px-4 py-2.5 text-sm font-medium text-white shadow-xl">{message}</div>
     </div>
   );
 }
