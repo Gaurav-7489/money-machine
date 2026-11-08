@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Briefcase, Check, UserRound } from "lucide-react";
-import { Button, DeviceNote, Field, PageHeader, inputCls } from "@/components/ui";
+import { Briefcase, Check, ChevronLeft, UserRound } from "lucide-react";
+import { Button, DeviceNote, Field, inputCls } from "@/components/ui";
 import { useStore } from "@/lib/store";
 import { fieldErrors, onboardingInput, type FieldErrors } from "@/lib/validation";
 import type { Role } from "@/lib/types";
@@ -33,8 +34,10 @@ export default function ChooseRole() {
 
   return (
     <main className="min-h-dvh bg-white md:grid md:place-items-center md:bg-canvas">
-      <form onSubmit={submit} className="mx-auto w-full max-w-md px-5 py-6 md:card md:p-8" noValidate>
-        <PageHeader title="" back="/" />
+      <form onSubmit={submit} className="animate-fade-up mx-auto w-full max-w-md px-5 py-6 md:card md:p-8" noValidate>
+        <Link href="/" aria-label="Back" className="press -ml-2 mb-4 grid h-9 w-9 place-items-center rounded-full text-ink hover:bg-canvas">
+          <ChevronLeft className="h-5 w-5" />
+        </Link>
         <h1 className="text-2xl font-bold tracking-tight">Who are you?</h1>
         <p className="mt-1 text-sm text-muted">Choose what best describes you.</p>
 
@@ -45,18 +48,18 @@ export default function ChooseRole() {
             return (
               <label
                 key={id}
-                className={`flex cursor-pointer items-start gap-4 rounded-2xl border p-4 transition ${selected ? "border-brand-400 bg-brand-50/50 ring-4 ring-brand-100" : "border-line hover:bg-canvas"}`}
+                className={`press flex cursor-pointer items-center gap-4 rounded-2xl border p-4 transition ${selected ? "border-brand-400 bg-brand-50/50 ring-4 ring-brand-100" : "border-line hover:bg-canvas"}`}
               >
                 <input type="radio" name="role" value={id} checked={selected} onChange={() => setRole(id)} className="sr-only" />
                 <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${tone}`}>
                   <Icon className="h-5 w-5" />
                 </span>
-                <span className="flex-1">
-                  <span className="block font-semibold">{title}</span>
-                  <span className="block text-sm text-muted">{body}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-semibold leading-tight">{title}</span>
+                  <span className="mt-0.5 block text-sm leading-snug text-muted">{body}</span>
                 </span>
-                <span className={`grid h-5 w-5 place-items-center rounded-full border-2 ${selected ? "border-brand-600 bg-brand-600 text-white" : "border-line"}`}>
-                  {selected && <Check className="h-3 w-3" strokeWidth={3} />}
+                <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 transition-colors ${selected ? "border-brand-600 bg-brand-600 text-white" : "border-line"}`}>
+                  {selected && <Check className="animate-pop h-3 w-3" strokeWidth={3} />}
                 </span>
               </label>
             );
