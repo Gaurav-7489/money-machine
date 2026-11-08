@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/* Money Machine design tokens — from the approved design system:
+   deep green #0E7A5C, aqua #2DE3C8, lime #A6E88E, cream #FBF3CC */
+@theme {
+  --color-brand-50: #ecfbf5;
+  --color-brand-100: #d2f5e7;
+  --color-brand-200: #a6ebd2;
+  --color-brand-300: #6fd9b7;
+  --color-brand-400: #34c497;
+  --color-brand-500: #14a77d;
+  --color-brand-600: #0e7a5c;
+  --color-brand-700: #0c654d;
+  --color-brand-800: #0b503e;
+  --color-brand-900: #093f32;
+  --color-aqua: #2de3c8;
+  --color-lime: #a6e88e;
+  --color-cream: #fbf3cc;
+  --color-ink: #0f1a17;
+  --color-muted: #5f6f69;
+  --color-line: #e6ece9;
+  --color-canvas: #f5f8f7;
+  --color-surface: #ffffff;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --radius-card: 1.25rem;
+  --shadow-card: 0 1px 2px rgb(15 26 23 / 0.04), 0 8px 24px -12px rgb(15 26 23 / 0.08);
+}
+
+html { -webkit-tap-highlight-color: transparent; }
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@utility card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+.pt-safe { padding-top: env(safe-area-inset-top); }
+
+:focus-visible { outline: 2px solid var(--color-brand-500); outline-offset: 2px; border-radius: 0.5rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
