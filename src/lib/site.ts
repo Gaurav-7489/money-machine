@@ -53,30 +53,3 @@ export const FAQ: { q: string; a: string }[] = [
     a: "The preview is free to try. Pricing for premium features has not been announced yet.",
   },
 ];
-
-export const AUDIENCES = {
-  creators: {
-    path: "/for-creators",
-    title: "For Creators — Get brand deals and affiliate income",
-    h1: "Turn your content into income",
-    lead: "Money Machine helps creators get discovered by brands, join affiliate programs and keep every rupee they earn in one clear place.",
-    points: [
-      ["Get discovered", "Show your niche, style and work in a profile brands can actually browse."],
-      ["Join affiliate programs", "Apply to programs from brands that fit your audience and see each application's status."],
-      ["Track your income", "Log brand deals, UGC and affiliate payouts. See your monthly growth at a glance."],
-      ["Earn badges", "Hit milestones like Collab Pro and Affiliate Ace as you grow."],
-    ],
-  },
-  brands: {
-    path: "/for-brands",
-    title: "For Brands — Find creators and run affiliate programs",
-    h1: "Grow your brand with creators",
-    lead: "Money Machine helps businesses find the right creators, launch affiliate programs with clear terms, and keep creator spending organised.",
-    points: [
-      ["Find creators", "Explore creators by niche and content style, then connect directly."],
-      ["Launch affiliate programs", "Set commission and terms, review applications and approve the creators you want."],
-      ["Track spending", "Record creator payments, commissions and campaign costs in one private ledger."],
-      ["Build trust", "Earn badges like Program Launcher and Affiliate Builder as your program grows."],
-    ],
-  },
-} as const;

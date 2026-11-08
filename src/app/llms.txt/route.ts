@@ -1,4 +1,4 @@
-import { AUDIENCES, FAQ, SITE } from "@/lib/site";
+import { FAQ, SITE } from "@/lib/site";
 
 export const dynamic = "force-static";
 
@@ -11,9 +11,7 @@ export function GET() {
 ${SITE.name} (${SITE.tagline}) was founded by ${SITE.founder} and is built by ${SITE.developer}. It is an installable web app (PWA) that works on phones, tablets and desktops.
 
 ## Pages
-- [Home](${SITE.url}/): Overview, how it works and FAQ
-- [For creators](${SITE.url}${AUDIENCES.creators.path}): ${AUDIENCES.creators.lead}
-- [For brands](${SITE.url}${AUDIENCES.brands.path}): ${AUDIENCES.brands.lead}
+- [Home](${SITE.url}/): Welcome screen
 - [Get started](${SITE.url}/onboarding): Choose a creator or business account
 
 ## Key features

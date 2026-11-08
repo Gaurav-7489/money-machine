@@ -45,10 +45,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-IN" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
-      </head>
+    <html lang="en-IN">
+
       <body>
         <StoreProvider>{children}</StoreProvider>
         <ServiceWorkerRegister />
