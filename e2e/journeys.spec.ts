@@ -146,3 +146,16 @@ test("no horizontal overflow or console errors on main pages", async ({ page }) 
   }
   expect(errors).toEqual([]);
 });
+
+test("help tips open on click or tap", async ({ page }) => {
+  await onboard(page);
+  await page.goto("/profile");
+  await page.getByRole("button", { name: "What does this mean?" }).first().click();
+  await expect(page.getByRole("tooltip")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("tooltip")).toBeHidden();
+  await page.getByRole("button", { name: "What does this mean?" }).first().click();
+  await expect(page.getByRole("tooltip")).toBeVisible();
+  await page.locator("main").click({ position: { x: 4, y: 4 } });
+  await expect(page.getByRole("tooltip")).toBeHidden();
+});

@@ -178,25 +178,39 @@ export function Toast({ message, onDone }: { message: string | null; onDone: () 
 /** Small "?" button that explains something in plain words. Works with hover, keyboard focus and tap. */
 export function InfoTip({ text, label = "What does this mean?", className = "" }: { text: string; label?: string; className?: string }) {
   const [open, setOpen] = useState(false);
+  // "pinned" = opened by a click/tap; it then ignores hover-out and stays until dismissed.
+  const [pinned, setPinned] = useState(false);
   const id = useId();
   const ref = useRef<HTMLSpanElement>(null);
+  const close = () => {
+    setOpen(false);
+    setPinned(false);
+  };
   useEffect(() => {
     if (!open) return;
-    const close = (e: PointerEvent) => ref.current && !ref.current.contains(e.target as Node) && setOpen(false);
-    document.addEventListener("pointerdown", close);
-    return () => document.removeEventListener("pointerdown", close);
+    const outside = (e: PointerEvent) => ref.current && !ref.current.contains(e.target as Node) && close();
+    document.addEventListener("pointerdown", outside);
+    return () => document.removeEventListener("pointerdown", outside);
   }, [open]);
   return (
-    <span ref={ref} className={`group relative inline-flex align-middle ${className}`} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+    <span
+      ref={ref}
+      className={`group relative inline-flex align-middle ${className}`}
+      onPointerEnter={(e) => e.pointerType === "mouse" && setOpen(true)}
+      onPointerLeave={(e) => e.pointerType === "mouse" && !pinned && setOpen(false)}
+    >
       <button
         type="button"
         aria-label={label}
         aria-describedby={open ? id : undefined}
         aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          setOpen(true);
+          setPinned(true);
+        }}
         onFocus={() => setOpen(true)}
-        onBlur={() => setOpen(false)}
-        onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
+        onBlur={close}
+        onKeyDown={(e) => e.key === "Escape" && close()}
         className="grid h-6 w-6 place-items-center rounded-full text-muted hover:bg-canvas hover:text-ink"
       >
         <HelpCircle className="h-4 w-4" />
