@@ -2,53 +2,76 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { ChevronRight, Link2, Wallet } from "lucide-react";
+import { useRef, useState } from "react";
+import { ChevronRight, ImagePlus, Link2, Loader2, Wallet, X } from "lucide-react";
 import { TONES } from "@/components/art";
+import { useFeedback } from "@/components/feedback";
 import { Button, DeviceNote, Field, inputCls } from "@/components/ui";
-import { uid } from "@/lib/format";
+import { compressImage, usePublishPost } from "@/lib/posts";
 import { useStore } from "@/lib/store";
-import { fieldErrors, postInput, type FieldErrors } from "@/lib/validation";
-import type { Post } from "@/lib/types";
+import type { FieldErrors } from "@/lib/validation";
 
 const TONE_KEYS = ["mint", "rose", "violet", "sky", "amber", "lime"] as const;
 
 export default function Create() {
-  const { session, update } = useStore();
+  const { session } = useStore();
   const router = useRouter();
+  const publish = usePublishPost();
+  const { toast } = useFeedback();
+  const [image, setImage] = useState<string | undefined>();
+  const [busy, setBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [caption, setCaption] = useState("");
   const [tags, setTags] = useState("");
   const [tone, setTone] = useState<(typeof TONE_KEYS)[number]>("mint");
   const [errors, setErrors] = useState<FieldErrors>({});
 
+  async function pick(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setBusy(true);
+    try {
+      setImage(await compressImage(file));
+    } catch (err) {
+      toast((err as Error).message, "error");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = postInput.safeParse({ caption, tags });
-    if (!parsed.success) return setErrors(fieldErrors(parsed.error));
-    const post: Post = {
-      id: uid("post"),
-      authorHandle: session!.handle,
-      caption: parsed.data.caption,
-      tags: (parsed.data.tags ?? "")
-        .split(/[\s,]+/)
-        .map((t) => t.replace(/^#/, "").toLowerCase())
-        .filter(Boolean)
-        .slice(0, 10),
-      tone,
-      createdAt: new Date().toISOString(),
-    };
-    update((s) => ({ ...s, posts: [post, ...s.posts] }));
+    const errs = publish({ caption, tags, tone, image });
+    if (errs) return setErrors(errs);
+    toast("Your post is live!");
     router.push("/home");
   }
 
   return (
     <div className="mx-auto grid max-w-4xl gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
       <form onSubmit={submit} className="card p-5" noValidate>
-        <h1 className="mb-4 text-xl font-bold tracking-tight">New post</h1>
-        <div className={`mb-4 grid aspect-[4/3] place-items-center rounded-2xl bg-gradient-to-br px-6 text-center ${TONES[tone].bg}`}>
-          <p className="text-lg font-semibold text-ink/80">{caption || "Your post preview"}</p>
-        </div>
-        <div className="mb-4 flex gap-2" role="radiogroup" aria-label="Background">
+        <h1 className="text-2xl font-bold tracking-tight">New post</h1>
+        <p className="mb-4 mt-0.5 text-sm text-muted">Write a caption, add a photo if you like, then press Share post.</p>
+        {image ? (
+          <div className="relative mb-4 overflow-hidden rounded-2xl ring-1 ring-line">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={image} alt="Photo preview" className="aspect-[4/3] w-full object-cover" />
+            <button type="button" onClick={() => setImage(undefined)} className="absolute right-2 top-2 inline-flex h-9 items-center gap-1 rounded-full bg-ink/80 px-3 text-xs font-semibold text-white hover:bg-ink">
+              <X className="h-4 w-4" /> Remove photo
+            </button>
+          </div>
+        ) : (
+          <div className={`mb-4 grid aspect-[4/3] place-items-center rounded-2xl bg-gradient-to-br px-6 text-center ${TONES[tone].bg}`}>
+            <p className="text-lg font-semibold text-ink/80">{caption || "Your post preview"}</p>
+          </div>
+        )}
+        <input ref={fileRef} type="file" accept="image/*" onChange={pick} className="sr-only" tabIndex={-1} aria-hidden="true" />
+        <Button type="button" variant="secondary" className="mb-4 w-full" onClick={() => fileRef.current?.click()} disabled={busy}>
+          {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImagePlus className="h-5 w-5" />} {image ? "Change photo" : "Add a photo"}
+        </Button>
+        {!image && <p className="mb-2 text-[13px] font-medium">Background colour</p>}
+        <div className={`mb-4 flex gap-2 ${image ? "hidden" : ""}`} role="radiogroup" aria-label="Background">
           {TONE_KEYS.map((t) => (
             <button
               type="button"
@@ -65,11 +88,11 @@ export default function Create() {
           <Field label="Caption" error={errors.caption}>
             <textarea className={`${inputCls} min-h-24`} value={caption} onChange={(e) => setCaption(e.target.value)} aria-invalid={!!errors.caption} maxLength={2200} />
           </Field>
-          <Field label="Tags" hint="Separate with spaces, e.g. #collab #skincare">
+          <Field label="Tags" optional hint="Words that help people find your post. Separate with spaces, e.g. #collab #skincare">
             <input className={inputCls} value={tags} onChange={(e) => setTags(e.target.value)} />
           </Field>
-          <DeviceNote>Photo and video uploads arrive with cloud storage. Text posts are saved on this device in the preview.</DeviceNote>
-          <Button type="submit" className="w-full">Share post</Button>
+          <DeviceNote>Preview build: posts and photos are saved on this device only. Video uploads arrive with cloud storage.</DeviceNote>
+          <Button type="submit" size="lg" className="w-full" disabled={busy}>Share post</Button>
         </div>
       </form>
 

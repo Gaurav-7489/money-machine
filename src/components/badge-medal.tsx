@@ -38,7 +38,7 @@ export function BadgeMedal({ icon, earned, size = "md" }: { icon: BadgeIcon; ear
         <Icon className={`${glyph} text-white`} strokeWidth={2.2} />
       </span>
       {!earned && (
-        <span className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full bg-white text-slate-500 shadow ring-1 ring-line">
+        <span className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full bg-surface text-slate-500 shadow ring-1 ring-line">
           <Lock className="h-3 w-3" />
         </span>
       )}

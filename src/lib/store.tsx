@@ -9,7 +9,7 @@
  * presented as verified.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { AffiliateApplication, AffiliateProgram, FinancialRecord, Message, Post, Session } from "./types";
+import type { AffiliateApplication, AffiliateProgram, Comment, FinancialRecord, Message, Post, Session, Thread } from "./types";
 
 interface StoreState {
   session: Session | null;
@@ -22,7 +22,23 @@ interface StoreState {
   saved: string[];
   following: string[];
   readThreads: string[];
+  /** profile handles the user saved from Search ("Saved" page) */
+  savedProfiles: string[];
+  /** posts the user reposted to their profile */
+  reposts: string[];
+  comments: Comment[];
+  /** conversations started by the user */
+  threads: Thread[];
+  starredThreads: string[];
+  /** threads moved to Trash (restorable) */
+  trashedThreads: string[];
+  /** threads permanently deleted from Trash */
+  deletedThreads: string[];
+  /** onboarding tips the user has closed */
+  dismissedTips: string[];
 }
+
+export type ListKey = "liked" | "saved" | "following" | "readThreads" | "savedProfiles" | "reposts" | "starredThreads" | "trashedThreads" | "deletedThreads" | "dismissedTips";
 
 const EMPTY: StoreState = {
   session: null,
@@ -35,6 +51,14 @@ const EMPTY: StoreState = {
   saved: [],
   following: [],
   readThreads: [],
+  savedProfiles: [],
+  reposts: [],
+  comments: [],
+  threads: [],
+  starredThreads: [],
+  trashedThreads: [],
+  deletedThreads: [],
+  dismissedTips: [],
 };
 
 const KEY = "mm.preview.v1";
@@ -42,7 +66,11 @@ const KEY = "mm.preview.v1";
 interface StoreApi extends StoreState {
   ready: boolean;
   update: (fn: (s: StoreState) => StoreState) => void;
-  toggle: (key: "liked" | "saved" | "following" | "readThreads", id: string) => void;
+  toggle: (key: ListKey, id: string) => void;
+  /** add (on=true) or remove (on=false) many ids at once */
+  setMany: (key: ListKey, ids: string[], on: boolean) => void;
+  /** false when the last save to this device failed (e.g. storage full) */
+  saveOk: boolean;
   reset: () => void;
 }
 
@@ -61,6 +89,7 @@ function load(): StoreState {
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<StoreState>(EMPTY);
   const [ready, setReady] = useState(false);
+  const [saveOk, setSaveOk] = useState(true);
 
   useEffect(() => {
     setState(load());
@@ -71,18 +100,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (!ready) return;
     try {
       window.localStorage.setItem(KEY, JSON.stringify(state));
+      setSaveOk(true);
     } catch {
-      /* storage unavailable (private mode) — keep in memory */
+      /* storage unavailable (private mode) or full — keep in memory */
+      setSaveOk(false);
     }
   }, [state, ready]);
 
   const update = useCallback((fn: (s: StoreState) => StoreState) => setState(fn), []);
-  const toggle = useCallback((key: "liked" | "saved" | "following" | "readThreads", id: string) => {
+  const toggle = useCallback((key: ListKey, id: string) => {
     setState((s) => ({ ...s, [key]: s[key].includes(id) ? s[key].filter((x) => x !== id) : [...s[key], id] }));
+  }, []);
+  const setMany = useCallback((key: ListKey, ids: string[], on: boolean) => {
+    setState((s) => ({
+      ...s,
+      [key]: on ? [...s[key], ...ids.filter((id) => !s[key].includes(id))] : s[key].filter((x) => !ids.includes(x)),
+    }));
   }, []);
   const reset = useCallback(() => setState(EMPTY), []);
 
-  const api = useMemo(() => ({ ...state, ready, update, toggle, reset }), [state, ready, update, toggle, reset]);
+  const api = useMemo(() => ({ ...state, ready, saveOk, update, toggle, setMany, reset }), [state, ready, saveOk, update, toggle, setMany, reset]);
   return <Ctx.Provider value={api}>{children}</Ctx.Provider>;
 }
 

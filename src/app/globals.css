@@ -46,6 +46,64 @@
   @keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
 }
 
+/* ── Dark theme ─────────────────────────────────────────────────────────
+   Tailwind v4 utilities read colours from CSS variables, so the dark theme
+   remaps the tokens (and the soft tint shades used for chips and icons)
+   instead of duplicating classes. The theme is chosen in Settings or with the
+   sun/moon switch, and applied before paint by a tiny script in layout.tsx. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-canvas: #0b1311;
+  --color-surface: #121c19;
+  --color-line: #24332e;
+  --color-ink: #e8f0ed;
+  --color-muted: #9fb0aa;
+  --color-cream: #2e2a14;
+
+  --color-brand-50: #10291f;
+  --color-brand-100: #143628;
+  --color-brand-200: #1f4c39;
+  --color-brand-700: #17a37b;
+  --color-brand-800: #8fe5c6;
+  --color-brand-900: #c2f3e1;
+
+  --color-emerald-50: #0f2a20;
+  --color-emerald-700: #6ee7b7;
+  --color-rose-50: #2d1519;
+  --color-rose-100: #3a1b21;
+  --color-rose-200: #4a2028;
+  --color-rose-700: #fda4af;
+  --color-pink-100: #36182a;
+  --color-orange-50: #2b1d12;
+  --color-orange-100: #33220f;
+  --color-violet-50: #211a33;
+  --color-violet-100: #2a2140;
+  --color-violet-200: #352851;
+  --color-violet-700: #c4b5fd;
+  --color-fuchsia-100: #321a35;
+  --color-amber-50: #2b2210;
+  --color-amber-200: #4a3a14;
+  --color-amber-700: #fcd34d;
+  --color-amber-900: #fde68a;
+  --color-yellow-100: #302a10;
+  --color-sky-50: #0f2230;
+  --color-sky-200: #16354a;
+  --color-sky-700: #7dd3fc;
+  --color-cyan-100: #0f2d33;
+  --color-teal-50: #0e2724;
+  --color-teal-100: #113330;
+  --color-lime-50: #1c2610;
+  --color-lime-100: #233012;
+  --color-lime-200: #2c3d15;
+  --color-lime-700: #bef264;
+  --color-slate-100: #1e2a27;
+  --color-slate-300: #3c4d47;
+  --color-slate-600: #b4c2bd;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
+}
+:root[data-theme="dark"] .skeleton { background-image: linear-gradient(90deg, #17221f 25%, #1e2b27 50%, #17221f 75%); }
+
 html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body {

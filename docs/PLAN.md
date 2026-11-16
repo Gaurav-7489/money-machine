@@ -18,6 +18,12 @@ When work started, the repository held only `README.md`. This branch adds:
 | Zod validation for every form | ✅ Done |
 | Proposed PostgreSQL schema (`src/db/schema.ts`, Drizzle) | ✅ Written, **not connected** |
 | Authentication, server-side authorization, database persistence | ⏳ Stage 2 (needs a provider decision and credentials) |
+| UX upgrade: labelled navigation, Search with filters + match %, feed composer/comments/reposts/photos, message folders (Sent/Starred/Trash), public profiles `/u/[handle]`, Friends, Saved, richer Edit Profile, toasts, confirm dialogs, tips, dark mode | ✅ Done (preview data layer) |
+
+**How the match % works** (`src/lib/match.ts`, unit tested): it is the share of the
+filters the searcher picked that a profile meets (half credit for "close", e.g. same
+country, another city). Type, name and social handle are hard filters. With no scoring
+filters picked, no percentage is shown. Nothing is estimated or invented.
 
 **About the preview data layer.** No database or auth credentials exist yet, so the
 current build keeps user-entered data in the browser's `localStorage` (`src/lib/store.tsx`).

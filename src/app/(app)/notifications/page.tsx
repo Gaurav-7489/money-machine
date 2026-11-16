@@ -1,18 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, CheckCircle2, Star } from "lucide-react";
+import { Bell, CheckCircle2, MessageCircle, Star } from "lucide-react";
 import { EmptyState, PageHeader } from "@/components/ui";
 import { useBadges, usePrograms } from "@/lib/hooks";
 import { useStore } from "@/lib/store";
+import { useThreads } from "@/lib/threads";
+import { timeAgo } from "@/lib/format";
 
 export default function Notifications() {
   const badges = useBadges().filter((b) => b.earned);
   const { applications, session, programs: owned } = useStore();
   const programs = usePrograms();
   const name = (id: string) => programs.find((p) => p.id === id)?.name ?? "a program";
+  const unread = useThreads().all.filter((t) => t.unread && !t.trashed);
 
   const items = [
+    ...unread.map((t) => ({ key: t.id, icon: <MessageCircle className="h-4 w-4 text-brand-600" />, text: `New message from ${t.profile.name} · ${timeAgo(t.at)}`, href: `/inbox/${t.id}` })),
     ...badges.map((b) => ({ key: b.badge.id, icon: <Star className="h-4 w-4 text-amber-500" />, text: `You earned the ${b.badge.name} badge`, href: "/badges" })),
     ...(session?.role === "creator"
       ? applications
@@ -26,17 +30,18 @@ export default function Notifications() {
   return (
     <div className="mx-auto max-w-2xl">
       <PageHeader title="Notifications" back="/home" />
+      <p className="-mt-2 mb-4 text-sm text-muted">New messages, badges you earn and updates on affiliate applications.</p>
       {items.length === 0 ? (
         <div className="card">
-          <EmptyState icon={<Bell className="h-5 w-5" />} title="You're all caught up" body="Badge awards and application updates will show up here." />
+          <EmptyState icon={<Bell className="h-5 w-5" />} title="You're all caught up" body="New messages, badges and application updates will show up here." />
         </div>
       ) : (
         <ul className="card divide-y divide-line">
           {items.map((i) => (
             <li key={i.key}>
-              <Link href={i.href} className="flex items-center gap-3 px-4 py-3.5 text-sm hover:bg-canvas">
-                <span className="grid h-9 w-9 place-items-center rounded-full bg-canvas">{i.icon}</span>
-                {i.text}
+              <Link href={i.href} className="flex items-center gap-3 px-4 py-3.5 text-[15px] transition-colors hover:bg-canvas">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-canvas">{i.icon}</span>
+                <span className="flex-1">{i.text}</span>
               </Link>
             </li>
           ))}

@@ -1,6 +1,26 @@
 export type Role = "creator" | "business";
 
-export interface Session {
+/** Optional collaboration details a user can add from Edit Profile.
+ *  All fields are optional so older saved sessions keep working. */
+export interface ProfileDetails {
+  bio?: string;
+  category?: string;
+  country?: string;
+  city?: string;
+  /** whole rupees per post / deliverable */
+  priceFrom?: number;
+  priceTo?: number;
+  /** whole rupees per confirmed sale (affiliate) */
+  perSale?: number;
+  earningModels?: string[];
+  instagram?: string;
+  youtube?: string;
+  x?: string;
+  /** public contact email, only shown if the user chooses to add one */
+  email?: string;
+}
+
+export interface Session extends ProfileDetails {
   role: Role;
   displayName: string;
   handle: string;
@@ -60,8 +80,26 @@ export interface Post {
   tags: string[];
   /** background tone for text posts */
   tone?: "rose" | "mint" | "violet" | "amber" | "sky" | "lime";
+  /** optional photo, stored as a compressed data URL in the preview build */
+  image?: string;
   createdAt: string;
   sample?: boolean;
+}
+
+export interface Comment {
+  id: string;
+  postId: string;
+  authorHandle: string;
+  authorName: string;
+  body: string;
+  createdAt: string;
+}
+
+/** A conversation the user started themselves (e.g. "Message" from Search). */
+export interface Thread {
+  id: string;
+  with: string;
+  createdAt: string;
 }
 
 export interface Message {

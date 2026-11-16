@@ -17,12 +17,15 @@ export function useFeed(): FeedPost[] {
       tags: p.tags,
       createdAt: p.createdAt,
       tone: p.tone ?? "mint",
+      image: p.image,
+      authorKind: session?.role ?? "creator",
+      mine: true,
       likes: 0,
       comments: 0,
     }));
     const samples: FeedPost[] = SAMPLE_POSTS.map((p) => {
       const prof = profileByHandle(p.authorHandle)!;
-      return { ...p, authorName: prof.name, authorTone: prof.tone, verified: prof.verified };
+      return { ...p, authorName: prof.name, authorTone: prof.tone, verified: prof.verified, authorKind: prof.kind };
     });
     return [...mine, ...samples].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }, [posts, session]);

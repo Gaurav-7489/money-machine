@@ -17,15 +17,28 @@ export interface Profile {
   tone: Tone;
   verified?: boolean;
   bio: string;
+  /** Collaboration details used by Search. Fictional, like the rest of this file. */
+  category: string;
+  country: string;
+  city: string;
+  /** creators: what they charge per post; businesses: their usual budget per post (whole ₹) */
+  priceFrom: number;
+  priceTo: number;
+  /** ₹ per confirmed sale: what a creator asks / what a business pays */
+  perSale?: number;
+  earningModels: string[];
+  socials: { instagram?: string; youtube?: string; x?: string };
+  /** only set where the profile has chosen to share an email (reserved .example domain) */
+  email?: string;
 }
 
 export const SAMPLE_PROFILES: Profile[] = [
-  { handle: "aanya.creates", name: "Aanya Mehra", kind: "creator", niche: "Lifestyle · Beauty", tone: "rose", verified: true, bio: "Skincare, slow mornings and honest reviews." },
-  { handle: "rohitvlogs", name: "Rohit Vlogs", kind: "creator", niche: "Travel · Vlogs", tone: "sky", bio: "Weekend trips and budget travel." },
-  { handle: "kavya.fit", name: "Kavya Fit", kind: "creator", niche: "Fitness", tone: "lime", bio: "Home workouts that actually stick." },
-  { handle: "glowhabit", name: "Glow Habit", kind: "business", niche: "Beauty brand", tone: "rose", verified: true, bio: "Clean skincare for everyday glow." },
-  { handle: "fitlife", name: "FitLife", kind: "business", niche: "Fitness brand", tone: "mint", bio: "Supplements and gear for active living." },
-  { handle: "brandco", name: "BrandCo", kind: "business", niche: "Lifestyle brand", tone: "violet", bio: "Everyday lifestyle essentials." },
+  { handle: "aanya.creates", name: "Aanya Mehra", kind: "creator", niche: "Lifestyle · Beauty", tone: "rose", verified: true, bio: "Skincare, slow mornings and honest reviews.", category: "Beauty", country: "India", city: "Mumbai", priceFrom: 8000, priceTo: 25000, perSale: 150, earningModels: ["paid_post", "affiliate", "barter"], socials: { instagram: "aanya.creates", youtube: "aanyacreates" } },
+  { handle: "rohitvlogs", name: "Rohit Vlogs", kind: "creator", niche: "Travel · Vlogs", tone: "sky", bio: "Weekend trips and budget travel.", category: "Travel", country: "India", city: "Pune", priceFrom: 5000, priceTo: 15000, earningModels: ["paid_post", "long_term"], socials: { instagram: "rohitvlogs", youtube: "rohitvlogs" } },
+  { handle: "kavya.fit", name: "Kavya Fit", kind: "creator", niche: "Fitness", tone: "lime", bio: "Home workouts that actually stick.", category: "Fitness", country: "India", city: "Bengaluru", priceFrom: 3000, priceTo: 10000, perSale: 100, earningModels: ["affiliate", "ugc", "paid_post"], socials: { instagram: "kavya.fit", x: "kavyafit" } },
+  { handle: "glowhabit", name: "Glow Habit", kind: "business", niche: "Beauty brand", tone: "rose", verified: true, bio: "Clean skincare for everyday glow.", category: "Beauty", country: "India", city: "Mumbai", priceFrom: 5000, priceTo: 30000, perSale: 120, earningModels: ["affiliate", "barter", "paid_post"], socials: { instagram: "glowhabit" }, email: "collabs@glowhabit.example" },
+  { handle: "fitlife", name: "FitLife", kind: "business", niche: "Fitness brand", tone: "mint", bio: "Supplements and gear for active living.", category: "Fitness", country: "India", city: "Delhi", priceFrom: 2000, priceTo: 12000, perSale: 80, earningModels: ["affiliate", "ugc", "long_term"], socials: { instagram: "fitlife", youtube: "fitlifeofficial" }, email: "partners@fitlife.example" },
+  { handle: "brandco", name: "BrandCo", kind: "business", niche: "Lifestyle brand", tone: "violet", bio: "Everyday lifestyle essentials.", category: "Lifestyle", country: "United Arab Emirates", city: "Dubai", priceFrom: 10000, priceTo: 50000, perSale: 200, earningModels: ["paid_post", "long_term"], socials: { instagram: "brandco", x: "brandco" } },
 ];
 
 export function profileByHandle(handle: string): Profile | undefined {

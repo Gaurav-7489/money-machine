@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { BadgeCheck, Handshake, Link2, Megaphone, Package, PlusCircle, Trash2, Video, Wallet } from "lucide-react";
+import { useFeedback } from "@/components/feedback";
 import { Button, DeviceNote, EmptyState, Field, PageHeader, Sheet, Toast, inputCls } from "@/components/ui";
 import { formatDate, formatINR, uid } from "@/lib/format";
 import { useMoney } from "@/lib/hooks";
@@ -13,7 +14,7 @@ import type { FinancialRecord } from "@/lib/types";
 const INCOME_CATS = [
   ["brand_deal", "Brand deal"],
   ["affiliate", "Affiliate"],
-  ["ugc", "UGC"],
+  ["ugc", "Content for brands (UGC)"],
   ["campaign", "Campaign"],
   ["other", "Other"],
 ] as const;
@@ -53,6 +54,7 @@ function MoneyInner() {
   const params = useSearchParams();
   const [open, setOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const { confirm } = useFeedback();
   const cats = kind === "income" ? INCOME_CATS : SPEND_CATS;
   const empty = { title: "", amount: "", category: cats[0][0] as string, date: new Date().toISOString().slice(0, 10), counterparty: "" };
   const [form, setForm] = useState(empty);
@@ -83,8 +85,9 @@ function MoneyInner() {
     setToast(`${label} added`);
   }
 
-  function remove(id: string) {
-    if (!window.confirm("Delete this record?")) return;
+  async function remove(id: string) {
+    const ok = await confirm({ title: "Delete this record?", body: "It will be removed from your totals. This can't be undone.", confirmLabel: "Delete", danger: true });
+    if (!ok) return;
     update((s) => ({ ...s, records: s.records.filter((r) => r.id !== id) }));
     setToast("Record deleted");
   }
@@ -94,7 +97,7 @@ function MoneyInner() {
   return (
     <div className="mx-auto max-w-2xl">
       <PageHeader title="Money" back="/profile" />
-      <div className="mb-4 inline-flex rounded-full bg-white p-1 ring-1 ring-line">
+      <div className="mb-4 inline-flex rounded-full bg-surface p-1 ring-1 ring-line">
         <span className="rounded-full bg-brand-600 px-4 py-1.5 text-[13px] font-semibold text-white">
           {kind === "income" ? "Income (Creator)" : "Spending (Business)"}
         </span>

@@ -126,7 +126,7 @@ export function InstallBanner() {
           Install
         </button>
       )}
-      <button onClick={dismiss} className="grid h-8 w-8 place-items-center rounded-full hover:bg-white" aria-label="Dismiss">
+      <button onClick={dismiss} className="grid h-8 w-8 place-items-center rounded-full hover:bg-surface" aria-label="Dismiss">
         <X className="h-4 w-4" />
       </button>
     </div>

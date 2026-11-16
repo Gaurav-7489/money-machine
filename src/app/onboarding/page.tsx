@@ -33,7 +33,7 @@ export default function ChooseRole() {
   }
 
   return (
-    <main className="min-h-dvh bg-white md:grid md:place-items-center md:bg-canvas">
+    <main className="min-h-dvh bg-surface md:grid md:place-items-center md:bg-canvas">
       <form onSubmit={submit} className="animate-fade-up mx-auto w-full max-w-md px-5 py-6 md:card md:p-8" noValidate>
         <Link href="/" aria-label="Back" className="press -ml-2 mb-4 grid h-9 w-9 place-items-center rounded-full text-ink hover:bg-canvas">
           <ChevronLeft className="h-5 w-5" />

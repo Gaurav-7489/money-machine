@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
 import { ServiceWorkerRegister } from "@/components/sw-register";
+import { FeedbackProvider } from "@/components/feedback";
+import { THEME_INIT_SCRIPT } from "@/components/theme";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -45,10 +47,14 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-IN">
-
+    <html lang="en-IN" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body>
-        <StoreProvider>{children}</StoreProvider>
+        <StoreProvider>
+          <FeedbackProvider>{children}</FeedbackProvider>
+        </StoreProvider>
         <ServiceWorkerRegister />
       </body>
     </html>

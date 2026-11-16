@@ -28,7 +28,7 @@ export function Avatar({
 }) {
   return (
     <span
-      className={`inline-grid shrink-0 place-items-center bg-gradient-to-br font-semibold ${TONES[tone].bg} ${TONES[tone].fg} ${SIZES[size]} ${square ? "rounded-xl" : "rounded-full"} ${ring ? "ring-2 ring-white outline-2 outline-offset-1 outline-brand-400" : ""}`}
+      className={`inline-grid shrink-0 place-items-center bg-gradient-to-br font-semibold ${TONES[tone].bg} ${TONES[tone].fg} ${SIZES[size]} ${square ? "rounded-xl" : "rounded-full"} ${ring ? "ring-2 ring-surface outline-2 outline-offset-1 outline-brand-400" : ""}`}
       aria-hidden="true"
     >
       {initials(name)}

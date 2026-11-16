@@ -17,11 +17,11 @@ function Hero() {
       <div className="animate-[float_7s_ease-in-out_infinite_1s] absolute bottom-12 right-4 grid h-40 w-40 place-items-center rounded-[2.5rem] bg-gradient-to-br from-violet-200 to-sky-100 shadow-xl shadow-violet-900/10">
         <span className="text-4xl font-bold text-violet-500">Br</span>
       </div>
-      <div className="absolute left-1/2 top-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-2xl bg-white shadow-lg">
+      <div className="absolute left-1/2 top-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-2xl bg-surface shadow-lg">
         <Handshake className="h-8 w-8 text-brand-600" />
       </div>
-      <span className="animate-fade-up absolute right-10 top-10 rounded-full [animation-delay:500ms] bg-white px-3 py-1.5 text-xs font-semibold text-brand-700 shadow">Collab</span>
-      <span className="animate-fade-up absolute bottom-6 left-10 rounded-full [animation-delay:650ms] bg-white px-3 py-1.5 text-xs font-semibold text-violet-600 shadow">Affiliate</span>
+      <span className="animate-fade-up absolute right-10 top-10 rounded-full [animation-delay:500ms] bg-surface px-3 py-1.5 text-xs font-semibold text-brand-700 shadow">Collab</span>
+      <span className="animate-fade-up absolute bottom-6 left-10 rounded-full [animation-delay:650ms] bg-surface px-3 py-1.5 text-xs font-semibold text-violet-600 shadow">Affiliate</span>
     </div>
   );
 }
@@ -35,7 +35,7 @@ export function Welcome() {
   }, [ready, session, router]);
 
   return (
-    <main className="min-h-dvh bg-gradient-to-b from-white to-brand-50/60">
+    <main className="min-h-dvh bg-gradient-to-b from-surface to-brand-50/60">
       <div className="mx-auto grid min-h-dvh max-w-6xl items-center gap-10 px-6 py-10 lg:grid-cols-2 lg:gap-16">
         <div className="text-center lg:text-left">
           <div className="animate-scale-in"><LogoMark className="mx-auto h-14 w-14 lg:mx-0" /></div>

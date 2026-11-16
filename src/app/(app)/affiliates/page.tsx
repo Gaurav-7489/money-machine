@@ -228,7 +228,7 @@ function BusinessView() {
 
 function Tabs({ tabs, value, onChange }: { tabs: [string, string][]; value: string; onChange: (v: string) => void }) {
   return (
-    <div role="tablist" className="mb-4 inline-flex rounded-full bg-white p-1 ring-1 ring-line">
+    <div role="tablist" className="mb-4 inline-flex rounded-full bg-surface p-1 ring-1 ring-line">
       {tabs.map(([id, label]) => (
         <button
           key={id}

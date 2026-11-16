@@ -57,3 +57,41 @@ export function fieldErrors(error: z.ZodError): FieldErrors {
   }
   return out;
 }
+
+const optionalRupees = z
+  .union([z.literal(""), z.coerce.number({ message: "Use numbers only" }).int("Use whole rupees").min(0, "Can't be below 0").max(100_000_000, "That amount looks too large")])
+  .transform((v) => (v === "" ? undefined : v));
+
+const socialHandle = z
+  .string()
+  .trim()
+  .max(60)
+  .transform((v) => v.replace(/^https?:\/\/(www\.)?[^/]+\//i, "").replace(/^@/, "").replace(/\/+$/, ""))
+  .refine((v) => v === "" || /^[A-Za-z0-9_.-]{1,40}$/.test(v), "Use letters, numbers, dots or underscores")
+  .transform((v) => v || undefined);
+
+export const profileInput = z
+  .object({
+    displayName: z.string().trim().min(2, "Name must be 2–50 characters").max(50, "Name must be 2–50 characters"),
+    bio: z.string().trim().max(160, "Keep your bio under 160 characters").transform((v) => v || undefined),
+    category: z.string().transform((v) => v || undefined),
+    country: z.string().transform((v) => v || undefined),
+    city: z.string().transform((v) => v || undefined),
+    priceFrom: optionalRupees,
+    priceTo: optionalRupees,
+    perSale: optionalRupees,
+    earningModels: z.array(z.string()).max(10),
+    instagram: socialHandle,
+    youtube: socialHandle,
+    x: socialHandle,
+    email: z
+      .string()
+      .trim()
+      .max(320)
+      .refine((v) => v === "" || z.email().safeParse(v).success, "Enter a valid email, like name@example.com")
+      .transform((v) => v || undefined),
+  })
+  .refine((d) => d.priceFrom === undefined || d.priceTo === undefined || d.priceFrom <= d.priceTo, {
+    message: "“From” should be smaller than “To”",
+    path: ["priceTo"],
+  });

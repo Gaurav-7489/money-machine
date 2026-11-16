@@ -2,17 +2,25 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Plus, Sparkles } from "lucide-react";
+import { Plus, Sparkles, UsersRound } from "lucide-react";
 import { Avatar } from "@/components/art";
-import { PostCard } from "@/components/feed/post-card";
+import { Composer } from "@/components/feed/composer";
+import { PostCard, type FeedPost } from "@/components/feed/post-card";
 import { GrowthCard, ProgramsCard, TabletQuickCards } from "@/components/side-panels";
-import { EmptyState, SampleTag, StatusPill } from "@/components/ui";
+import { EmptyState, SampleTag, StatusPill, Tip } from "@/components/ui";
 import { useFeed } from "@/lib/feed";
 import { usePrograms } from "@/lib/hooks";
 import { SAMPLE_PROFILES, profileByHandle } from "@/lib/sample-data";
 import { useStore } from "@/lib/store";
 
-const TABS = ["For You", "Following", "Opportunities"] as const;
+const TABS = [
+  { id: "all", label: "All" },
+  { id: "creators", label: "Creators" },
+  { id: "businesses", label: "Businesses" },
+  { id: "friends", label: "Friends" },
+  { id: "opps", label: "Opportunities" },
+] as const;
+type TabId = (typeof TABS)[number]["id"];
 
 function Stories() {
   const { session } = useStore();
@@ -25,10 +33,10 @@ function Stories() {
             <Plus className="h-3 w-3" strokeWidth={3} />
           </span>
         </span>
-        <span className="text-[11px]">Your post</span>
+        <span className="text-[11px]">New post</span>
       </Link>
       {SAMPLE_PROFILES.map((p) => (
-        <Link key={p.handle} href={`/explore?q=${p.handle}`} className="flex w-16 shrink-0 flex-col items-center gap-1">
+        <Link key={p.handle} href={`/u/${p.handle}`} className="flex w-16 shrink-0 flex-col items-center gap-1">
           <span className="rounded-full bg-gradient-to-tr from-brand-500 via-aqua to-lime p-[2px]">
             <span className="block rounded-full bg-canvas p-[2px]">
               <Avatar name={p.name} tone={p.tone} size="lg" />
@@ -56,7 +64,7 @@ function Opportunities() {
                 {p.sample && <SampleTag />}
               </span>
               <span className="block truncate text-sm text-muted">{p.description}</span>
-              <span className="mt-1 block text-xs font-semibold text-brand-700">{p.commissionPercent}% commission</span>
+              <span className="mt-1 block text-xs font-semibold text-brand-700">Earn {p.commissionPercent}% of each sale</span>
             </span>
             <StatusPill status={p.status} />
           </Link>
@@ -66,61 +74,71 @@ function Opportunities() {
   );
 }
 
+function PostList({ posts, listKey }: { posts: FeedPost[]; listKey: string }) {
+  return (
+    <div key={listKey} className="stagger space-y-5">
+      {posts.map((p, i) => (
+        <div key={p.id} style={{ ["--i" as string]: Math.min(i, 6) }}>
+          <PostCard post={p} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Home() {
-  const [tab, setTab] = useState<(typeof TABS)[number]>("For You");
+  const [tab, setTab] = useState<TabId>("all");
   const feed = useFeed();
   const { following, session } = useStore();
-  const followingFeed = feed.filter((p) => following.includes(p.authorHandle) || p.authorHandle === session?.handle);
+  const byTab: Record<Exclude<TabId, "opps">, FeedPost[]> = {
+    all: feed,
+    creators: feed.filter((p) => p.authorKind === "creator"),
+    businesses: feed.filter((p) => p.authorKind === "business"),
+    friends: feed.filter((p) => following.includes(p.authorHandle) || p.authorHandle === session?.handle),
+  };
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[minmax(0,1fr)_240px] lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="mx-auto w-full max-w-xl">
+        <h1 className="sr-only">Feed</h1>
         <Stories />
-        <div role="tablist" className="mb-4 flex border-b border-line">
+        <Tip id="feed-intro" title="Welcome to your feed!">
+          Write something in the box below and press <strong>Publish</strong> to share it. Use the tabs to see posts from creators, businesses or your friends
+          (people you follow).
+        </Tip>
+        <Composer />
+        <div role="tablist" aria-label="Show posts from" className="no-scrollbar -mx-4 mb-4 flex overflow-x-auto border-b border-line px-4 md:mx-0 md:px-0">
           {TABS.map((t) => (
             <button
-              key={t}
+              key={t.id}
               role="tab"
-              aria-selected={tab === t}
-              onClick={() => setTab(t)}
-              className={`relative flex-1 pb-3 text-sm transition md:flex-none md:px-5 ${tab === t ? "font-semibold text-ink" : "text-muted hover:text-ink"}`}
+              aria-selected={tab === t.id}
+              onClick={() => setTab(t.id)}
+              className={`relative shrink-0 px-4 pb-3 pt-1 text-[15px] transition ${tab === t.id ? "font-semibold text-ink" : "text-muted hover:text-ink"}`}
             >
-              {t}
-              {tab === t && <span className="tab-indicator absolute inset-x-4 -bottom-px h-0.5 rounded-full bg-brand-600" />}
+              {t.label}
+              {tab === t.id && <span className="tab-indicator absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-brand-600" />}
             </button>
           ))}
         </div>
 
-        {tab === "For You" && (
-          <div key="foryou" className="stagger space-y-5">
-            {feed.map((p, i) => (
-              <div key={p.id} style={{ ["--i" as string]: Math.min(i, 6) }}>
-                <PostCard post={p} />
-              </div>
-            ))}
-          </div>
+        {tab === "opps" ? (
+          <Opportunities />
+        ) : byTab[tab].length ? (
+          <PostList posts={byTab[tab]} listKey={tab} />
+        ) : tab === "friends" ? (
+          <EmptyState
+            icon={<UsersRound className="h-5 w-5" />}
+            title="No posts from friends yet"
+            body="Follow creators and businesses in Search, and their posts will show up here."
+            action={<Link href="/explore" className="inline-flex h-11 items-center rounded-full bg-brand-50 px-5 text-sm font-semibold text-brand-700 hover:bg-brand-100">Find people to follow</Link>}
+          />
+        ) : (
+          <EmptyState icon={<Sparkles className="h-5 w-5" />} title="Nothing here yet" body="Be the first to post something!" />
         )}
-        {tab === "Following" &&
-          (followingFeed.length ? (
-            <div key="following" className="stagger space-y-5">
-              {followingFeed.map((p, i) => (
-                <div key={p.id} style={{ ["--i" as string]: Math.min(i, 6) }}>
-                  <PostCard post={p} />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              icon={<Sparkles className="h-5 w-5" />}
-              title="Your following feed is empty"
-              body="Follow creators and brands in Explore to see their posts here."
-              action={<Link href="/explore" className="text-sm font-semibold text-brand-700">Go to Explore</Link>}
-            />
-          ))}
-        {tab === "Opportunities" && <Opportunities />}
       </div>
 
-      <aside className="hidden md:block">
+      <aside className="hidden md:block" aria-label="Your summary">
         <div className="sticky top-24 space-y-4">
           <div className="lg:hidden">
             <TabletQuickCards />

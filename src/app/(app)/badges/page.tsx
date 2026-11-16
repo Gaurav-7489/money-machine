@@ -13,12 +13,12 @@ export default function Badges() {
     <div className="mx-auto max-w-2xl">
       <PageHeader title="Badges" back="/profile" />
       {featured && (
-        <section className="card animate-scale-in flex flex-col items-center bg-gradient-to-br from-cream via-white to-violet-50 p-6 text-center">
+        <section className="card animate-scale-in flex flex-col items-center bg-gradient-to-br from-cream via-surface to-violet-50 p-6 text-center">
           <BadgeMedal icon={featured.badge.icon} earned={featured.earned} size="lg" />
           <p className="mt-3 text-lg font-bold">{featured.badge.name}</p>
           <p className="text-sm text-muted">{featured.earned ? `Earned · ${featured.badge.description}` : `Next up · ${featured.badge.description}`}</p>
           {!featured.earned && (
-            <div className="mt-3 h-2 w-48 overflow-hidden rounded-full bg-white ring-1 ring-line">
+            <div className="mt-3 h-2 w-48 overflow-hidden rounded-full bg-surface ring-1 ring-line">
               <div className="h-full rounded-full bg-brand-500 transition-[width] duration-700" style={{ width: `${(featured.current / featured.target) * 100}%` }} />
             </div>
           )}
