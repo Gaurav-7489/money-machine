@@ -5,7 +5,7 @@ export const PRIMARY_NAV = [
   { href: "/home", label: "Feed", icon: Home },
   { href: "/explore", label: "Search", icon: Search },
   { href: "/create", label: "Create", icon: PlusSquare },
-  { href: "/inbox", label: "Messages", icon: MessageCircle },
+  { href: "/inbox", label: "Messages", short: "DMs", icon: MessageCircle },
   { href: "/profile", label: "Profile", icon: User },
 ] as const;
 

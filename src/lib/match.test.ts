@@ -64,3 +64,17 @@ describe("match scoring", () => {
     expect(activeFilterCount(f)).toBe(4);
   });
 });
+
+describe("what are you looking for", () => {
+  const fit: Matchable = { ...base, handle: "fit", name: "Fit One", category: "Fitness", niche: "Fitness", priceFrom: 50000, priceTo: 60000 };
+  const fitCheap: Matchable = { ...fit, handle: "fit2", name: "Fit Two", priceFrom: 1000, priceTo: 3000 };
+  it("lists category matches first, then by price fit", () => {
+    const r = findMatches([base, fit, fitCheap], { ...EMPTY_FILTERS, looking: "fitness", priceMin: 1000, priceMax: 5000 });
+    expect(r.map((x) => x.profile.handle)).toEqual(["fit2", "fit", "asha.cooks"]);
+  });
+  it("round-trips through the URL and counts as a filter", () => {
+    const f = { ...EMPTY_FILTERS, looking: "makeup" };
+    expect(filtersFromParams(new URLSearchParams(filtersToParams(f))).looking).toBe("makeup");
+    expect(activeFilterCount(f)).toBe(1);
+  });
+});

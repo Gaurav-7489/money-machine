@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { BookmarkPlus, ChevronDown, Mail, RotateCcw, Search, SearchX, SlidersHorizontal, X } from "lucide-react";
+import { BookmarkPlus, ChevronDown, Coffee, Dumbbell, Gamepad2, GraduationCap, Laptop, Mail, PiggyBank, Plane, RotateCcw, Search, SearchX, Shirt, SlidersHorizontal, Sparkles, UtensilsCrossed, X } from "lucide-react";
 import { Avatar } from "@/components/art";
 import { useFeedback } from "@/components/feedback";
 import { MatchCard, MatchCardSkeleton } from "@/components/search/match-card";
-import { Button, EmptyState, Field, InfoTip, SampleTag, Tip, inputCls, selectCls } from "@/components/ui";
+import { Button, EmptyState, InfoTip, SampleTag, Tip } from "@/components/ui";
 import { CATEGORIES, COUNTRIES, EARNING_MODELS, LOCATIONS } from "@/lib/catalog";
 import { usePrograms } from "@/lib/hooks";
 import { EMPTY_FILTERS, MIN_MATCH_OPTIONS, activeFilterCount, filtersFromParams, filtersToParams, findMatches, type MatchFilters } from "@/lib/match";
@@ -25,17 +25,36 @@ type TabId = (typeof TABS)[number]["id"];
 
 const numOrNull = (v: string) => (v.trim() === "" ? null : Math.max(0, Math.floor(Number(v.replace(/[^\d]/g, "")) || 0)));
 
-function FilterGroup({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+
+const darkInput =
+  "h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3.5 text-[15px] text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/20 aria-[invalid=true]:border-rose-400";
+const darkSelect = `${darkInput} appearance-auto [&>option]:bg-[#0b1417] [&>option]:text-white`;
+
+function DarkGroup({ title, hint, optional, children }: { title: string; hint?: string; optional?: boolean; children: React.ReactNode }) {
   return (
-    <fieldset className="space-y-3 border-t border-line pt-4 first:border-t-0 first:pt-0">
-      <legend className="mb-1 flex items-center gap-1 text-sm font-bold">
+    <fieldset className="space-y-2 border-t border-white/10 pt-4">
+      <legend className="mb-1 flex items-center gap-2 text-sm font-bold text-white">
         {title}
-        {hint && <InfoTip text={hint} />}
+        {optional && <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-300">Optional</span>}
       </legend>
+      {hint && <p className="text-[12px] leading-snug text-slate-400">{hint}</p>}
       {children}
     </fieldset>
   );
 }
+
+const DISCOVERY = [
+  { category: "Beauty", icon: Sparkles, tone: "from-rose-100 to-pink-50 text-rose-700" },
+  { category: "Fashion", icon: Shirt, tone: "from-violet-100 to-fuchsia-50 text-violet-700" },
+  { category: "Fitness", icon: Dumbbell, tone: "from-lime-100 to-emerald-50 text-emerald-700" },
+  { category: "Food", icon: UtensilsCrossed, tone: "from-amber-100 to-orange-50 text-amber-700" },
+  { category: "Travel", icon: Plane, tone: "from-sky-100 to-cyan-50 text-sky-700" },
+  { category: "Tech", icon: Laptop, tone: "from-slate-200 to-slate-50 text-slate-700" },
+  { category: "Lifestyle", icon: Coffee, tone: "from-teal-100 to-emerald-50 text-teal-700" },
+  { category: "Finance", icon: PiggyBank, tone: "from-yellow-100 to-amber-50 text-yellow-700" },
+  { category: "Gaming", icon: Gamepad2, tone: "from-indigo-100 to-violet-50 text-indigo-700" },
+  { category: "Education", icon: GraduationCap, tone: "from-cyan-100 to-sky-50 text-cyan-700" },
+] as const;
 
 function ExploreInner() {
   const params = useSearchParams();
@@ -210,6 +229,43 @@ function ExploreInner() {
         ))}
       </div>
 
+      {tab !== "opps" && (
+        <section aria-label="Browse niches" className="mt-5">
+          <h2 className="mb-2 text-sm font-bold">Discover by category</h2>
+          <ul className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:px-0 md:grid-cols-5 xl:grid-cols-6">
+            {DISCOVERY.map(({ category, icon: Icon, tone }) => {
+              const on = applied.category === category;
+              const count = SAMPLE_PROFILES.filter((p) => p.category === category && (applied.kind === "all" || p.kind === applied.kind)).length;
+              return (
+                <li key={category} className="shrink-0">
+                  <button
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => go({ ...applied, q, category: on ? "" : category })}
+                    className={`press lift flex h-full w-32 flex-col items-start gap-2 rounded-2xl bg-gradient-to-br p-3 text-left ring-1 transition sm:w-full ${tone} ${on ? "ring-2 ring-brand-500" : "ring-line hover:ring-brand-200"}`}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span className="text-sm font-bold text-ink">{category}</span>
+                    <span className="text-[11px] text-muted">{count} {count === 1 ? "profile" : "profiles"}</span>
+                  </button>
+                </li>
+              );
+            })}
+            <li className="shrink-0">
+              <button
+                type="button"
+                onClick={() => setTab("opps")}
+                className="press lift flex h-full w-32 flex-col items-start gap-2 rounded-2xl bg-gradient-to-br from-[#0b1417] to-[#12333a] p-3 text-left text-amber-300 ring-1 ring-line sm:w-full"
+              >
+                <Sparkles className="h-5 w-5" />
+                <span className="text-sm font-bold text-white">Opportunities</span>
+                <span className="text-[11px] text-slate-300">{programs.filter((p) => p.status === "active").length} open programs</span>
+              </button>
+            </li>
+          </ul>
+        </section>
+      )}
+
       <div className="mt-5 grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
         {/* ── Filters ─────────────────────────────────────────── */}
         {tab !== "opps" && (
@@ -227,110 +283,130 @@ function ExploreInner() {
               <ChevronDown className={`h-5 w-5 transition-transform ${panelOpen ? "rotate-180" : ""}`} />
             </button>
 
-            <form id="filter-panel" onSubmit={runSearch} noValidate className={`card space-y-4 p-5 ${panelOpen ? "animate-fade-in block" : "hidden"} lg:block`}>
-              <div className="flex items-center justify-between">
-                <h2 className="flex items-center gap-2 font-bold"><SlidersHorizontal className="h-4 w-4" /> Filters</h2>
-                <button type="button" onClick={clearAll} className="press inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[13px] font-semibold text-brand-700 hover:bg-brand-50">
+            <form
+              id="filter-panel"
+              onSubmit={runSearch}
+              noValidate
+              aria-label="Search engine"
+              className={`space-y-5 rounded-[var(--radius-card)] border border-white/10 bg-[#0b1417] p-5 text-slate-100 shadow-xl ${panelOpen ? "animate-fade-in block" : "hidden"} lg:block`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <p className="bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 bg-clip-text text-[11px] font-extrabold uppercase tracking-[0.18em] text-transparent">Money Machine</p>
+                  <h2 className="text-lg font-bold text-white">Search engine</h2>
+                </div>
+                <button type="button" onClick={clearAll} className="press inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[13px] font-semibold text-teal-300 hover:bg-white/10">
                   <RotateCcw className="h-3.5 w-3.5" /> Clear filters
                 </button>
               </div>
 
-              <FilterGroup title="Who are you looking for?">
-                <div role="radiogroup" aria-label="Profile type" className="grid grid-cols-3 gap-1.5 rounded-2xl bg-canvas p-1">
-                  {([["all", "Everyone"], ["creator", "Creators"], ["business", "Businesses"]] as const).map(([id, label]) => (
-                    <button
-                      key={id}
-                      type="button"
-                      role="radio"
-                      aria-checked={draft.kind === id}
-                      onClick={() => setDraft((d) => ({ ...d, kind: id }))}
-                      className={`press h-10 rounded-xl text-[13px] font-semibold ${draft.kind === id ? "bg-surface text-brand-700 shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                <Field label="Category" optional>
-                  <select className={selectCls} value={draft.category} onChange={(e) => setDraft((d) => ({ ...d, category: e.target.value }))}>
+              <div role="radiogroup" aria-label="Profile type" className="grid grid-cols-2 gap-1 rounded-full border border-white/10 bg-white/5 p-1">
+                {([["creator", "Creator"], ["business", "Business"]] as const).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="radio"
+                    aria-checked={draft.kind === id}
+                    onClick={() => setDraft((d) => ({ ...d, kind: d.kind === id ? "all" : id }))}
+                    className={`press h-10 rounded-full text-sm font-semibold transition ${draft.kind === id ? "bg-gradient-to-r from-teal-400 to-cyan-500 text-slate-950 shadow" : "text-slate-300 hover:text-white"}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <p className="-mt-3 text-[12px] text-slate-400">
+                {draft.kind === "all" ? "Showing creators and businesses. Pick one to narrow it down." : `Searching ${draft.kind === "creator" ? "creators" : "businesses"} only. Tap again to search both.`}
+              </p>
+
+              <DarkGroup title="What are you looking for?" hint="Creators matching the product category are matched first, followed by price range.">
+                <label className="block">
+                  <span className="sr-only">What are you looking for?</span>
+                  <input className={darkInput} placeholder="Makeup, fitness, home decor" value={draft.looking} onChange={(e) => setDraft((d) => ({ ...d, looking: e.target.value }))} />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-[12px] text-slate-400">Category <span className="text-slate-500">(optional)</span></span>
+                  <select aria-label="Category" className={darkSelect} value={draft.category} onChange={(e) => setDraft((d) => ({ ...d, category: e.target.value }))}>
                     <option value="">Any category</option>
                     {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
                   </select>
-                </Field>
-              </FilterGroup>
+                </label>
+              </DarkGroup>
 
-              <FilterGroup title="Where?" hint="Pick a country first to see its cities. A profile in the same country but another city counts as a close match.">
-                <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
-                  <Field label="Country" optional>
-                    <select className={selectCls} value={draft.country} onChange={(e) => setDraft((d) => ({ ...d, country: e.target.value, city: "" }))}>
+              <DarkGroup title="Country / City" optional hint="Location affects the match score. Same country but another city counts as a close match.">
+                <div className="grid grid-cols-2 gap-2">
+                  <label className="block">
+                    <span className="sr-only">Country</span>
+                    <select aria-label="Country" className={darkSelect} value={draft.country} onChange={(e) => setDraft((d) => ({ ...d, country: e.target.value, city: "" }))}>
                       <option value="">Any country</option>
                       {COUNTRIES.map((c) => <option key={c}>{c}</option>)}
                     </select>
-                  </Field>
-                  <Field label="City" optional>
-                    <select className={selectCls} value={draft.city} onChange={(e) => setDraft((d) => ({ ...d, city: e.target.value }))}>
+                  </label>
+                  <label className="block">
+                    <span className="sr-only">City</span>
+                    <select aria-label="City" className={darkSelect} value={draft.city} onChange={(e) => setDraft((d) => ({ ...d, city: e.target.value }))}>
                       <option value="">Any city</option>
                       {cities.map((c) => <option key={c}>{c}</option>)}
                     </select>
-                  </Field>
+                  </label>
                 </div>
-              </FilterGroup>
+              </DarkGroup>
 
-              <FilterGroup title="Money" hint="Prices are in Indian rupees (₹). For creators this is what they charge; for businesses it is what they usually pay.">
-                <div>
-                  <p className="mb-1.5 flex items-center gap-2 text-[13px] font-medium">Price per post <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span></p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <label>
-                      <span className="sr-only">Lowest price per post in rupees</span>
-                      <input inputMode="numeric" className={inputCls} placeholder="From ₹ e.g. 2000" value={priceMin} onChange={(e) => setPriceMin(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!priceErr} />
-                    </label>
-                    <label>
-                      <span className="sr-only">Highest price per post in rupees</span>
-                      <input inputMode="numeric" className={inputCls} placeholder="To ₹ e.g. 20000" value={priceMax} onChange={(e) => setPriceMax(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!priceErr} />
-                    </label>
-                  </div>
-                  {priceErr && <p className="mt-1 text-[12px] text-rose-600" role="alert">{priceErr}</p>}
+              <DarkGroup title="Means of earning" optional>
+                <select
+                  aria-label="Means of earning"
+                  className={darkSelect}
+                  value={draft.earningModels.length === 1 ? draft.earningModels[0] : draft.earningModels.length > 1 ? "__multi" : ""}
+                  onChange={(e) => setDraft((d) => ({ ...d, earningModels: e.target.value ? [e.target.value] : [] }))}
+                >
+                  <option value="">Any</option>
+                  {draft.earningModels.length > 1 && <option value="__multi" disabled>{draft.earningModels.length} selected</option>}
+                  {EARNING_MODELS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
+                </select>
+              </DarkGroup>
+
+              <DarkGroup title="Price range (₹)" optional hint="Per post. For creators this is what they charge; for businesses what they usually pay.">
+                <div className="grid grid-cols-2 gap-2">
+                  <label>
+                    <span className="sr-only">Lowest price per post in rupees</span>
+                    <input inputMode="numeric" className={darkInput} placeholder="Min" value={priceMin} onChange={(e) => setPriceMin(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!priceErr} />
+                  </label>
+                  <label>
+                    <span className="sr-only">Highest price per post in rupees</span>
+                    <input inputMode="numeric" className={darkInput} placeholder="Max" value={priceMax} onChange={(e) => setPriceMax(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!priceErr} />
+                  </label>
                 </div>
-                <Field label="Price per sale — up to ₹" optional hint="For affiliate deals: the money paid for each sale.">
-                  <input inputMode="numeric" className={inputCls} placeholder="e.g. 150" value={perSale} onChange={(e) => setPerSale(e.target.value.replace(/[^\d]/g, ""))} />
-                </Field>
-                <div>
-                  <p className="mb-1.5 flex items-center gap-2 text-[13px] font-medium">How they earn <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span></p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {EARNING_MODELS.map((m) => {
-                      const on = draft.earningModels.includes(m.id);
-                      return (
-                        <button
-                          key={m.id}
-                          type="button"
-                          aria-pressed={on}
-                          title={m.hint}
-                          onClick={() => setDraft((d) => ({ ...d, earningModels: on ? d.earningModels.filter((x) => x !== m.id) : [...d.earningModels, m.id] }))}
-                          className={`press h-9 rounded-full px-3 text-[13px] font-medium ${on ? "bg-brand-600 text-white" : "border border-line bg-surface hover:bg-canvas"}`}
-                        >
-                          {m.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </FilterGroup>
+                {priceErr && <p className="text-[12px] text-rose-400" role="alert">{priceErr}</p>}
+                <label className="block">
+                  <span className="mb-1 block text-[12px] text-slate-400">Price per sale — up to ₹ <span className="text-slate-500">(optional, affiliate deals)</span></span>
+                  <input inputMode="numeric" className={darkInput} placeholder="e.g. 150" value={perSale} onChange={(e) => setPerSale(e.target.value.replace(/[^\d]/g, ""))} />
+                </label>
+              </DarkGroup>
 
-              <FilterGroup title="Know who you want?" hint="These narrow results to exact people. Leave them empty to see everyone.">
-                <Field label="Creator or business name" optional>
-                  <input className={inputCls} placeholder="e.g. Aanya" value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} />
-                </Field>
-                <Field label="Social media handle" optional hint="Instagram, YouTube or X. With or without @.">
-                  <input className={inputCls} placeholder="e.g. @glowhabit" autoCapitalize="none" value={draft.social} onChange={(e) => setDraft((d) => ({ ...d, social: e.target.value }))} />
-                </Field>
-              </FilterGroup>
+              <DarkGroup title="Search by name" optional>
+                <label className="block">
+                  <span className="sr-only">Creator or business name</span>
+                  <input className={darkInput} placeholder="Creator or business name" value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} />
+                </label>
+              </DarkGroup>
 
-              <Button type="submit" size="lg" className="w-full" disabled={loading}>
+              <DarkGroup title="Search by handle" optional hint="Instagram, YouTube or X. With or without @.">
+                <label className="block">
+                  <span className="sr-only">Social media handle</span>
+                  <input className={darkInput} placeholder="@handle" autoCapitalize="none" value={draft.social} onChange={(e) => setDraft((d) => ({ ...d, social: e.target.value }))} />
+                </label>
+              </DarkGroup>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="press flex h-12 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-teal-400 to-cyan-500 text-[15px] font-bold text-slate-950 shadow-lg shadow-cyan-500/20 hover:brightness-110 disabled:opacity-70"
+              >
                 {loading ? (
-                  <><span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" /> Searching…</>
+                  <><span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900/30 border-t-slate-900" /> Searching…</>
                 ) : (
                   <><Search className="h-5 w-5" /> Search matches</>
                 )}
-              </Button>
+              </button>
             </form>
           </section>
         )}

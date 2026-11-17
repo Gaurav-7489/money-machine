@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ChevronRight, Link2, Star, Wallet } from "lucide-react";
+import { ArrowRight, Briefcase, ChevronRight, Link2, Star, UserRound, Wallet } from "lucide-react";
+import { useFeedback } from "./feedback";
 import { Avatar } from "./art";
 import { Sparkline } from "./sparkline";
 import { SampleTag, StatusPill } from "./ui";
@@ -116,6 +117,35 @@ export function TabletQuickCards() {
           {session?.role === "business" ? "Invite creators to an affiliate program and grow your brand." : "Show brands what you create and get discovered."}
         </p>
       </Link>
+    </div>
+  );
+}
+
+/** Creator / Business mode switch. Changes only the session role (which views and
+ *  defaults you see). Posts, money records and programs are kept as they are. */
+export function ModeSwitch({ className = "" }: { className?: string }) {
+  const { session, update } = useStore();
+  const { toast } = useFeedback();
+  if (!session) return null;
+  const set = (role: "creator" | "business") => {
+    if (session.role === role) return;
+    update((s) => (s.session ? { ...s, session: { ...s.session, role } } : s));
+    toast(`Switched to ${role === "business" ? "Business" : "Creator"} mode`, "success");
+  };
+  return (
+    <div role="radiogroup" aria-label="Account mode" className={`grid grid-cols-2 gap-1 rounded-full border border-line bg-surface p-1 ${className}`}>
+      {([["creator", "Creator", UserRound], ["business", "Business", Briefcase]] as const).map(([id, label, Icon]) => (
+        <button
+          key={id}
+          type="button"
+          role="radio"
+          aria-checked={session.role === id}
+          onClick={() => set(id)}
+          className={`press inline-flex h-9 items-center justify-center gap-1.5 rounded-full text-[13px] font-semibold transition ${session.role === id ? "bg-brand-600 text-white shadow-sm" : "text-muted hover:text-ink"}`}
+        >
+          <Icon className="h-4 w-4" /> {label}
+        </button>
+      ))}
     </div>
   );
 }

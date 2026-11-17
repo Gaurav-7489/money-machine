@@ -6,7 +6,7 @@ import { Plus, Sparkles, UsersRound } from "lucide-react";
 import { Avatar } from "@/components/art";
 import { Composer } from "@/components/feed/composer";
 import { PostCard, type FeedPost } from "@/components/feed/post-card";
-import { GrowthCard, ProgramsCard, TabletQuickCards } from "@/components/side-panels";
+import { GrowthCard, ModeSwitch, ProgramsCard, TabletQuickCards } from "@/components/side-panels";
 import { EmptyState, SampleTag, StatusPill, Tip } from "@/components/ui";
 import { useFeed } from "@/lib/feed";
 import { usePrograms } from "@/lib/hooks";
@@ -106,6 +106,10 @@ export default function Home() {
           Write something in the box below and press <strong>Publish</strong> to share it. Use the tabs to see posts from creators, businesses or your friends
           (people you follow).
         </Tip>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <span className="text-[13px] font-medium text-muted">Account mode</span>
+          <ModeSwitch className="w-60" />
+        </div>
         <Composer />
         <div role="tablist" aria-label="Show posts from" className="no-scrollbar -mx-4 mb-4 flex overflow-x-auto border-b border-line px-4 md:mx-0 md:px-0">
           {TABS.map((t) => (

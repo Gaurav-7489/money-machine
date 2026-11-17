@@ -207,7 +207,9 @@ function BottomNav() {
   return (
     <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 backdrop-blur pb-safe md:hidden">
       <ul className="mx-auto grid max-w-md grid-cols-5 px-1">
-        {PRIMARY_NAV.map(({ href, label, icon: Icon }) => {
+        {PRIMARY_NAV.map((item) => {
+          const { href, label, icon: Icon } = item;
+          const shortLabel = "short" in item ? item.short : label;
           const active =
             isActive(pathname, href) ||
             (href === "/profile" && ["/money", "/badges", "/affiliates", "/friends", "/saved"].some((p) => isActive(pathname, p))) ||
@@ -222,7 +224,8 @@ function BottomNav() {
                 <span className={`grid h-8 w-12 place-items-center rounded-full transition-colors ${active ? "bg-brand-50" : ""}`}>
                   <Icon className="h-[22px] w-[22px]" strokeWidth={active ? 2.5 : 1.9} />
                 </span>
-                {label}
+                <span aria-hidden="true">{shortLabel}</span>
+                <span className="sr-only">{label}</span>
                 {href === "/inbox" && unreadCount > 0 && (
                   <span className="absolute right-[calc(50%-22px)] top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-brand-600 px-1 text-[10px] font-bold text-white">{unreadCount}</span>
                 )}

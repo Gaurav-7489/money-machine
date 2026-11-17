@@ -15,6 +15,9 @@ import { LOCATIONS, cleanHandle } from "./catalog";
 export interface MatchFilters {
   /** quick search text: name, handle, niche, bio */
   q: string;
+  /** "What are you looking for?": a product category or niche. Scored, not a
+   *  hard filter, and profiles that fit it are listed first, then by price. */
+  looking: string;
   kind: "all" | "creator" | "business";
   category: string;
   country: string;
@@ -31,6 +34,7 @@ export interface MatchFilters {
 
 export const EMPTY_FILTERS: MatchFilters = {
   q: "",
+  looking: "",
   kind: "all",
   category: "",
   country: "",
@@ -91,6 +95,15 @@ export function passesHardFilters(p: Matchable, f: MatchFilters): boolean {
 export function scoreProfile(p: Matchable, f: MatchFilters): { percent: number | null; checks: MatchCheck[] } {
   const checks: MatchCheck[] = [];
 
+  const looking = norm(f.looking).replace(/^#/, "");
+  if (looking) {
+    const words = looking.split(/[\s,]+/).filter(Boolean);
+    const hay = [p.category, p.niche, p.bio].join(" ").toLowerCase();
+    const exact = [p.category, p.niche].some((s) => s.toLowerCase().includes(looking));
+    const some = words.some((w) => hay.includes(w));
+    checks.push({ label: `Looking for: ${f.looking.trim()}`, score: exact ? 1 : some ? 0.5 : 0 });
+  }
+
   if (f.category) checks.push({ label: `Category: ${f.category}`, score: p.category === f.category ? 1 : 0 });
 
   if (f.city) {
@@ -131,7 +144,17 @@ export function findMatches<T extends Matchable>(profiles: T[], f: MatchFilters,
     .filter((p) => passesHardFilters(p, f))
     .map((p) => ({ profile: p, ...scoreProfile(p, f) }))
     .filter((r) => r.percent === null || r.percent >= minPercent)
-    .sort((a, b) => (b.percent ?? 0) - (a.percent ?? 0) || a.profile.name.localeCompare(b.profile.name));
+    .sort(
+      (a, b) =>
+        // With "What are you looking for?" set, category fit wins, then price fit, then overall %.
+        (f.looking.trim() ? checkScore(b, "Looking for") - checkScore(a, "Looking for") || checkScore(b, "Price per post") - checkScore(a, "Price per post") : 0) ||
+        (b.percent ?? 0) - (a.percent ?? 0) ||
+        a.profile.name.localeCompare(b.profile.name),
+    );
+}
+
+function checkScore(r: { checks: MatchCheck[] }, prefix: string): number {
+  return r.checks.find((c) => c.label.startsWith(prefix))?.score ?? 0;
 }
 
 /** Plain-language label for a match percentage. */
@@ -153,6 +176,7 @@ export const MIN_MATCH_OPTIONS = [
 /** Count of filters (besides quick search and type) that are currently set. */
 export function activeFilterCount(f: MatchFilters): number {
   return [
+    f.looking,
     f.category,
     f.country,
     f.city,
@@ -171,6 +195,7 @@ export function filtersFromParams(p: URLSearchParams): MatchFilters {
   const kind = p.get("type");
   return {
     q: p.get("q") ?? "",
+    looking: p.get("looking") ?? "",
     kind: kind === "creator" || kind === "business" ? kind : "all",
     category: p.get("category") ?? "",
     country: p.get("country") ?? "",
@@ -187,6 +212,7 @@ export function filtersFromParams(p: URLSearchParams): MatchFilters {
 export function filtersToParams(f: MatchFilters, extra: Record<string, string> = {}): string {
   const p = new URLSearchParams();
   if (f.q) p.set("q", f.q);
+  if (f.looking) p.set("looking", f.looking);
   if (f.kind !== "all") p.set("type", f.kind);
   if (f.category) p.set("category", f.category);
   if (f.country) p.set("country", f.country);
