@@ -77,7 +77,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
             {socials.length > 0 && (
               <ul className="mt-2 flex flex-wrap justify-center gap-2 sm:justify-start" aria-label="Social media">
                 {socials.map(([k, v]) => (
-                  <li key={k} className="inline-flex items-center gap-1 rounded-full bg-canvas px-2.5 py-1 text-xs ring-1 ring-line">
+                  <li key={k} className="inline-flex items-center gap-1 rounded-full bg-elevated px-2.5 py-1 text-xs ring-1 ring-line">
                     <AtSign className="h-3 w-3" /> {SOCIAL_NAMES[k] ?? k}: <span className="font-semibold">{v}</span>
                   </li>
                 ))}
@@ -145,11 +145,11 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
           Working together <InfoTip text="What this profile usually charges or pays. Prices are in Indian rupees (₹) and are shared by the profile, not checked by Money Machine." />
         </h3>
         <dl className="grid grid-cols-2 gap-3 text-sm">
-          <div className="rounded-2xl bg-canvas p-3">
+          <div className="rounded-2xl bg-elevated p-3">
             <dt className="text-xs text-muted">{isCreator ? "Charges per video" : "Pays per video"}</dt>
             <dd className="mt-0.5 font-bold">{priceText(p)}</dd>
           </div>
-          <div className="rounded-2xl bg-canvas p-3">
+          <div className="rounded-2xl bg-elevated p-3">
             <dt className="text-xs text-muted">{isCreator ? "Asks commission" : "Pays commission"}</dt>
             <dd className="mt-0.5 font-bold">{p.commissionPercent !== undefined ? `${p.commissionPercent}%` : "—"}{p.perSale !== undefined ? ` · ${formatINR(p.perSale)}/sale` : ""}</dd>
           </div>
@@ -157,7 +157,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
         <p className="mt-3 text-xs text-muted">Open to:</p>
         <p className="mt-1 flex flex-wrap gap-1.5">
           {p.earningModels.map((m) => (
-            <span key={m} className="rounded-full bg-canvas px-2.5 py-1 text-xs font-medium ring-1 ring-line">{earningLabel(m)}</span>
+            <span key={m} className="rounded-full bg-elevated px-2.5 py-1 text-xs font-medium ring-1 ring-line">{earningLabel(m)}</span>
           ))}
         </p>
       </section>

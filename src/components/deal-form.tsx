@@ -83,11 +83,11 @@ export function DealFields({ draft, onChange, errors, noteLabel = "Note / messag
           {draft.deliverables.map((d, i) => (
             <li key={i} className="flex items-center gap-2">
               <div className="flex items-center rounded-full border border-line">
-                <button type="button" onClick={() => set("deliverables", draft.deliverables.map((x, j) => (j === i ? { ...x, count: Math.max(0, x.count - 1) } : x)))} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-canvas" aria-label={`Fewer ${d.type}`}>
+                <button type="button" onClick={() => set("deliverables", draft.deliverables.map((x, j) => (j === i ? { ...x, count: Math.max(0, x.count - 1) } : x)))} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-elevated" aria-label={`Fewer ${d.type}`}>
                   <Minus className="h-4 w-4" />
                 </button>
                 <span className="w-6 text-center font-bold tabular-nums" aria-live="polite">{d.count}</span>
-                <button type="button" onClick={() => set("deliverables", draft.deliverables.map((x, j) => (j === i ? { ...x, count: Math.min(30, x.count + 1) } : x)))} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-canvas" aria-label={`More ${d.type}`}>
+                <button type="button" onClick={() => set("deliverables", draft.deliverables.map((x, j) => (j === i ? { ...x, count: Math.min(30, x.count + 1) } : x)))} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-elevated" aria-label={`More ${d.type}`}>
                   <Plus className="h-4 w-4" />
                 </button>
               </div>
@@ -121,7 +121,7 @@ export function DealFields({ draft, onChange, errors, noteLabel = "Note / messag
 export function DealSummary({ deal, compact = false }: { deal: DealOffer; compact?: boolean }) {
   return (
     <div className={`overflow-hidden rounded-2xl ring-1 ring-brand-200 ${compact ? "" : "bg-surface"}`}>
-      <div className="bg-aurora flex items-center justify-between px-3.5 py-2 text-white">
+      <div className="bg-aurora flex items-center justify-between px-3.5 py-2 text-on-accent">
         <span className="text-[13px] font-bold">{earningLabel(deal.type)}</span>
         <span className="text-[12px] font-semibold opacity-90">Deal offer</span>
       </div>

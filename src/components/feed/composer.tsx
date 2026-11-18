@@ -153,7 +153,7 @@ export function Composer({ autoFocus = false, onDone }: { autoFocus?: boolean; o
             </div>
           )}
           {emojiOpen && (
-            <div className="animate-fade-in mt-2 flex flex-wrap gap-1 rounded-2xl bg-canvas p-2" aria-label="Emoji">
+            <div className="animate-fade-in mt-2 flex flex-wrap gap-1 rounded-2xl bg-elevated p-2" aria-label="Emoji">
               {QUICK_EMOJI.map((em) => (
                 <button key={em} type="button" onClick={() => addEmoji(em)} className="press grid h-9 w-9 place-items-center rounded-xl text-xl hover:bg-surface" aria-label={`Add ${em}`}>
                   {em}

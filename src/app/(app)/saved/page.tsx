@@ -1,5 +1,6 @@
 "use client";
 
+import { TabIndicator } from "@/components/motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -34,8 +35,9 @@ export default function Saved() {
             role="tab"
             aria-selected={tab === id}
             onClick={() => setTab(id)}
-            className={`press h-10 rounded-xl text-sm font-semibold ${tab === id ? "bg-ink text-surface" : "text-muted hover:text-ink"}`}
+            className={`press relative isolate h-10 rounded-xl text-sm font-semibold ${tab === id ? "text-surface" : "text-muted hover:text-ink"}`}
           >
+            {tab === id && <TabIndicator group="saved" variant="pill" />}
             {label}
           </button>
         ))}
@@ -55,7 +57,7 @@ export default function Saved() {
                   <SampleTag />
                 </Link>
                 <div className="mt-3 grid grid-cols-2 gap-2">
-                  <button onClick={() => router.push(`/inbox/${startThread(p.handle)}`)} className="press btn-glow inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-aurora text-[13px] font-semibold text-white">
+                  <button onClick={() => router.push(`/inbox/${startThread(p.handle)}`)} className="press btn-glow inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-aurora text-[13px] font-semibold text-on-accent">
                     <MessageCircle className="h-4 w-4" /> DM
                   </button>
                   <button
@@ -63,7 +65,7 @@ export default function Saved() {
                       update((s) => ({ ...s, savedProfiles: s.savedProfiles.filter((h) => h !== p.handle), starredProfiles: s.starredProfiles.filter((h) => h !== p.handle) }));
                       toast(`${p.name} unstarred`, "info");
                     }}
-                    className="press inline-flex h-10 items-center justify-center gap-1.5 rounded-full border border-line bg-surface text-[13px] font-semibold hover:bg-canvas"
+                    className="press inline-flex h-10 items-center justify-center gap-1.5 rounded-full border border-line bg-surface text-[13px] font-semibold hover:bg-elevated"
                   >
                     <BookmarkX className="h-4 w-4" /> Unstar
                   </button>

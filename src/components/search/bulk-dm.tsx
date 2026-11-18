@@ -62,7 +62,7 @@ export function BulkDm({ open, onClose, recipients, onSent }: { open: boolean; o
         </div>
       ) : (
         <>
-          <div className="mb-4 flex items-center gap-3 rounded-2xl bg-canvas p-3">
+          <div className="mb-4 flex items-center gap-3 rounded-2xl bg-elevated p-3">
             <div className="flex -space-x-2">
               {recipients.slice(0, 4).map((p) => (
                 <span key={p.handle} className="rounded-full ring-2 ring-surface"><Avatar name={p.name} tone={p.tone} size="sm" square={p.kind === "business"} /></span>

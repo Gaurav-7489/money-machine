@@ -171,15 +171,15 @@ test("public profile: DM, add friend, star", async ({ page }) => {
   await expect(page.getByText("Your friends (1)")).toBeVisible();
 });
 
-test("theme switch: black and white, remembered", async ({ page }) => {
+test("theme switch: white and dark, remembered, no flash", async ({ page }) => {
   await onboard(page);
-  const sw = page.getByRole("switch", { name: "Black theme" });
+  const sw = page.getByRole("switch", { name: "Dark theme" });
   if (await sw.isVisible()) await sw.click();
-  else await page.getByRole("button", { name: "Switch to black theme" }).first().click();
+  else await page.getByRole("button", { name: "Switch to dark theme" }).first().click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(0, 0, 0)");
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(13, 11, 18)");
 });
 
 test("no horizontal overflow or console errors on main pages", async ({ page }) => {
@@ -194,4 +194,23 @@ test("no horizontal overflow or console errors on main pages", async ({ page }) 
     expect(overflow, `horizontal overflow on ${path}`).toBeLessThanOrEqual(0);
   }
   expect(errors).toEqual([]);
+});
+
+test("landing: editorial hero, theme toggle and CTA", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Cash out.");
+  await expect(page.getByRole("link", { name: /get started/i }).first()).toBeVisible();
+  const before = await page.locator("html").getAttribute("data-theme");
+  await page.getByRole("button", { name: /switch to (dark|white) theme/i }).first().click();
+  await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "");
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test("first visit follows the device colour scheme", async ({ browser }) => {
+  const ctx = await browser.newContext({ colorScheme: "dark" });
+  const page = await ctx.newPage();
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await ctx.close();
 });

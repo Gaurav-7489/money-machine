@@ -19,7 +19,7 @@ export default function Badges() {
           <p className="text-sm text-muted">{featured.earned ? `Earned · ${featured.badge.description}` : `Next up · ${featured.badge.description}`}</p>
           {!featured.earned && (
             <div className="mt-3 h-2 w-48 overflow-hidden rounded-full bg-surface ring-1 ring-line">
-              <div className="h-full rounded-full bg-brand-500 transition-[width] duration-700" style={{ width: `${(featured.current / featured.target) * 100}%` }} />
+              <div className="h-full rounded-full bg-aurora transition-[width] duration-700" style={{ width: `${(featured.current / featured.target) * 100}%` }} />
             </div>
           )}
         </section>

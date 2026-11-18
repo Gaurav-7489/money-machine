@@ -1,5 +1,6 @@
 "use client";
 
+import { TabIndicator } from "@/components/motion";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { BadgeCheck, CreditCard, Handshake, Link2, Megaphone, Package, PlusCircle, Rocket, ShoppingCart, Sparkles, Trash2, TrendingDown, TrendingUp, Video, Wallet } from "lucide-react";
@@ -114,7 +115,7 @@ function RecordList({ kind }: { kind: Kind }) {
         const Icon = CAT_ICON[r.category] ?? Wallet;
         return (
           <li key={r.id} className="flex items-center gap-3 px-4 py-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-canvas text-ink"><Icon className="h-4 w-4" /></span>
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-elevated text-ink"><Icon className="h-4 w-4" /></span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-semibold">{r.title}</span>
               <span className="block text-xs text-muted">{formatDate(r.date)}{r.counterparty ? ` · ${r.counterparty}` : ""} · {r.source === "verified" ? "Verified" : "Self-reported"}</span>
@@ -138,7 +139,7 @@ function StripeCard({ purpose }: { purpose: "payouts" | "revenue" }) {
           <span className="block font-bold">Connect Stripe</span>
           <span className="block text-[13px] text-muted">{purpose === "payouts" ? "Show real, verified earnings from your payouts." : "Import real revenue and payments to measure scaling."}</span>
         </span>
-        <span className="rounded-full bg-canvas px-2.5 py-1 text-[11px] font-bold text-muted ring-1 ring-line">Soon</span>
+        <span className="rounded-full bg-elevated px-2.5 py-1 text-[11px] font-bold text-muted ring-1 ring-line">Soon</span>
       </button>
       <Sheet open={open} onClose={() => setOpen(false)} title="Connect Stripe">
         <div className="space-y-3 text-[15px]">
@@ -163,25 +164,25 @@ function CreatorEarnings() {
   return (
     <div className="mx-auto max-w-2xl">
       <PageHeader title="Earnings" back="/profile" />
-      <section className="bg-money relative overflow-hidden rounded-[var(--radius-card)] p-5 text-white shadow-lg">
+      <section className="bg-money relative overflow-hidden rounded-[var(--radius-card)] p-5 text-on-accent shadow-lg">
         <span className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/15 blur-2xl" />
         <div className="relative flex items-end justify-between gap-4">
           <div>
-            <p className="text-sm text-white/85">Total earned</p>
+            <p className="text-sm text-on-accent/75">Total earned</p>
             <p className="mt-1 text-4xl font-extrabold tracking-tight">{formatINR(summary.total)}</p>
             <p className="mt-1.5 text-xs">
               {summary.changePercent !== null ? (
                 <span className="rounded-full bg-white/20 px-2 py-0.5 font-bold">{summary.changePercent >= 0 ? "▲" : "▼"} {Math.abs(summary.changePercent)}% vs last month</span>
               ) : (
-                <span className="text-white/85">This month: {formatINR(summary.thisMonth)}</span>
+                <span className="text-on-accent/75">This month: {formatINR(summary.thisMonth)}</span>
               )}
             </p>
           </div>
           <Bars values={summary.monthly.map((m) => m.total)} tone="bg-white" />
         </div>
         <div className="relative mt-4 grid grid-cols-2 gap-3 border-t border-white/25 pt-3 text-sm">
-          <div><p className="flex items-center gap-1 text-xs text-white/85"><BadgeCheck className="h-3.5 w-3.5" /> Verified</p><p className="font-bold">{formatINR(summary.verifiedTotal)}</p></div>
-          <div><p className="text-xs text-white/85">Self-reported</p><p className="font-bold">{formatINR(summary.selfReportedTotal)}</p></div>
+          <div><p className="flex items-center gap-1 text-xs text-on-accent/75"><BadgeCheck className="h-3.5 w-3.5" /> Verified</p><p className="font-bold">{formatINR(summary.verifiedTotal)}</p></div>
+          <div><p className="text-xs text-on-accent/75">Self-reported</p><p className="font-bold">{formatINR(summary.selfReportedTotal)}</p></div>
         </div>
       </section>
 
@@ -192,7 +193,7 @@ function CreatorEarnings() {
             {bySource.map((s) => (
               <li key={s.id}>
                 <div className="mb-1 flex justify-between text-[13px]"><span className="font-medium">{s.label}</span><span className="font-bold tabular-nums">{formatINR(s.total)}</span></div>
-                <div className="h-2 overflow-hidden rounded-full bg-canvas"><div className="bg-aurora h-full rounded-full" style={{ width: `${Math.max(4, (s.total / summary.total) * 100)}%` }} /></div>
+                <div className="h-2 overflow-hidden rounded-full bg-elevated"><div className="bg-aurora h-full rounded-full" style={{ width: `${Math.max(4, (s.total / summary.total) * 100)}%` }} /></div>
               </li>
             ))}
           </ul>
@@ -223,28 +224,29 @@ function BusinessGrowth() {
   return (
     <div className="mx-auto max-w-2xl">
       <PageHeader title="Grow & Scale" back="/profile" />
-      <section className="bg-aurora relative overflow-hidden rounded-[var(--radius-card)] p-5 text-white shadow-lg">
+      <section className="bg-aurora relative overflow-hidden rounded-[var(--radius-card)] p-5 text-on-accent shadow-lg">
         <span className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/15 blur-2xl" />
         <div className="relative flex items-end justify-between gap-4">
           <div>
-            <p className="flex items-center gap-1.5 text-sm text-white/85"><Rocket className="h-4 w-4" /> Profit</p>
+            <p className="flex items-center gap-1.5 text-sm text-on-accent/75"><Rocket className="h-4 w-4" /> Profit</p>
             <p className="mt-1 text-4xl font-extrabold tracking-tight">{up ? "" : "−"}{formatINR(Math.abs(g.profit))}</p>
             <p className="mt-1.5 text-xs">
-              {g.roi !== null ? <span className="rounded-full bg-white/20 px-2 py-0.5 font-bold">{g.roi >= 0 ? "▲" : "▼"} {Math.abs(g.roi)}% return on investment</span> : <span className="text-white/85">Add investments and revenue to see your return.</span>}
+              {g.roi !== null ? <span className="rounded-full bg-white/20 px-2 py-0.5 font-bold">{g.roi >= 0 ? "▲" : "▼"} {Math.abs(g.roi)}% return on investment</span> : <span className="text-on-accent/75">Add investments and revenue to see your return.</span>}
             </p>
           </div>
           <Bars values={g.monthlyProfit.map((m) => m.total)} tone="bg-white" />
         </div>
         <div className="relative mt-4 grid grid-cols-2 gap-3 border-t border-white/25 pt-3 text-sm">
-          <div><p className="flex items-center gap-1 text-xs text-white/85"><TrendingDown className="h-3.5 w-3.5" /> Invested</p><p className="font-bold">{formatINR(g.spending.total)}</p></div>
-          <div><p className="flex items-center gap-1 text-xs text-white/85"><TrendingUp className="h-3.5 w-3.5" /> Revenue</p><p className="font-bold">{formatINR(g.revenue.total)}</p></div>
+          <div><p className="flex items-center gap-1 text-xs text-on-accent/75"><TrendingDown className="h-3.5 w-3.5" /> Invested</p><p className="font-bold">{formatINR(g.spending.total)}</p></div>
+          <div><p className="flex items-center gap-1 text-xs text-on-accent/75"><TrendingUp className="h-3.5 w-3.5" /> Revenue</p><p className="font-bold">{formatINR(g.revenue.total)}</p></div>
         </div>
       </section>
       <p className="mt-2 flex items-center justify-center gap-1 text-center text-[12px] text-muted">Your profit shows on your profile. Spending stays private. <InfoTip text="Profit = revenue minus what you invested in creators, commissions and campaigns." /></p>
 
       <div role="tablist" aria-label="Show" className="mt-4 grid grid-cols-2 gap-1 rounded-2xl bg-surface p-1 ring-1 ring-line">
         {([["spending", "Invest", TrendingDown], ["revenue", "Scaling", TrendingUp]] as const).map(([id, label, Icon]) => (
-          <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`press flex h-11 items-center justify-center gap-1.5 rounded-xl text-sm font-bold ${tab === id ? "bg-ink text-surface" : "text-muted"}`}>
+          <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`press relative isolate flex h-11 items-center justify-center gap-1.5 rounded-xl text-sm font-bold ${tab === id ? "text-surface" : "text-muted"}`}>
+            {tab === id && <TabIndicator group="money" variant="pill" />}
             <Icon className="h-4 w-4" /> {label}
           </button>
         ))}

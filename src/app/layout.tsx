@@ -1,10 +1,16 @@
 import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Inter } from "next/font/google";
 import "./globals.css";
+import { Ambient } from "@/components/ambient";
+import { MotionProvider } from "@/components/motion";
 import { StoreProvider } from "@/lib/store";
 import { ServiceWorkerRegister } from "@/components/sw-register";
 import { FeedbackProvider } from "@/components/feedback";
 import { THEME_INIT_SCRIPT } from "@/components/theme";
 import { SITE } from "@/lib/site";
+
+const body = Inter({ subsets: ["latin"], variable: "--font-body", display: "swap" });
+const head = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-head", display: "swap", weight: ["500", "700", "800"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -40,8 +46,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+    { media: "(prefers-color-scheme: light)", color: "#FAFAFD" },
+    { media: "(prefers-color-scheme: dark)", color: "#0D0B12" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -50,13 +56,16 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-IN" suppressHydrationWarning>
+    <html lang="en-IN" suppressHydrationWarning className={`${body.variable} ${head.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body>
+        <Ambient />
         <StoreProvider>
-          <FeedbackProvider>{children}</FeedbackProvider>
+          <MotionProvider>
+            <FeedbackProvider>{children}</FeedbackProvider>
+          </MotionProvider>
         </StoreProvider>
         <ServiceWorkerRegister />
       </body>

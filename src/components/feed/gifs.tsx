@@ -46,7 +46,7 @@ export function GifView({ id, size = "md" }: { id: string; size?: "sm" | "md" | 
 function UploadedGif({ id, size }: { id: string; size: "sm" | "md" | "lg" }) {
   const { url, missing } = useMediaUrl(id);
   const cls = size === "sm" ? "max-h-24" : size === "lg" ? "max-h-[420px] w-full" : "max-h-48";
-  if (missing) return <p className="rounded-xl bg-canvas px-3 py-2 text-xs text-muted">GIF saved on another device</p>;
+  if (missing) return <p className="rounded-xl bg-elevated px-3 py-2 text-xs text-muted">GIF saved on another device</p>;
   if (!url) return <div className={`skeleton h-24 w-36`} />;
   // eslint-disable-next-line @next/next/no-img-element
   return <img src={url} alt="GIF" className={`rounded-2xl object-contain ${cls}`} />;

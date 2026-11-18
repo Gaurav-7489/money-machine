@@ -71,7 +71,7 @@ export function InstallGuide() {
   return (
     <div className="space-y-3 text-sm">
       {canPrompt && (
-        <button onClick={install} className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-brand-600 font-semibold text-white hover:bg-brand-700">
+        <button onClick={install} className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-aurora font-semibold text-on-accent hover:bg-brand-700">
           <Download className="h-4 w-4" /> Add to Home Screen
         </button>
       )}
@@ -122,7 +122,7 @@ export function InstallBanner() {
         <p className="text-muted">{platform === "ios" ? "Tap Share, then “Add to Home Screen”." : "Use it like an app — full screen, one tap away."}</p>
       </div>
       {canPrompt && (
-        <button onClick={install} className="h-8 rounded-full bg-brand-600 px-3 text-xs font-semibold text-white">
+        <button onClick={install} className="h-8 rounded-full bg-aurora px-3 text-xs font-semibold text-on-accent">
           Install
         </button>
       )}

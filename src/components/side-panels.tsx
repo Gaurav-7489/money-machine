@@ -114,7 +114,7 @@ export function TabletQuickCards() {
       >
         <div className="flex items-start justify-between">
           <p className="font-semibold">{session?.role === "business" ? "Create a Program" : "Share a Post"}</p>
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-500 text-white">
+          <span className="grid h-8 w-8 place-items-center rounded-full bg-aurora text-on-accent">
             <ArrowRight className="h-4 w-4" />
           </span>
         </div>

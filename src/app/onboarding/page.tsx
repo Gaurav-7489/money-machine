@@ -21,7 +21,7 @@ function Chips({ options, value, onChange }: { options: readonly { id: string; l
       {options.map((o) => {
         const on = value.includes(o.id);
         return (
-          <button key={o.id} type="button" aria-pressed={on} title={o.hint} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`press inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold transition-colors ${on ? "bg-aurora text-white shadow-sm" : "border border-line bg-surface hover:border-brand-300"}`}>
+          <button key={o.id} type="button" aria-pressed={on} title={o.hint} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`press inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold transition-colors ${on ? "bg-aurora text-on-accent shadow-sm" : "border border-line bg-surface hover:border-brand-300"}`}>
             {on && <Check className="h-4 w-4" strokeWidth={3} />} {o.label}
           </button>
         );
@@ -90,13 +90,13 @@ export default function Onboarding() {
   }
 
   return (
-    <main className="min-h-dvh bg-surface md:grid md:place-items-center md:bg-canvas">
+    <main className="min-h-dvh bg-surface md:grid md:place-items-center md:bg-elevated">
       <form onSubmit={next} className="mx-auto w-full max-w-md px-5 pb-28 pt-6 md:card md:p-8 md:pb-8" noValidate>
         <div className="mb-5 flex items-center gap-3">
           {step === 0 ? (
-            <Link href="/" aria-label="Back" className="press -ml-2 grid h-9 w-9 place-items-center rounded-full text-ink hover:bg-canvas"><ChevronLeft className="h-5 w-5" /></Link>
+            <Link href="/" aria-label="Back" className="press -ml-2 grid h-9 w-9 place-items-center rounded-full text-ink hover:bg-elevated"><ChevronLeft className="h-5 w-5" /></Link>
           ) : (
-            <button type="button" onClick={() => { setErrors({}); setStep((s) => s - 1); }} aria-label="Back" className="press -ml-2 grid h-9 w-9 place-items-center rounded-full text-ink hover:bg-canvas"><ChevronLeft className="h-5 w-5" /></button>
+            <button type="button" onClick={() => { setErrors({}); setStep((s) => s - 1); }} aria-label="Back" className="press -ml-2 grid h-9 w-9 place-items-center rounded-full text-ink hover:bg-elevated"><ChevronLeft className="h-5 w-5" /></button>
           )}
           <div className="flex flex-1 gap-1.5" aria-label={`Step ${step + 1} of ${STEPS}`}>
             {Array.from({ length: STEPS }, (_, i) => <span key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i <= step ? "bg-aurora" : "bg-line"}`} />)}
@@ -113,9 +113,9 @@ export default function Onboarding() {
                 {ROLES.map(({ id, title, body, icon: Icon }) => {
                   const selected = role === id;
                   return (
-                    <label key={id} className={`press relative flex cursor-pointer flex-col items-center gap-2 rounded-3xl border p-4 text-center transition ${selected ? "border-transparent ring-aurora bg-aurora-soft" : "border-line hover:bg-canvas"}`}>
+                    <label key={id} className={`press relative flex cursor-pointer flex-col items-center gap-2 rounded-3xl border p-4 text-center transition ${selected ? "border-transparent ring-aurora bg-aurora-soft" : "border-line hover:bg-elevated"}`}>
                       <input type="radio" name="role" value={id} checked={selected} onChange={() => setRole(id)} className="sr-only" />
-                      <span className={`grid h-12 w-12 place-items-center rounded-2xl ${selected ? "bg-aurora text-white" : "bg-canvas text-brand-600"}`}><Icon className="h-6 w-6" /></span>
+                      <span className={`grid h-12 w-12 place-items-center rounded-2xl ${selected ? "bg-aurora text-on-accent" : "bg-elevated text-brand-600"}`}><Icon className="h-6 w-6" /></span>
                       <span className="font-bold">{title}</span>
                       <span className="text-[12px] leading-snug text-muted">{body}</span>
                     </label>
