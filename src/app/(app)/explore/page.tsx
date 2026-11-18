@@ -1,5 +1,6 @@
 "use client";
 
+import { TabIndicator } from "@/components/motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { CheckSquare, RotateCcw, Search, SearchX, Send, SlidersHorizontal, Sparkles, Square, Star, Undo2, X } from "lucide-react";
@@ -19,7 +20,7 @@ const numOrNull = (v: string) => (v.trim() === "" ? null : Number(digits(v)) || 
 
 function Chip({ on, onClick, children, title }: { on: boolean; onClick: () => void; children: React.ReactNode; title?: string }) {
   return (
-    <button type="button" aria-pressed={on} title={title} onClick={onClick} className={`press h-9 shrink-0 rounded-full px-3.5 text-[13px] font-semibold transition-colors ${on ? "bg-aurora text-white shadow-sm" : "border border-line bg-surface text-ink hover:border-brand-300"}`}>
+    <button type="button" aria-pressed={on} title={title} onClick={onClick} className={`press h-9 shrink-0 rounded-full px-3.5 text-[13px] font-semibold transition-colors ${on ? "bg-aurora text-on-accent shadow-sm" : "border border-line bg-surface text-ink hover:border-brand-300"}`}>
       {children}
     </button>
   );
@@ -30,7 +31,7 @@ function Group({ title, hint, optional, children }: { title: string; hint?: stri
     <fieldset className="space-y-2.5 border-t border-line pt-4 first:border-t-0 first:pt-0">
       <legend className="mb-2 flex items-center gap-1.5 text-[14px] font-bold">
         {title}
-        {optional && <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span>}
+        {optional && <span className="rounded-full bg-elevated px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span>}
         {hint && <InfoTip text={hint} />}
       </legend>
       {children}
@@ -219,11 +220,11 @@ function ExploreInner() {
           className="h-[52px] w-full rounded-full border border-line bg-surface pl-12 pr-24 text-[15px] shadow-sm outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
         />
         {q && (
-          <button type="button" onClick={() => { setQ(""); go({ ...applied, q: "" }, {}, custom); }} className="absolute right-[58px] top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-muted hover:bg-canvas" aria-label="Clear search text">
+          <button type="button" onClick={() => { setQ(""); go({ ...applied, q: "" }, {}, custom); }} className="absolute right-[58px] top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-muted hover:bg-elevated" aria-label="Clear search text">
             <X className="h-4 w-4" />
           </button>
         )}
-        <button type="button" onClick={() => setSheet(true)} className="press absolute right-1.5 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-aurora text-white lg:hidden" aria-label={`Filters${count ? `, ${count} on` : ""}`}>
+        <button type="button" onClick={() => setSheet(true)} className="press absolute right-1.5 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-aurora text-on-accent lg:hidden" aria-label={`Filters${count ? `, ${count} on` : ""}`}>
           <SlidersHorizontal className="h-[18px] w-[18px]" />
           {count > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-ink px-1 text-[10px] font-bold text-surface">{count}</span>}
         </button>
@@ -233,7 +234,7 @@ function ExploreInner() {
         <button
           onClick={() => router.replace(`/explore${kind !== defaultKind ? `?type=${kind}` : ""}`, { scroll: false })}
           aria-pressed={!custom}
-          className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold ${!custom ? "bg-aurora text-white" : "border border-line bg-surface"}`}
+          className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold ${!custom ? "bg-aurora text-on-accent" : "border border-line bg-surface"}`}
         >
           <Sparkles className="h-4 w-4" /> Matched to you
         </button>
@@ -259,7 +260,7 @@ function ExploreInner() {
         </p>
       )}
 
-      <div className="mt-5 grid gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
+      <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
         <aside className="hidden lg:block" aria-label="Filters">
           <div className="card sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto p-5">
             <h2 className="mb-4 flex items-center gap-2 font-bold"><SlidersHorizontal className="h-4 w-4 text-brand-600" /> Custom search</h2>
@@ -280,8 +281,9 @@ function ExploreInner() {
                   aria-checked={on}
                   disabled={disabled}
                   onClick={() => setLevel(v)}
-                  className={`press flex h-12 shrink-0 flex-col items-center justify-center rounded-2xl px-4 leading-tight disabled:opacity-40 ${on ? "bg-ink text-surface" : "border border-line bg-surface"}`}
+                  className={`press relative isolate flex h-12 shrink-0 flex-col items-center justify-center rounded-2xl px-4 leading-tight disabled:opacity-40 ${on ? "text-surface" : "border border-line bg-surface"}`}
                 >
+                  {on && <TabIndicator group="match" variant="pill" />}
                   <span className="text-[13px] font-bold">{v === 0 ? "All" : `${v}%+`}</span>
                   <span className={`text-[11px] ${on ? "opacity-80" : "text-muted"}`}>{n} {n === 1 ? "match" : "matches"}</span>
                 </button>
@@ -299,9 +301,9 @@ function ExploreInner() {
           </div>
 
           {loading ? (
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{[0, 1, 2].map((i) => <MatchCardSkeleton key={i} />)}</div>
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 xl:grid-cols-3">{[0, 1, 2].map((i) => <MatchCardSkeleton key={i} />)}</div>
           ) : results.length ? (
-            <ul key={params.toString()} className="stagger grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <ul key={params.toString()} className="stagger grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {results.map((r, i) => (
                 <li key={r.profile.handle} style={{ ["--i" as string]: Math.min(i, 6) }}>
                   <MatchCard
@@ -352,7 +354,7 @@ function ExploreInner() {
           <button onClick={() => setSelected([])} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-white/10" aria-label="Clear selection" title="Clear selection">
             <X className="h-5 w-5" />
           </button>
-          <button onClick={() => setBulkOpen(true)} className="press btn-glow inline-flex h-10 items-center gap-1.5 rounded-full bg-aurora px-4 text-sm font-bold text-white">
+          <button onClick={() => setBulkOpen(true)} className="press btn-glow inline-flex h-10 items-center gap-1.5 rounded-full bg-aurora px-4 text-sm font-bold text-on-accent">
             <Send className="h-4 w-4" /> Bulk DM{bulkDaysLeft > 0 ? ` · ${bulkDaysLeft}d` : ""}
           </button>
         </div>

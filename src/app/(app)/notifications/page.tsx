@@ -39,8 +39,8 @@ export default function Notifications() {
         <ul className="card divide-y divide-line">
           {items.map((i) => (
             <li key={i.key}>
-              <Link href={i.href} className="flex items-center gap-3 px-4 py-3.5 text-[15px] transition-colors hover:bg-canvas">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-canvas">{i.icon}</span>
+              <Link href={i.href} className="flex items-center gap-3 px-4 py-3.5 text-[15px] transition-colors hover:bg-elevated">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-elevated">{i.icon}</span>
                 <span className="flex-1">{i.text}</span>
               </Link>
             </li>

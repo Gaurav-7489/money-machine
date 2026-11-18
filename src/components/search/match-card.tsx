@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Check, MapPin, MessageCircle, Minus, Quote, Star, Trash2, X } from "lucide-react";
 import { Avatar, VerifiedMark } from "@/components/art";
 import { SampleTag } from "@/components/ui";
@@ -25,6 +26,12 @@ export function priceText(p: Pick<Profile, "priceFrom" | "priceTo">) {
 
 /** Circular match meter. */
 export function MatchRing({ percent, size = 56 }: { percent: number; size?: number }) {
+  // draw the ring in after mount so the progress animates
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    const t = requestAnimationFrame(() => setShown(percent));
+    return () => cancelAnimationFrame(t);
+  }, [percent]);
   const r = 22;
   const c = 2 * Math.PI * r;
   const id = `mr-${percent}`;
@@ -33,13 +40,13 @@ export function MatchRing({ percent, size = 56 }: { percent: number; size?: numb
       <svg viewBox="0 0 52 52" className="absolute inset-0 -rotate-90">
         <defs>
           <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor={percent >= 50 ? "#7C3AED" : "#94a3b8"} />
-            <stop offset="0.55" stopColor={percent >= 50 ? "#D946EF" : "#94a3b8"} />
-            <stop offset="1" stopColor={percent >= 50 ? "#F59E0B" : "#cbd5e1"} />
+            <stop offset="0" style={{ stopColor: percent >= 50 ? "var(--color-brand-500)" : "var(--color-muted)" }} />
+            <stop offset="0.55" style={{ stopColor: percent >= 50 ? "var(--color-accent-2)" : "var(--color-muted)" }} />
+            <stop offset="1" style={{ stopColor: percent >= 50 ? "var(--color-accent-1)" : "var(--color-line)" }} />
           </linearGradient>
         </defs>
         <circle cx="26" cy="26" r={r} fill="none" stroke="var(--color-line)" strokeWidth="5" />
-        <circle cx="26" cy="26" r={r} fill="none" stroke={`url(#${id})`} strokeWidth="5" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - Math.max(percent, 2) / 100)} className="transition-[stroke-dashoffset] duration-700" />
+        <circle cx="26" cy="26" r={r} fill="none" stroke={`url(#${id})`} strokeWidth="5" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - Math.max(shown, 2) / 100)} className="transition-[stroke-dashoffset] duration-700" />
       </svg>
       <span className="relative text-[13px] font-extrabold tabular-nums">{percent}%</span>
     </span>
@@ -54,7 +61,7 @@ export function MatchCard({ result, selected, onSelect, starred, onStar, onRemov
       <div className="flex items-start gap-3">
         <label className="press -m-1 mt-0.5 flex cursor-pointer items-center rounded-lg p-1">
           <input type="checkbox" checked={selected} onChange={onSelect} className="peer sr-only" />
-          <span className={`grid h-6 w-6 place-items-center rounded-lg border-2 transition-colors peer-focus-visible:ring-4 peer-focus-visible:ring-brand-100 ${selected ? "border-transparent bg-aurora text-white" : "border-line bg-surface"}`} aria-hidden="true">
+          <span className={`grid h-6 w-6 place-items-center rounded-lg border-2 transition-colors peer-focus-visible:ring-4 peer-focus-visible:ring-brand-100 ${selected ? "border-transparent bg-aurora text-on-accent" : "border-line bg-surface"}`} aria-hidden="true">
             {selected && <Check className="animate-pop h-4 w-4" strokeWidth={3} />}
           </span>
           <span className="sr-only">Select {p.name}</span>
@@ -85,17 +92,17 @@ export function MatchCard({ result, selected, onSelect, starred, onStar, onRemov
           <span key={n} className="bg-aurora-soft rounded-full px-2 py-0.5 text-[11px] font-semibold text-brand-700">{n}</span>
         ))}
         {p.earningModels.slice(0, 3).map((m) => (
-          <span key={m} className="rounded-full bg-canvas px-2 py-0.5 text-[11px] font-medium text-muted ring-1 ring-line">{earningShort(m)}</span>
+          <span key={m} className="rounded-full bg-elevated px-2 py-0.5 text-[11px] font-medium text-muted ring-1 ring-line">{earningShort(m)}</span>
         ))}
         {p.earningModels.length > 3 && <span className="px-1 text-[11px] text-muted">+{p.earningModels.length - 3}</span>}
       </p>
 
       <dl className="mt-3 grid grid-cols-2 gap-2 text-[12px]">
-        <div className="rounded-xl bg-canvas px-2.5 py-2">
+        <div className="rounded-xl bg-elevated px-2.5 py-2">
           <dt className="text-muted">{isCreator ? "Charges per video" : "Pays per video"}</dt>
           <dd className="font-semibold">{priceText(p)}</dd>
         </div>
-        <div className="rounded-xl bg-canvas px-2.5 py-2">
+        <div className="rounded-xl bg-elevated px-2.5 py-2">
           <dt className="text-muted">{isCreator ? "Asks commission" : "Pays commission"}</dt>
           <dd className="font-semibold">{p.commissionPercent !== undefined ? `${p.commissionPercent}%` : "—"}{p.perSale !== undefined ? ` · ${formatINR(p.perSale)}/sale` : ""}</dd>
         </div>
@@ -117,7 +124,7 @@ export function MatchCard({ result, selected, onSelect, starred, onStar, onRemov
       )}
 
       <div className="mt-3 flex gap-2">
-        <button onClick={onMessage} className="press btn-glow inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-aurora text-[13px] font-semibold text-white">
+        <button onClick={onMessage} className="press btn-glow inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-aurora text-[13px] font-semibold text-on-accent">
           <MessageCircle className="h-4 w-4" /> DM
         </button>
         <button

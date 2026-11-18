@@ -63,7 +63,7 @@ function RichText({ text }: { text: string }) {
 function Photos({ list, alt }: { list: string[]; alt: string }) {
   if (list.length === 1)
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={list[0]} alt={alt} className="max-h-[520px] w-full rounded-2xl bg-canvas object-cover ring-1 ring-line" />;
+    return <img src={list[0]} alt={alt} className="max-h-[520px] w-full rounded-2xl bg-elevated object-cover ring-1 ring-line" />;
   return (
     <div className="grid grid-cols-2 gap-1 overflow-hidden rounded-2xl ring-1 ring-line">
       {list.map((src, i) => (
@@ -81,7 +81,7 @@ function Stat({ onClick, pressed, label, count, icon, activeCls = "", title }: {
       onClick={onClick}
       aria-pressed={pressed}
       title={title ?? label}
-      className={`press flex h-10 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium transition-colors hover:bg-canvas ${pressed ? activeCls : "text-muted hover:text-ink"}`}
+      className={`press flex h-10 items-center gap-1 rounded-full px-2 text-[13px] max-[360px]:px-1 sm:gap-1.5 sm:px-2.5 font-medium transition-colors hover:bg-elevated ${pressed ? activeCls : "text-muted hover:text-ink"}`}
     >
       {icon}
       <span className="sr-only">{label}</span>
@@ -94,7 +94,7 @@ function Stat({ onClick, pressed, label, count, icon, activeCls = "", title }: {
 export function QuotedPost({ post }: { post: FeedPost | undefined }) {
   if (!post) return <p className="mt-2 rounded-2xl border border-line px-3 py-2 text-sm text-muted">This post isn&apos;t available.</p>;
   return (
-    <Link href={`/home#${post.id}`} className="mt-2 block rounded-2xl border border-line p-3 hover:bg-canvas">
+    <Link href={`/home#${post.id}`} className="mt-2 block rounded-2xl border border-line p-3 hover:bg-elevated">
       <p className="flex items-center gap-1.5 text-[13px]">
         <Avatar name={post.authorName} tone={post.authorTone} size="xs" square={post.authorKind === "business"} />
         <span className="font-semibold">{post.authorName}</span>
@@ -254,34 +254,34 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
           {post.quoteOf && <QuotedPost post={quoted} />}
 
           {myReaction && (
-            <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-canvas px-2 py-0.5 text-[12px] ring-1 ring-line">
+            <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-elevated px-2 py-0.5 text-[12px] ring-1 ring-line">
               <span>{myReaction}</span> <span className="text-muted">You reacted</span>
             </p>
           )}
 
-          <div className="relative -ml-2.5 mt-1 flex items-center">
+          <div className="relative mt-1 flex items-center -ml-2.5 max-sm:-ml-[54px] max-sm:w-[calc(100%+54px)] max-sm:justify-between">
             <Stat
               onClick={() => toggle("liked", post.id)}
               pressed={isLiked}
               label={isLiked ? "Liked" : "Like"}
               count={likeCount}
-              activeCls="text-rose-600"
-              icon={<Heart className={`h-[19px] w-[19px] ${isLiked ? "animate-pop fill-rose-500 text-rose-500" : ""}`} />}
+              activeCls="text-accent-2"
+              icon={<span key={String(isLiked)} className={isLiked ? "burst" : ""}><Heart className={`h-[19px] w-[19px] ${isLiked ? "animate-pop fill-accent-2 text-accent-2" : ""}`} /></span>}
             />
             <Stat onClick={() => setShowComments((v) => !v)} pressed={showComments} label="Comment" count={commentCount} activeCls="text-brand-600" icon={<MessageCircle className="h-[19px] w-[19px]" />} />
             <div className="relative">
               <Stat onClick={() => (post.mine ? setQuoting(true) : setRepostMenu((v) => !v))} pressed={isReposted} label={isReposted ? "Reposted" : "Repost"} count={repostCount} activeCls="text-emerald-600" icon={<Repeat2 className={`h-[19px] w-[19px] ${isReposted ? "animate-pop" : ""}`} />} />
               {repostMenu && (
                 <div className="animate-scale-in absolute bottom-full left-0 z-20 mb-1 w-44 overflow-hidden rounded-2xl bg-surface shadow-xl ring-1 ring-line" role="menu">
-                  <button role="menuitem" onClick={repost} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm font-medium hover:bg-canvas"><Repeat2 className="h-4 w-4" /> {isReposted ? "Undo repost" : "Repost"}</button>
-                  <button role="menuitem" onClick={() => { setRepostMenu(false); setQuoting(true); }} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm font-medium hover:bg-canvas"><Quote className="h-4 w-4" /> Quote</button>
+                  <button role="menuitem" onClick={repost} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm font-medium hover:bg-elevated"><Repeat2 className="h-4 w-4" /> {isReposted ? "Undo repost" : "Repost"}</button>
+                  <button role="menuitem" onClick={() => { setRepostMenu(false); setQuoting(true); }} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm font-medium hover:bg-elevated"><Quote className="h-4 w-4" /> Quote</button>
                 </div>
               )}
             </div>
-            <div className="relative">
+            <div>
               <Stat onClick={() => setReactOpen((v) => !v)} pressed={!!myReaction} label="React with an emoji" activeCls="text-amber-600" icon={myReaction ? <span className="text-[17px] leading-none">{myReaction}</span> : <SmilePlus className="h-[19px] w-[19px]" />} />
               {reactOpen && (
-                <div className="animate-scale-in absolute bottom-full left-1/2 z-20 mb-1 flex -translate-x-1/2 gap-0.5 rounded-full bg-surface p-1 shadow-xl ring-1 ring-line" role="menu" aria-label="Reactions">
+                <div className="animate-scale-in absolute bottom-full left-0 right-0 z-20 mx-auto mb-1 flex w-fit max-w-full flex-wrap justify-center gap-0.5 rounded-full bg-surface p-1 shadow-xl ring-1 ring-line" role="menu" aria-label="Reactions">
                   {REACTIONS.map((e) => (
                     <button key={e} role="menuitem" onClick={() => react(e)} className={`press grid h-9 w-9 place-items-center rounded-full text-xl transition-transform hover:scale-125 ${myReaction === e ? "bg-brand-50" : ""}`} aria-label={`React ${e}`}>
                       {e}
@@ -291,7 +291,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
               )}
             </div>
             <Stat onClick={share} label="Share" icon={<Send className="h-[18px] w-[18px]" />} />
-            <span className="flex-1" />
+            <span className="flex-1 max-sm:hidden" />
             <Stat onClick={saveToggle} pressed={isSaved} label={isSaved ? "Saved" : "Save"} activeCls="text-amber-600" icon={<Bookmark className={`h-[19px] w-[19px] ${isSaved ? "animate-pop fill-current" : ""}`} />} />
           </div>
         </div>
@@ -342,7 +342,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
               {emojiOpen && (
                 <div className="mb-2 ml-12 flex flex-wrap gap-1">
                   {QUICK_EMOJI.map((em) => (
-                    <button key={em} type="button" onClick={() => setDraft((d) => d + em)} className="press grid h-8 w-8 place-items-center rounded-lg text-lg hover:bg-canvas" aria-label={`Add ${em}`}>{em}</button>
+                    <button key={em} type="button" onClick={() => setDraft((d) => d + em)} className="press grid h-8 w-8 place-items-center rounded-lg text-lg hover:bg-elevated" aria-label={`Add ${em}`}>{em}</button>
                   ))}
                 </div>
               )}
@@ -360,9 +360,9 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
                   onChange={(e) => setDraft(e.target.value)}
                   maxLength={500}
                   placeholder={`Reply to ${post.authorName}…`}
-                  className="h-10 min-w-0 flex-1 rounded-full border border-line bg-canvas px-4 text-sm outline-none focus:border-brand-400 focus:bg-surface focus:ring-4 focus:ring-brand-100"
+                  className="h-10 min-w-0 flex-1 rounded-full border border-line bg-elevated px-4 text-sm outline-none focus:border-brand-400 focus:bg-surface focus:ring-4 focus:ring-brand-100"
                 />
-                <button type="submit" disabled={!draft.trim() && !draftGif} className="press grid h-10 w-10 shrink-0 place-items-center rounded-full bg-aurora text-white disabled:opacity-40" aria-label="Post comment">
+                <button type="submit" disabled={!draft.trim() && !draftGif} className="press grid h-10 w-10 shrink-0 place-items-center rounded-full bg-aurora text-on-accent disabled:opacity-40" aria-label="Post comment">
                   <SendHorizontal className="h-4 w-4" />
                 </button>
               </div>
@@ -375,11 +375,11 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
       <Sheet open={quoting} onClose={() => setQuoting(false)} title="Quote post">
         <form onSubmit={sendQuote} className="space-y-3">
           <label htmlFor={`q-${post.id}`} className="sr-only">Add your thoughts</label>
-          <textarea id={`q-${post.id}`} value={quoteText} onChange={(e) => setQuoteText(e.target.value)} maxLength={2200} rows={3} autoFocus placeholder="Add your thoughts…" className="w-full resize-none rounded-2xl border border-line bg-canvas px-4 py-3 text-[15px] outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-100" />
+          <textarea id={`q-${post.id}`} value={quoteText} onChange={(e) => setQuoteText(e.target.value)} maxLength={2200} rows={3} autoFocus placeholder="Add your thoughts…" className="w-full resize-none rounded-2xl border border-line bg-elevated px-4 py-3 text-[15px] outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-100" />
           <QuotedPost post={post} />
           <div className="flex gap-2">
             <button type="button" onClick={() => setQuoting(false)} className="press h-11 flex-1 rounded-full border border-line font-semibold">Cancel</button>
-            <button type="submit" className="press btn-glow h-11 flex-1 rounded-full bg-aurora font-semibold text-white">Post quote</button>
+            <button type="submit" className="press btn-glow h-11 flex-1 rounded-full bg-aurora font-semibold text-on-accent">Post quote</button>
           </div>
         </form>
       </Sheet>

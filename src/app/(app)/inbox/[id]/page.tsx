@@ -45,7 +45,7 @@ function MatchesCard({ handles }: { handles: string[] }) {
                 send(id, { body: `Hi ${p.name}! Money Machine matched us, I'd love to work together. ${session?.role === "creator" ? "Here's my profile." : "Are you open to a collab?"} 👋` });
                 router.push(`/inbox/${id}`);
               }}
-              className="press inline-flex h-9 shrink-0 items-center gap-1 rounded-full bg-aurora px-3 text-[12px] font-bold text-white disabled:bg-none disabled:bg-canvas disabled:text-muted"
+              className="press inline-flex h-9 shrink-0 items-center gap-1 rounded-full bg-aurora px-3 text-[12px] font-bold text-on-accent disabled:bg-none disabled:bg-elevated disabled:text-muted"
             >
               {already ? <><Check className="h-3.5 w-3.5" /> Sent</> : "Say hi 👋"}
             </button>
@@ -62,7 +62,7 @@ function Bubble({ m, name, tone, square, onReply }: { m: ViewMessage; name: stri
       <div className="animate-fade-up flex flex-col items-end">
         {m.deal && <div className="mb-1 w-[85%] max-w-sm"><DealSummary deal={{ ...m.deal, note: "" }} compact /></div>}
         {m.gif && <div className="mb-1"><GifView id={m.gif} size="md" /></div>}
-        {m.body && <p className="bg-aurora max-w-[80%] whitespace-pre-wrap break-words rounded-3xl rounded-br-md px-4 py-2.5 text-[15px] text-white">{m.body}</p>}
+        {m.body && <p className="bg-aurora max-w-[80%] whitespace-pre-wrap break-words rounded-3xl rounded-br-md px-4 py-2.5 text-[15px] text-on-accent">{m.body}</p>}
         <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted"><CheckCheck className="h-3.5 w-3.5 text-brand-500" /> Sent · {timeAgo(m.at)}</span>
       </div>
     );
@@ -70,7 +70,7 @@ function Bubble({ m, name, tone, square, onReply }: { m: ViewMessage; name: stri
     <div className="flex items-end gap-2">
       <Avatar name={name} tone={tone} size="xs" square={square} />
       <div className="max-w-[85%]">
-        {m.body && <p className="whitespace-pre-wrap break-words rounded-3xl rounded-bl-md bg-canvas px-4 py-2.5 text-[15px] ring-1 ring-line">{m.body}</p>}
+        {m.body && <p className="whitespace-pre-wrap break-words rounded-3xl rounded-bl-md bg-elevated px-4 py-2.5 text-[15px] ring-1 ring-line">{m.body}</p>}
         {m.matches && <MatchesCard handles={m.matches} />}
         {m.deal && (
           <div className="mt-1.5 w-[min(22rem,80vw)]">
@@ -207,7 +207,7 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
           <p className="mt-2 flex items-center gap-1 text-sm font-semibold group-hover:underline">{p.name} {p.verified && <VerifiedMark />}</p>
           <p className="text-xs text-muted">@{p.handle} · {p.niche}</p>
           <span className="mt-1.5 flex flex-wrap justify-center gap-1">
-            {folder && <span className="inline-flex items-center gap-1 rounded-full bg-canvas px-2 py-0.5 text-[11px] font-semibold text-muted ring-1 ring-line">{thread.pinned && <Pin className="h-3 w-3" />}{folder.label} folder</span>}
+            {folder && <span className="inline-flex items-center gap-1 rounded-full bg-elevated px-2 py-0.5 text-[11px] font-semibold text-muted ring-1 ring-line">{thread.pinned && <Pin className="h-3 w-3" />}{folder.label} folder</span>}
           </span>
         </Link>
         <div className="flex-1 space-y-3" aria-live="polite">
@@ -245,7 +245,7 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
               aria-describedby={error ? "msg-err" : undefined}
               className="max-h-40 min-h-11 flex-1 resize-none bg-transparent px-1 py-2.5 text-[15px] outline-none [field-sizing:content]"
             />
-            <button type="submit" className="press btn-glow grid h-11 w-11 shrink-0 place-items-center rounded-full bg-aurora text-white" aria-label="Send">
+            <button type="submit" className="press btn-glow grid h-11 w-11 shrink-0 place-items-center rounded-full bg-aurora text-on-accent" aria-label="Send">
               <SendHorizontal className="h-5 w-5" />
             </button>
           </div>

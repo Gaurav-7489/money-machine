@@ -1,5 +1,6 @@
 "use client";
 
+import { TabIndicator } from "@/components/motion";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -31,7 +32,7 @@ function NewMessage({ open, onClose }: { open: boolean; onClose: () => void }) {
                 onClose();
                 router.push(`/inbox/${id}`);
               }}
-              className="flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left hover:bg-canvas"
+              className="flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left hover:bg-elevated"
             >
               <Avatar name={p.name} tone={p.tone} square={p.kind === "business"} />
               <span className="min-w-0 flex-1">
@@ -49,9 +50,9 @@ function NewMessage({ open, onClose }: { open: boolean; onClose: () => void }) {
 }
 
 const FOLDER_STYLE: Record<FolderDef["kind"], { icon: typeof FolderIcon; cls: string }> = {
-  mm: { icon: BadgeCheck, cls: "bg-aurora text-white" },
-  owner: { icon: Crown, cls: "bg-gradient-to-br from-amber-400 via-orange-400 to-rose-500 text-white" },
-  general: { icon: MessageSquareText, cls: "bg-canvas text-ink ring-1 ring-line" },
+  mm: { icon: BadgeCheck, cls: "bg-aurora text-on-accent" },
+  owner: { icon: Crown, cls: "bg-gradient-to-br from-accent-4 via-accent-3 to-accent-2 text-on-accent" },
+  general: { icon: MessageSquareText, cls: "bg-elevated text-ink ring-1 ring-line" },
   deal: { icon: Handshake, cls: "bg-brand-50 text-brand-700 ring-1 ring-brand-200" },
 };
 
@@ -68,11 +69,11 @@ function FolderCard({ f, count, unread, active, onClick }: { f: FolderDef; count
           {f.label}
           {f.kind === "mm" && <Pin className="h-3 w-3 shrink-0" />}
         </span>
-        <span className={`block text-[11px] ${f.kind === "mm" || f.kind === "owner" ? "text-white/85" : "text-muted"}`}>
+        <span className={`block text-[11px] ${f.kind === "mm" || f.kind === "owner" ? "text-on-accent/75" : "text-muted"}`}>
           {f.kind === "mm" ? "Official · matches" : f.kind === "owner" ? "Founder outreach" : `${count} ${count === 1 ? "chat" : "chats"}`}
         </span>
       </span>
-      {unread > 0 && <span className="absolute right-2.5 top-2.5 grid h-5 min-w-5 place-items-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">{unread}</span>}
+      {unread > 0 && <span className="absolute right-2.5 top-2.5 grid h-5 min-w-5 place-items-center rounded-full bg-danger px-1 text-[10px] font-bold text-on-danger">{unread}</span>}
     </button>
   );
 }
@@ -145,7 +146,8 @@ function InboxInner() {
         {BOXES.map((b) => {
           const n = select(b.id, null).filter((t) => (b.id === "all" ? t.unread : true)).length;
           return (
-            <button key={b.id} role="tab" aria-selected={box === b.id} onClick={() => nav({ box: b.id, folder: b.id === "trash" ? null : undefined })} className={`press relative h-10 rounded-xl text-[13px] font-semibold ${box === b.id ? "bg-ink text-surface" : "text-muted hover:text-ink"}`}>
+            <button key={b.id} role="tab" aria-selected={box === b.id} onClick={() => nav({ box: b.id, folder: b.id === "trash" ? null : undefined })} className={`press relative isolate h-10 rounded-xl text-[13px] font-semibold ${box === b.id ? "text-surface" : "text-muted hover:text-ink"}`}>
+              {box === b.id && <TabIndicator group="dm-box" variant="pill" />}
               {b.label}
               {n > 0 && b.id !== "trash" && <span className={`ml-1 text-[11px] ${box === b.id ? "opacity-70" : "text-brand-600"}`}>{n}</span>}
             </button>
@@ -179,7 +181,7 @@ function InboxInner() {
       </div>
 
       {box === "trash" && list.length > 0 && (
-        <div className="mb-3 flex items-center justify-between rounded-xl bg-canvas px-3 py-2 text-[13px] text-muted ring-1 ring-line">
+        <div className="mb-3 flex items-center justify-between rounded-xl bg-elevated px-3 py-2 text-[13px] text-muted ring-1 ring-line">
           <span>Conversations in Trash can be restored.</span>
           <button onClick={emptyTrash} className="press rounded-full px-3 py-1.5 font-semibold text-rose-600 hover:bg-rose-50">Empty Trash</button>
         </div>
@@ -203,7 +205,7 @@ function InboxInner() {
                 <Link href={`/inbox/${t.id}`} className="flex min-w-0 flex-1 items-center gap-3 py-3.5 pl-4 pr-2 transition-colors hover:bg-canvas/60">
                   <span className="relative">
                     <Avatar name={t.profile.name} tone={t.profile.tone} size="md" square={t.profile.kind === "business"} ring={t.pinned} />
-                    {t.unread && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-rose-500 ring-2 ring-surface" />}
+                    {t.unread && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-danger ring-2 ring-surface" />}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-1.5">
@@ -214,8 +216,8 @@ function InboxInner() {
                     </span>
                     <span className={`block truncate text-sm ${t.unread ? "font-medium text-ink" : "text-muted"}`}>{t.preview}</span>
                     <span className="mt-1 flex flex-wrap items-center gap-1">
-                      {f && !activeFolder && <span className="rounded-full bg-canvas px-1.5 py-px text-[10px] font-semibold text-muted ring-1 ring-line">{f.label}</span>}
-                      {t.dealType && <span className="bg-aurora rounded-full px-1.5 py-px text-[10px] font-bold text-white">{earningShort(t.dealType)}</span>}
+                      {f && !activeFolder && <span className="rounded-full bg-elevated px-1.5 py-px text-[10px] font-semibold text-muted ring-1 ring-line">{f.label}</span>}
+                      {t.dealType && <span className="bg-aurora rounded-full px-1.5 py-px text-[10px] font-bold text-on-accent">{earningShort(t.dealType)}</span>}
                       {t.sample && <SampleTag />}
                     </span>
                   </span>

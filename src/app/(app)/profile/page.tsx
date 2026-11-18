@@ -1,5 +1,6 @@
 "use client";
 
+import { TabIndicator } from "@/components/motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -75,13 +76,13 @@ function completeness(s: Session) {
 function ChipField({ label, hint, options, value, onChange }: { label: string; hint?: string; options: { id: string; label: string }[]; value: string[]; onChange: (v: string[]) => void }) {
   return (
     <div>
-      <p className="mb-1.5 text-[13px] font-medium">{label} <span className="ml-1 rounded-full bg-canvas px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span></p>
+      <p className="mb-1.5 text-[13px] font-medium">{label} <span className="ml-1 rounded-full bg-elevated px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span></p>
       {hint && <p className="mb-2 text-[12px] text-muted">{hint}</p>}
       <div className="flex flex-wrap gap-1.5">
         {options.map((o) => {
           const on = value.includes(o.id);
           return (
-            <button key={o.id} type="button" aria-pressed={on} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-aurora text-white" : "border border-line bg-surface hover:bg-canvas"}`}>
+            <button key={o.id} type="button" aria-pressed={on} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-aurora text-on-accent" : "border border-line bg-surface hover:bg-elevated"}`}>
               {o.label}
             </button>
           );
@@ -177,7 +178,7 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
                   aria-pressed={on}
                   title={m.hint}
                   onClick={() => setForm((f) => ({ ...f, earningModels: on ? f.earningModels.filter((x) => x !== m.id) : [...f.earningModels, m.id] }))}
-                  className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-aurora text-white" : "border border-line bg-surface hover:bg-canvas"}`}
+                  className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-aurora text-on-accent" : "border border-line bg-surface hover:bg-elevated"}`}
                 >
                   {m.label}
                 </button>
@@ -246,8 +247,8 @@ export default function Profile() {
 
   const tools = [
     isBiz
-      ? { href: "/money", label: "Profit", value: `${growth.profit < 0 ? "−" : ""}${formatINR(Math.abs(growth.profit))}`, icon: Rocket, tone: "bg-aurora text-white" }
-      : { href: "/money", label: "Earned", value: formatINR(summary.total), icon: Wallet, tone: "bg-money text-white" },
+      ? { href: "/money", label: "Profit", value: `${growth.profit < 0 ? "−" : ""}${formatINR(Math.abs(growth.profit))}`, icon: Rocket, tone: "bg-aurora text-on-accent" }
+      : { href: "/money", label: "Earned", value: formatINR(summary.total), icon: Wallet, tone: "bg-money text-on-accent" },
     { href: "/affiliates", label: isBiz ? "Programs running" : "Programs joined", value: String(programs.length), icon: Link2, tone: "bg-violet-50 text-violet-600" },
     { href: "/badges", label: "Badges earned", value: String(earned), icon: Star, tone: "bg-amber-50 text-amber-500" },
   ];
@@ -281,14 +282,14 @@ export default function Profile() {
         {(socials.length > 0 || session.email) && (
           <ul className="mt-2 flex flex-wrap justify-center gap-2 text-xs">
             {socials.map(([k, v]) => (
-              <li key={k} className="inline-flex items-center gap-1 rounded-full bg-canvas px-2.5 py-1 ring-1 ring-line"><AtSign className="h-3 w-3" /> {k}: <span className="font-semibold">{v}</span></li>
+              <li key={k} className="inline-flex items-center gap-1 rounded-full bg-elevated px-2.5 py-1 ring-1 ring-line"><AtSign className="h-3 w-3" /> {k}: <span className="font-semibold">{v}</span></li>
             ))}
-            {session.email && <li className="inline-flex items-center gap-1 rounded-full bg-canvas px-2.5 py-1 ring-1 ring-line"><Mail className="h-3 w-3" /> {session.email}</li>}
+            {session.email && <li className="inline-flex items-center gap-1 rounded-full bg-elevated px-2.5 py-1 ring-1 ring-line"><Mail className="h-3 w-3" /> {session.email}</li>}
           </ul>
         )}
         {(session.earningModels ?? []).length > 0 && (
           <p className="mt-2 flex flex-wrap justify-center gap-1.5">
-            {session.earningModels!.map((m) => <span key={m} className="rounded-full bg-canvas px-2.5 py-0.5 text-xs font-medium text-muted ring-1 ring-line">{earningLabel(m)}</span>)}
+            {session.earningModels!.map((m) => <span key={m} className="rounded-full bg-elevated px-2.5 py-0.5 text-xs font-medium text-muted ring-1 ring-line">{earningLabel(m)}</span>)}
           </p>
         )}
         <dl className="mt-4 grid w-full max-w-sm grid-cols-3 text-center">
@@ -297,7 +298,7 @@ export default function Profile() {
             <dt className="flex items-center justify-center gap-0.5 text-xs text-muted">Reposts</dt>
             <dd className="order-first text-lg font-bold">{reposts.length}</dd>
           </div>
-          <Link href="/friends" className="flex flex-col rounded-xl hover:bg-canvas"><dt className="text-xs text-muted">Friends</dt><dd className="order-first text-lg font-bold">{following.length}</dd></Link>
+          <Link href="/friends" className="flex flex-col rounded-xl hover:bg-elevated"><dt className="text-xs text-muted">Friends</dt><dd className="order-first text-lg font-bold">{following.length}</dd></Link>
         </dl>
         <Button variant="secondary" className="mt-4 w-full max-w-sm" onClick={() => setEditing(true)}>
           <Pencil className="h-4 w-4" /> Edit Profile
@@ -310,8 +311,8 @@ export default function Profile() {
             <p className="font-semibold">Your profile is {done.percent}% complete</p>
             <button onClick={() => setEditing(true)} className="font-semibold text-brand-700 hover:underline">Finish it</button>
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-canvas ring-1 ring-line" role="progressbar" aria-valuenow={done.percent} aria-valuemin={0} aria-valuemax={100} aria-label="Profile completeness">
-            <div className="h-full rounded-full bg-brand-500 transition-[width] duration-700" style={{ width: `${done.percent}%` }} />
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-elevated ring-1 ring-line" role="progressbar" aria-valuenow={done.percent} aria-valuemin={0} aria-valuemax={100} aria-label="Profile completeness">
+            <div className="h-full rounded-full bg-aurora transition-[width] duration-700" style={{ width: `${done.percent}%` }} />
           </div>
           {done.next && <p className="mt-2 text-xs text-muted">Next step: {done.next.label}. Complete profiles show up better in Search.</p>}
         </section>
@@ -350,7 +351,7 @@ export default function Profile() {
               className={`relative flex items-center gap-1.5 px-4 pb-3 text-sm ${tab === id ? "font-semibold" : "text-muted hover:text-ink"}`}
             >
               <Icon className="h-4 w-4" /> {label} ({n})
-              {tab === id && <span className="tab-indicator absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-brand-600" />}
+              {tab === id && <TabIndicator group="profile" />}
             </button>
           ))}
         </div>

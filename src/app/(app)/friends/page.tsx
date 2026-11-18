@@ -44,7 +44,7 @@ function PersonRow({ p, followingNow }: { p: Profile; followingNow: boolean }) {
         {followingNow && (
           <button
             onClick={() => router.push(`/inbox/${startThread(p.handle)}`)}
-            className="press btn-glow inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-aurora px-4 text-[13px] font-semibold text-white sm:flex-none"
+            className="press btn-glow inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-aurora px-4 text-[13px] font-semibold text-on-accent sm:flex-none"
           >
             <MessageCircle className="h-4 w-4" /> DM
           </button>
@@ -52,7 +52,7 @@ function PersonRow({ p, followingNow }: { p: Profile; followingNow: boolean }) {
         <button
           onClick={follow}
           aria-pressed={followingNow}
-          className={`press inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-[13px] font-semibold sm:flex-none ${followingNow ? "border border-line bg-surface hover:bg-canvas" : "bg-brand-50 text-brand-700 hover:bg-brand-100"}`}
+          className={`press inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-[13px] font-semibold sm:flex-none ${followingNow ? "border border-line bg-surface hover:bg-elevated" : "bg-brand-50 text-brand-700 hover:bg-brand-100"}`}
         >
           {followingNow ? "Friends ✓" : <><UserPlus className="h-4 w-4" /> Add friend</>}
         </button>

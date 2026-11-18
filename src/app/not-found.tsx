@@ -7,7 +7,7 @@ export default function NotFound() {
       <div>
         <LogoMark className="mx-auto h-12 w-12" />
         <h1 className="mt-4 text-xl font-bold">Page not found</h1>
-        <Link href="/home" className="mt-5 inline-flex h-11 items-center rounded-full bg-brand-600 px-5 text-sm font-semibold text-white">Go home</Link>
+        <Link href="/home" className="mt-5 inline-flex h-11 items-center rounded-full bg-aurora px-5 text-sm font-semibold text-on-accent">Go home</Link>
       </div>
     </main>
   );
