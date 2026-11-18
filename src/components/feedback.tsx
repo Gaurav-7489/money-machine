@@ -34,7 +34,7 @@ const Ctx = createContext<FeedbackApi | null>(null);
 const ICON = { success: CheckCircle2, error: XCircle, info: Info };
 const TONE = {
   success: "bg-ink text-surface",
-  error: "bg-rose-600 text-white",
+  error: "bg-danger text-on-danger",
   info: "bg-ink text-surface",
 };
 
@@ -116,13 +116,13 @@ function ConfirmDialog({ opts, onDone }: { opts: ConfirmOptions | null; onDone: 
           <h2 id="confirm-title" className="mt-3 text-lg font-bold">{opts.title}</h2>
           {opts.body && <p className="mt-1 text-sm text-muted">{opts.body}</p>}
           <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row">
-            <button onClick={() => onDone(false)} className="press h-11 flex-1 rounded-full border border-line bg-surface text-sm font-semibold hover:bg-canvas">
+            <button onClick={() => onDone(false)} className="press h-11 flex-1 rounded-full border border-line bg-surface text-sm font-semibold hover:bg-elevated">
               {opts.cancelLabel ?? "Cancel"}
             </button>
             <button
               autoFocus
               onClick={() => onDone(true)}
-              className={`press h-11 flex-1 rounded-full text-sm font-semibold text-white ${opts.danger ? "bg-rose-600 hover:bg-rose-700" : "bg-brand-600 hover:bg-brand-700"}`}
+              className={`press h-11 flex-1 rounded-full text-sm font-semibold ${opts.danger ? "bg-danger text-on-danger hover:brightness-110" : "bg-aurora text-on-accent btn-glow"}`}
             >
               {opts.confirmLabel ?? "Yes, continue"}
             </button>

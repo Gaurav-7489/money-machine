@@ -8,9 +8,9 @@ import { useStore } from "@/lib/store";
 type Variant = "primary" | "secondary" | "ghost" | "soft";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-aurora text-white btn-glow",
-  secondary: "bg-surface text-ink border border-line hover:bg-canvas",
-  ghost: "text-ink hover:bg-canvas",
+  primary: "bg-aurora text-on-accent btn-glow",
+  secondary: "bg-surface text-ink border border-line hover:bg-elevated",
+  ghost: "text-ink hover:bg-elevated",
   soft: "bg-brand-50 text-brand-700 hover:bg-brand-100",
 };
 
@@ -75,7 +75,7 @@ export function PageHeader({ title, back, action }: { title: string; back?: stri
           </svg>
         </Link>
       )}
-      <h1 className="min-w-0 flex-1 truncate text-2xl font-bold tracking-tight">{title}</h1>
+      <h1 className="min-w-0 flex-1 truncate text-[26px] font-extrabold">{title}</h1>
       {action}
     </div>
   );
@@ -84,7 +84,7 @@ export function PageHeader({ title, back, action }: { title: string; back?: stri
 export function EmptyState({ icon, title, body, action }: { icon: ReactNode; title: string; body: string; action?: ReactNode }) {
   return (
     <div className="animate-fade-up flex flex-col items-center px-6 py-10 text-center">
-      <div className="mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-600">{icon}</div>
+      <div className="bg-aurora-soft mb-3 grid h-14 w-14 place-items-center rounded-2xl text-brand-700 ring-1 ring-line">{icon}</div>
       <p className="font-semibold">{title}</p>
       <p className="mt-1 max-w-xs text-sm text-muted">{body}</p>
       {action && <div className="mt-4">{action}</div>}
@@ -118,7 +118,7 @@ export function Field({
     <label className="block">
       <span className="mb-1.5 flex items-center gap-2 text-[13px] font-medium text-ink">
         {label}
-        {optional && <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span>}
+        {optional && <span className="rounded-full bg-elevated px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span>}
       </span>
       {children}
       {error ? (
@@ -133,26 +133,43 @@ export function Field({
 }
 
 export const inputCls =
-  "w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-[15px] outline-none transition placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-100 aria-[invalid=true]:border-rose-400";
+  "w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-[15px] outline-none transition placeholder:text-muted/70 focus:border-brand-400 focus:ring-4 focus:ring-brand-100 aria-[invalid=true]:border-rose-400";
 
 export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
-    if (open && !d.open) d.showModal();
-    if (!open && d.open) d.close();
+    if (open && !d.open) {
+      d.removeAttribute("data-closing");
+      d.showModal();
+    }
+    if (!open && d.open) {
+      // play the closing animation, then close
+      const quick = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      d.setAttribute("data-closing", "");
+      const t = setTimeout(() => {
+        d.removeAttribute("data-closing");
+        d.close();
+      }, quick ? 0 : 210);
+      return () => clearTimeout(t);
+    }
   }, [open]);
   return (
     <dialog
       ref={ref}
-      onClose={onClose}
+      onCancel={(e) => {
+        e.preventDefault();
+        onClose();
+      }}
       onClick={(e) => e.target === ref.current && onClose()}
-      className="m-auto w-[min(32rem,calc(100%-2rem))] rounded-3xl bg-surface p-0 shadow-2xl backdrop:bg-ink/40 backdrop:backdrop-blur-sm max-md:mb-0 max-md:w-full max-md:max-w-none max-md:rounded-b-none"
+      aria-label={title}
+      className="m-auto w-[min(32rem,calc(100%-2rem))] overflow-hidden rounded-[28px] border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/45 backdrop:backdrop-blur-sm max-md:mb-0 max-md:w-full max-md:max-w-none max-md:rounded-b-none"
     >
+      <div className="bg-aurora h-1" aria-hidden="true" />
       <div className="flex items-center justify-between border-b border-line px-5 py-4">
-        <h2 className="text-base font-bold">{title}</h2>
-        <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-full hover:bg-canvas" aria-label="Close">
+        <h2 className="text-lg font-bold">{title}</h2>
+        <button onClick={onClose} className="press grid h-9 w-9 place-items-center rounded-full hover:bg-elevated" aria-label="Close">
           <X className="h-4 w-4" />
         </button>
       </div>
@@ -197,7 +214,7 @@ export function InfoTip({ text, label = "What does this mean?", className = "" }
         onFocus={() => setOpen(true)}
         onBlur={() => setOpen(false)}
         onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
-        className="grid h-6 w-6 place-items-center rounded-full text-muted hover:bg-canvas hover:text-ink"
+        className="grid h-6 w-6 place-items-center rounded-full text-muted hover:bg-elevated hover:text-ink"
       >
         <HelpCircle className="h-4 w-4" />
       </button>
@@ -243,7 +260,7 @@ export function MatchMeter({ percent, label }: { percent: number; label: string 
         <span className="font-semibold">{label}</span>
         <span className="font-bold tabular-nums">{percent}%</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-canvas ring-1 ring-line" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label={`${label}: ${percent}%`}>
+      <div className="h-2 overflow-hidden rounded-full bg-elevated ring-1 ring-line" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label={`${label}: ${percent}%`}>
         <div className={`h-full rounded-full transition-[width] duration-700 ${color}`} style={{ width: `${Math.max(percent, 3)}%` }} />
       </div>
     </div>
