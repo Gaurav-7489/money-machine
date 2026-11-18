@@ -72,6 +72,19 @@ function PostOpportunity({ open, onClose }: { open: boolean; onClose: () => void
   );
 }
 
+/** Restrained imagery for fictional opportunity examples only. */
+const OPPORTUNITY_PHOTOS: Record<string, string> = {
+  Skincare: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=1000&q=80&auto=format&fit=crop",
+  Makeup: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1000&q=80&auto=format&fit=crop",
+  Fashion: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1000&q=80&auto=format&fit=crop",
+  Travel: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1000&q=80&auto=format&fit=crop",
+  Fitness: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1000&q=80&auto=format&fit=crop",
+  Tech: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1000&q=80&auto=format&fit=crop",
+  Food: "https://images.unsplash.com/photo-1547592180-85f173990554?w=1000&q=80&auto=format&fit=crop",
+  "Home Decor": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1000&q=80&auto=format&fit=crop",
+};
+const SAMPLE_OPPORTUNITY_FALLBACK = OPPORTUNITY_PHOTOS.Fashion;
+
 export function OpportunityCard({ o }: { o: Opportunity }) {
   const { session, oppApplied, toggle, update } = useStore();
   const { startThread, send } = useThreads();
@@ -99,7 +112,16 @@ export function OpportunityCard({ o }: { o: Opportunity }) {
 
   return (
     <article className="card overflow-hidden" aria-label={o.title}>
-      <div className="bg-aurora h-1.5" />
+      {o.sample ? (
+        <div
+          className="relative h-36 overflow-hidden bg-gradient-to-br from-brand-100 to-rose-100 bg-cover bg-center sm:h-40"
+          style={{ backgroundImage: `linear-gradient(0deg, rgba(13,11,20,.20), transparent 70%), url("${o.niches.map((n) => OPPORTUNITY_PHOTOS[n]).find(Boolean) ?? SAMPLE_OPPORTUNITY_FALLBACK}")` }}
+          role="img"
+          aria-label={`Sample campaign photograph for ${o.title}`}
+        >
+          <span className="absolute bottom-3 left-3 rounded-full border border-white/50 bg-white/85 px-3 py-1 text-xs font-semibold text-gray-900 backdrop-blur">Campaign preview</span>
+        </div>
+      ) : <div className="bg-aurora h-1.5" />}
       <div className="p-4">
         <div className="flex items-start gap-3">
           <Link href={mine ? "/profile" : `/u/${o.ownerHandle}`}><Avatar name={name} tone={owner?.tone ?? "violet"} square /></Link>
