@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Inter } from "next/font/google";
+import { Bricolage_Grotesque, Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import { Ambient } from "@/components/ambient";
 import { MotionProvider } from "@/components/motion";
@@ -11,6 +11,7 @@ import { SITE } from "@/lib/site";
 
 const body = Inter({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 const head = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-head", display: "swap", weight: ["500", "700", "800"] });
+const serif = Cormorant_Garamond({ subsets: ["latin"], variable: "--font-cormorant", display: "swap", weight: ["400", "500"], style: ["normal", "italic"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -56,7 +57,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-IN" suppressHydrationWarning className={`${body.variable} ${head.variable}`}>
+    <html lang="en-IN" suppressHydrationWarning className={`${body.variable} ${head.variable} ${serif.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>

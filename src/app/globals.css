@@ -43,6 +43,7 @@
 
   --font-sans: var(--font-body), "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: var(--font-head), var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;
 
   --radius-card: 1.5rem;
   --shadow-card: 0 1px 2px rgb(22 21 34 / 0.04), 0 10px 30px -14px rgb(92 63 194 / 0.16);
@@ -177,6 +178,7 @@ body {
   text-rendering: optimizeLegibility;
 }
 h1, h2, .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
+.hero-cinematic h1 { font-family: var(--font-serif); letter-spacing: -0.01em; }
 ::selection { background: var(--color-brand-200); color: var(--color-ink); }
 
 /* ── Signature gradients ──────────────────────────────────────────────── */
@@ -294,4 +296,63 @@ dialog[data-closing]::backdrop { animation: fade-out 0.2s ease-in both; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after, dialog[open], dialog[open]::backdrop { animation: none !important; transition: none !important; }
+}
+
+/* ── Cinematic hero (landing): warm parchment in White, candlelit dark in Dark ── */
+.hero-cinematic {
+  --cine-ink: #2d2116;
+  --cine-muted: #5d4b37;
+  --cine-accent: #9b7437;
+  --cine-shade: rgb(74 52 26 / 0.26);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: #f1e6d3;
+  background-image:
+    radial-gradient(55% 60% at 70% 28%, rgb(255 242 214 / 0.95), transparent 70%),
+    radial-gradient(110% 80% at 50% 110%, rgb(214 186 140 / 0.65), transparent 60%),
+    linear-gradient(180deg, #f7f0e2 0%, #ead9bb 100%);
+}
+.hero-cinematic::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(120% 100% at 50% 45%, transparent 55%, var(--cine-shade));
+}
+.hero-cinematic::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.2;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.25  0 0 0 0 0.18  0 0 0 0 0.1  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+:root[data-theme="dark"] .hero-cinematic {
+  --cine-ink: #f3e7d2;
+  --cine-muted: #b8a688;
+  --cine-accent: #d4b07a;
+  --cine-shade: rgb(0 0 0 / 0.8);
+  background-color: #0b0806;
+  background-image:
+    radial-gradient(55% 60% at 70% 28%, rgb(214 150 70 / 0.26), transparent 70%),
+    radial-gradient(110% 80% at 50% 110%, rgb(120 70 30 / 0.22), transparent 60%),
+    linear-gradient(180deg, #120d08 0%, #070504 100%);
+}
+:root[data-theme="dark"] .hero-cinematic::after {
+  mix-blend-mode: screen;
+  opacity: 0.1;
+}
+.cine-btn {
+  border: 1px solid var(--cine-accent);
+  border-radius: 999px;
+  color: var(--cine-ink);
+  transition: background-color 0.4s ease, box-shadow 0.4s ease;
+}
+.cine-btn:hover {
+  background-color: color-mix(in srgb, var(--cine-accent) 12%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--cine-accent) 16%, transparent);
 }

@@ -3,13 +3,11 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Briefcase, FolderOpen, MessagesSquare, Rocket, Search, Sparkles, UserRound } from "lucide-react";
+import { ArrowRight, Briefcase, FolderOpen, MessagesSquare, Rocket, Search, UserRound } from "lucide-react";
 import { Waves, WaveDivider } from "./ambient";
 import { Logo } from "./logo";
 import { Magnetic } from "./motion";
 import { ThemeToggle } from "./theme";
-import { ButtonLink } from "./ui";
-import { WelcomeArt } from "./welcome-art";
 import { FAQ } from "@/lib/site";
 import { useStore } from "@/lib/store";
 
@@ -35,49 +33,45 @@ export function Welcome() {
 
   return (
     <div className="relative overflow-x-clip">
-      <header className="mx-auto flex max-w-6xl items-center gap-2 px-5 py-4 md:px-8">
-        <Logo />
-        <span className="flex-1" />
-        <ThemeToggle />
-        <Link href="/onboarding" className="press hidden h-10 items-center rounded-full border border-line bg-surface/70 px-4 text-sm font-semibold hover:bg-surface sm:inline-flex">
-          Sign up
-        </Link>
-      </header>
+      <div className="hero-cinematic">
+        <header className="relative z-10 mx-auto flex max-w-6xl items-center gap-2 px-5 py-4 md:px-8">
+          <Logo />
+          <span className="flex-1" />
+          <ThemeToggle />
+          <Link href="/onboarding" className="press hidden h-10 items-center rounded-full border border-line bg-surface/70 px-4 text-sm font-semibold hover:bg-surface sm:inline-flex">
+            Sign up
+          </Link>
+        </header>
 
-      <main>
         {/* ── Hero ── */}
-        <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-16 pt-6 md:px-8 lg:grid-cols-[1.1fr_1fr] lg:gap-6 lg:pb-24 lg:pt-10">
-          <div className="text-center lg:text-left">
-            <p className="animate-fade-up glass inline-flex items-center gap-2 rounded-full border border-line/70 px-3.5 py-1.5 text-[13px] font-semibold">
-              <span className="bg-aurora grid h-5 w-5 place-items-center rounded-full text-on-accent"><Sparkles className="h-3 w-3" /></span>
-              For creators &amp; the brands that need them
-            </p>
-            <h1 className="animate-fade-up mt-5 text-[clamp(2.9rem,11vw,6.2rem)] font-extrabold leading-[0.92] tracking-[-0.045em] [animation-delay:80ms]">
-              Create.
-              <br />
-              Collab.
-              <br />
-              <span className="text-aurora">Cash out.</span>
-            </h1>
-            <p className="animate-fade-up mx-auto mt-6 max-w-md text-[17px] leading-relaxed text-muted [animation-delay:160ms] lg:mx-0">
-              Money Machine connects creators and businesses automatically, so brand deals, affiliate programs and UGC find you instead of the other way round.
-            </p>
-            <div className="animate-fade-up mt-8 flex flex-col items-center gap-3 [animation-delay:240ms] sm:flex-row sm:justify-center lg:justify-start">
-              <Magnetic className="w-full sm:w-auto">
-                <ButtonLink href="/onboarding" size="lg" className="bg-aurora-flow group h-14 w-full px-8 text-[16px] sm:w-auto">
-                  Get started <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
-                </ButtonLink>
-              </Magnetic>
-              <a href="#how" className="press inline-flex h-14 items-center gap-2 rounded-full px-5 text-[15px] font-semibold text-ink hover:bg-surface/70">
-                See how it works
-              </a>
-            </div>
-          </div>
-          <div className="animate-scale-in [animation-delay:150ms]">
-            <WelcomeArt />
+        <section className="relative z-10 mx-auto flex min-h-[calc(100svh-5.5rem)] max-w-4xl flex-col items-center justify-center px-6 pb-20 pt-4 text-center">
+          <p className="animate-fade-up font-serif text-[13px] uppercase tracking-[0.34em] text-[var(--cine-accent)]">
+            For creators &amp; the brands that need them
+          </p>
+          <h1 className="animate-fade-up mt-6 font-serif text-[clamp(3.4rem,12vw,8rem)] font-medium leading-[0.9] text-[var(--cine-ink)] [animation-delay:80ms]">
+            <em className="font-normal italic">Create.</em>
+            <br />
+            Collab.
+            <br />
+            <span className="text-[var(--cine-accent)]">Cash out.</span>
+          </h1>
+          <p className="animate-fade-up mx-auto mt-8 max-w-xl font-serif text-[clamp(1.2rem,2.4vw,1.45rem)] leading-snug text-[var(--cine-muted)] [animation-delay:160ms]">
+            Money Machine connects creators and businesses automatically, so brand deals, affiliate programs and UGC find you instead of the other way round.
+          </p>
+          <div className="animate-fade-up mt-12 flex flex-col items-center gap-6 [animation-delay:240ms] sm:flex-row">
+            <Magnetic>
+              <Link href="/onboarding" className="cine-btn press inline-flex h-14 items-center justify-center px-10 font-serif text-[15px] uppercase tracking-[0.2em]">
+                Get started
+              </Link>
+            </Magnetic>
+            <a href="#how" className="font-serif text-[16px] italic text-[var(--cine-muted)] underline-offset-4 hover:underline">
+              See how it works
+            </a>
           </div>
         </section>
+      </div>
 
+      <main>
         {/* ── How it works: a dark/ink band with flowing waves ── */}
         <div className="text-surface" aria-hidden="true">
           <WaveDivider />
