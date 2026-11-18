@@ -5,6 +5,15 @@ export type Role = "creator" | "business";
 export interface ProfileDetails {
   bio?: string;
   category?: string;
+  /** Creators: the content they make. Businesses: what they sell. */
+  niches?: string[];
+  /** What this account wants to find in Search (creators: brand types, businesses: creator types). */
+  lookingFor?: string[];
+  /** typical pay per video / reel in whole rupees */
+  payPerVideoMin?: number;
+  payPerVideoMax?: number;
+  /** affiliate commission in percent */
+  commissionPercent?: number;
   country?: string;
   city?: string;
   /** whole rupees per post / deliverable */
@@ -34,12 +43,15 @@ export type RecordSource = "self_reported" | "verified";
 export type IncomeCategory = "brand_deal" | "affiliate" | "ugc" | "campaign" | "other";
 export type SpendingCategory = "creator_payment" | "affiliate_commission" | "campaign" | "product_seeding" | "other";
 
+export type RevenueCategory = "sales" | "subscriptions" | "services" | "other";
+
 export interface FinancialRecord {
   id: string;
-  kind: "income" | "spending";
+  /** income = creator earnings; spending = business investment; revenue = business sales */
+  kind: "income" | "spending" | "revenue";
   title: string;
   amount: number; // whole rupees
-  category: IncomeCategory | SpendingCategory;
+  category: IncomeCategory | SpendingCategory | RevenueCategory;
   date: string; // ISO yyyy-mm-dd
   counterparty?: string;
   source: RecordSource;
@@ -82,6 +94,14 @@ export interface Post {
   tone?: "rose" | "mint" | "violet" | "amber" | "sky" | "lime";
   /** optional photo, stored as a compressed data URL in the preview build */
   image?: string;
+  /** extra photos (up to 4 in total with image) */
+  images?: string[];
+  /** id of a video saved in this device's media store (IndexedDB) */
+  videoId?: string;
+  /** a built-in reaction GIF id, or an uploaded GIF in the media store ("media:<id>") */
+  gif?: string;
+  /** id of the post this one quotes */
+  quoteOf?: string;
   createdAt: string;
   sample?: boolean;
 }
@@ -92,7 +112,35 @@ export interface Comment {
   authorHandle: string;
   authorName: string;
   body: string;
+  gif?: string;
+  /** id of the comment this replies to */
+  parentId?: string;
   createdAt: string;
+}
+
+/** A deal proposal attached to a message (bulk DM, opportunity application). */
+export interface DealOffer {
+  /** an EARNING_MODELS id: decides which folder the message lands in */
+  type: string;
+  budgetMin?: number;
+  budgetMax?: number;
+  deliverables: { count: number; type: string }[];
+  note: string;
+}
+
+/** An opportunity a business posts for creators. */
+export interface Opportunity {
+  id: string;
+  ownerHandle: string;
+  title: string;
+  type: string;
+  niches: string[];
+  budgetMin?: number;
+  budgetMax?: number;
+  deliverables: { count: number; type: string }[];
+  details: string;
+  createdAt: string;
+  sample?: boolean;
 }
 
 /** A conversation the user started themselves (e.g. "Message" from Search). */
@@ -100,6 +148,8 @@ export interface Thread {
   id: string;
   with: string;
   createdAt: string;
+  /** deal type that started the thread, decides the folder */
+  dealType?: string;
 }
 
 export interface Message {
@@ -107,5 +157,7 @@ export interface Message {
   threadId: string;
   fromMe: boolean;
   body: string;
+  gif?: string;
+  deal?: DealOffer;
   createdAt: string;
 }

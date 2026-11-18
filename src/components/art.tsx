@@ -1,4 +1,4 @@
-import { BadgeCheck, Dumbbell, Mountain, ShoppingBag, Sparkles } from "lucide-react";
+import { BadgeCheck, Dumbbell, Headphones, Lamp, Mountain, ShoppingBag, Soup, Sparkles } from "lucide-react";
 import type { Tone } from "@/lib/sample-data";
 import { initials } from "@/lib/format";
 
@@ -37,16 +37,17 @@ export function Avatar({
 }
 
 export function VerifiedMark() {
-  return <BadgeCheck className="h-4 w-4 fill-sky-500 text-white" aria-label="Verified" />;
+  return <BadgeCheck className="h-4 w-4 shrink-0 fill-brand-500 text-white" aria-label="Verified" />;
 }
 
-const MEDIA = { bottle: Sparkles, mountain: Mountain, dumbbell: Dumbbell, bag: ShoppingBag };
+const MEDIA = { bottle: Sparkles, mountain: Mountain, dumbbell: Dumbbell, bag: ShoppingBag, lamp: Lamp, headphones: Headphones, bowl: Soup };
+export type MediaKind = keyof typeof MEDIA;
 
 /** Illustrative media placeholder for sample posts (no stock or real photos). */
-export function MediaArt({ tone, media, label }: { tone: Tone; media: keyof typeof MEDIA; label?: string }) {
+export function MediaArt({ tone, media, label }: { tone: Tone; media: MediaKind; label?: string }) {
   const Icon = MEDIA[media];
   return (
-    <div className={`relative grid aspect-[4/3] w-full place-items-center overflow-hidden bg-gradient-to-br ${TONES[tone].bg}`} role="img" aria-label={label ?? "Post media"}>
+    <div className={`relative grid aspect-[16/10] w-full place-items-center overflow-hidden rounded-2xl bg-gradient-to-br ${TONES[tone].bg}`} role="img" aria-label={label ?? "Post media"}>
       <div className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-white/40 blur-2xl" />
       <div className="absolute -bottom-12 -right-6 h-48 w-48 rounded-full bg-white/30 blur-2xl" />
       <div className="relative grid h-24 w-24 place-items-center rounded-[2rem] bg-white/60 shadow-lg backdrop-blur">

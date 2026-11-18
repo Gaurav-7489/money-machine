@@ -50,16 +50,21 @@ export function parseTags(raw: string): string[] {
 export function usePublishPost() {
   const { session, update } = useStore();
   return useCallback(
-    (input: { caption: string; tags?: string; tone?: Post["tone"]; image?: string }): FieldErrors | null => {
-      const parsed = postInput.safeParse({ caption: input.caption, tags: input.tags ?? "" });
+    (input: { caption: string; tags?: string; tone?: Post["tone"]; image?: string; images?: string[]; videoId?: string; gif?: string; quoteOf?: string }): FieldErrors | null => {
+      const hasMedia = !!(input.image || input.images?.length || input.videoId || input.gif || input.quoteOf);
+      const parsed = postInput.safeParse({ caption: input.caption.trim() || (hasMedia ? " " : ""), tags: input.tags ?? "" });
       if (!parsed.success) return fieldErrors(parsed.error);
       const post: Post = {
         id: uid("post"),
         authorHandle: session!.handle,
-        caption: parsed.data.caption,
+        caption: input.caption.trim(),
         tags: parseTags(parsed.data.tags ?? ""),
         tone: input.tone ?? "mint",
-        image: input.image,
+        image: input.image ?? input.images?.[0],
+        images: input.images && input.images.length > 1 ? input.images.slice(1) : undefined,
+        videoId: input.videoId,
+        gif: input.gif,
+        quoteOf: input.quoteOf,
         createdAt: new Date().toISOString(),
       };
       update((s) => ({ ...s, posts: [post, ...s.posts] }));

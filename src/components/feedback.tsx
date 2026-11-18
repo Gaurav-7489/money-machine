@@ -33,9 +33,9 @@ const Ctx = createContext<FeedbackApi | null>(null);
 
 const ICON = { success: CheckCircle2, error: XCircle, info: Info };
 const TONE = {
-  success: "bg-ink text-white",
+  success: "bg-ink text-surface",
   error: "bg-rose-600 text-white",
-  info: "bg-ink text-white",
+  info: "bg-ink text-surface",
 };
 
 export function FeedbackProvider({ children }: { children: ReactNode }) {

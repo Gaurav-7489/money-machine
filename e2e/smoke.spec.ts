@@ -7,6 +7,11 @@ async function onboard(page: Page, role: "Creator" | "Business" = "Creator") {
   await page.getByLabel(role === "Business" ? "Brand name" : "Your name").fill(role === "Business" ? "Test Brand" : "Test Creator");
   await page.getByLabel("Username").fill(role === "Business" ? "testbrand" : "testcreator");
   await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: "Skincare" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: role === "Business" ? "Skincare" : "Brand deals" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: /show my matches/i }).click();
   await expect(page).toHaveURL(/\/home$/);
 }
 
@@ -28,7 +33,7 @@ test("creator can record income and earn a badge", async ({ page }) => {
   await onboard(page);
   await page.goto("/money");
   await expect(page.getByText("No income recorded yet")).toBeVisible();
-  await page.getByRole("button", { name: /add income/i }).click();
+  await page.getByRole("button", { name: /add earning/i }).click();
   await page.getByLabel("Description").fill("Skincare collab");
   await page.getByLabel("Amount (₹)").fill("2500");
   await page.getByRole("button", { name: "Save" }).click();

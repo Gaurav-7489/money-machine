@@ -19,6 +19,13 @@ When work started, the repository held only `README.md`. This branch adds:
 | Proposed PostgreSQL schema (`src/db/schema.ts`, Drizzle) | ✅ Written, **not connected** |
 | Authentication, server-side authorization, database persistence | ⏳ Stage 2 (needs a provider decision and credentials) |
 | UX upgrade: labelled navigation, Search with filters + match %, feed composer/comments/reposts/photos, message folders (Sent/Starred/Trash), public profiles `/u/[handle]`, Friends, Saved, richer Edit Profile, toasts, confirm dialogs, tips, dark mode | ✅ Done (preview data layer) |
+| v2 brief: "Aurora Luxe" palette + true-black theme toggle, role-specific pages (creator vs business), post-aware search engine with 90/70/60/50% match levels + counts, Select all + Bulk DM (type, budget range, deliverables, note, Change/Send/Cancel, once every 10 days), DM boxes (All/Sent/Friends/Starred/Trash) + folders (Money Machine admin pinned, Zenath Sath for creators, General, one per means of earning), auto-matching intros from the Money Machine account, Threads-style feed (thoughts, up to 4 photos, video, GIFs, emoji reactions, repost/quote, comments with GIFs), Opportunities, Friends instead of Following, Earnings (creator) vs Grow & Scale with profit (business), Stripe placeholder | ✅ Done (preview data layer) |
+
+**Search v2.** Keywords are matched against name, handle, bio, niches **and every post caption, #tag and opportunity** the profile published (`src/lib/search-index.ts`). A brand whose bio never says "skincare" is still found when its posts do, and the card shows the matching post. A niche that only appears in posts earns partial credit. New businesses land on "Matched to you", built from what they chose at onboarding (`filtersFromProfile`).
+
+**DM folders.** `src/lib/threads.ts` assigns each conversation a folder: the Money Machine admin thread (pinned, sends welcome + automatic matches), the founder's outreach folder (creators only), General, or the deal folder for the offer's type if the creator chose that means of earning at onboarding. Bulk DMs and opportunity applications carry a `DealOffer`, so they land in the right folder.
+
+**Media.** Photos stay compressed data URLs; videos and uploaded GIFs live in the browser's IndexedDB (`src/lib/media.ts`) until object storage is connected. Built-in reaction GIFs are CSS-animated, so no third-party GIF API key is needed.
 
 **How the match % works** (`src/lib/match.ts`, unit tested): it is the share of the
 filters the searcher picked that a profile meets (half credit for "close", e.g. same

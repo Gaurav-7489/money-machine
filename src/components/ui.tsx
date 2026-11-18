@@ -8,7 +8,7 @@ import { useStore } from "@/lib/store";
 type Variant = "primary" | "secondary" | "ghost" | "soft";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-brand-600 text-white hover:bg-brand-700 shadow-sm shadow-brand-900/10",
+  primary: "bg-aurora text-white btn-glow",
   secondary: "bg-surface text-ink border border-line hover:bg-canvas",
   ghost: "text-ink hover:bg-canvas",
   soft: "bg-brand-50 text-brand-700 hover:bg-brand-100",
@@ -170,7 +170,7 @@ export function Toast({ message, onDone }: { message: string | null; onDone: () 
   if (!message) return null;
   return (
     <div role="status" className="fixed inset-x-0 bottom-24 z-50 flex justify-center px-4 md:bottom-8">
-      <div className="animate-fade-up rounded-full bg-ink px-4 py-2.5 text-sm font-medium text-white shadow-xl">{message}</div>
+      <div className="animate-fade-up rounded-full bg-ink px-4 py-2.5 text-sm font-medium text-surface shadow-xl">{message}</div>
     </div>
   );
 }
@@ -205,7 +205,7 @@ export function InfoTip({ text, label = "What does this mean?", className = "" }
         <span
           id={id}
           role="tooltip"
-          className="animate-fade-in absolute bottom-full left-1/2 z-50 mb-2 w-60 -translate-x-1/2 rounded-xl bg-ink px-3 py-2 text-left text-[12px] font-normal leading-snug text-white shadow-xl"
+          className="animate-fade-in absolute bottom-full left-1/2 z-50 mb-2 w-60 -translate-x-1/2 rounded-xl bg-ink px-3 py-2 text-left text-[12px] font-normal leading-snug text-surface shadow-xl"
         >
           {text}
         </span>
@@ -236,7 +236,7 @@ export function Tip({ id, title, children }: { id: string; title: string; childr
 
 /** Horizontal progress bar for a match percentage. */
 export function MatchMeter({ percent, label }: { percent: number; label: string }) {
-  const color = percent >= 90 ? "bg-brand-500" : percent >= 75 ? "bg-brand-400" : percent >= 50 ? "bg-amber-400" : "bg-slate-300";
+  const color = percent >= 90 ? "bg-aurora" : percent >= 70 ? "bg-gradient-to-r from-brand-500 to-fuchsia-500" : percent >= 50 ? "bg-gradient-to-r from-amber-400 to-orange-400" : "bg-slate-300";
   return (
     <div className="w-full">
       <div className="mb-1 flex items-baseline justify-between text-xs">

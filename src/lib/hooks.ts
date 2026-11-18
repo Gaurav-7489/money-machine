@@ -12,6 +12,19 @@ export function useMoney() {
   return useMemo(() => ({ kind, summary: summarize(records, kind), records: records.filter((r) => r.kind === kind) }), [records, kind]);
 }
 
+/** Business growth: what was invested (spending), what came back (revenue) and the profit. */
+export function useGrowth() {
+  const { records } = useStore();
+  return useMemo(() => {
+    const spending = summarize(records, "spending");
+    const revenue = summarize(records, "revenue");
+    const profit = revenue.total - spending.total;
+    const roi = spending.total > 0 ? Math.round((profit / spending.total) * 100) : null;
+    const monthlyProfit = revenue.monthly.map((m, i) => ({ month: m.month, total: m.total - spending.monthly[i]!.total }));
+    return { spending, revenue, profit, roi, monthlyProfit };
+  }, [records]);
+}
+
 export function useBadges() {
   const { records, programs, applications, session } = useStore();
   return useMemo(() => {

@@ -8,12 +8,12 @@ export function LogoMark({ className = "h-7 w-7" }: { className?: string }) {
     <svg viewBox="0 0 48 48" className={className} aria-hidden="true">
       <defs>
         <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#2DE3C8" />
-          <stop offset="1" stopColor="#0E7A5C" />
+          <stop offset="0" stopColor="#F59E0B" />
+          <stop offset="1" stopColor="#7C3AED" />
         </linearGradient>
       </defs>
       <path d="M6 38V14.5c0-2.6 3.2-3.9 5-2l13 13.6L37 12.5c1.8-1.9 5-.6 5 2V38" fill="none" stroke={`url(#${id})`} strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="24" cy="38" r="3.5" fill="#A6E88E" />
+      <circle cx="24" cy="38" r="3.5" fill="#EC4899" />
     </svg>
   );
 }

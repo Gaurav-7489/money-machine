@@ -1,35 +1,36 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { BookmarkPlus, ChevronDown, Mail, RotateCcw, Search, SearchX, SlidersHorizontal, X } from "lucide-react";
-import { Avatar } from "@/components/art";
+import { CheckSquare, RotateCcw, Search, SearchX, Send, SlidersHorizontal, Sparkles, Square, Star, Undo2, X } from "lucide-react";
 import { useFeedback } from "@/components/feedback";
+import { BulkDm } from "@/components/search/bulk-dm";
 import { MatchCard, MatchCardSkeleton } from "@/components/search/match-card";
-import { Button, EmptyState, Field, InfoTip, SampleTag, Tip, inputCls, selectCls } from "@/components/ui";
-import { CATEGORIES, COUNTRIES, EARNING_MODELS, LOCATIONS } from "@/lib/catalog";
-import { usePrograms } from "@/lib/hooks";
-import { EMPTY_FILTERS, MIN_MATCH_OPTIONS, activeFilterCount, filtersFromParams, filtersToParams, findMatches, type MatchFilters } from "@/lib/match";
-import { SAMPLE_PROFILES, profileByHandle } from "@/lib/sample-data";
+import { Button, EmptyState, InfoTip, Sheet, inputCls } from "@/components/ui";
+import { COUNTRIES, EARNING_MODELS, LOCATIONS, NICHES } from "@/lib/catalog";
+import { EMPTY_FILTERS, MATCH_LEVELS, activeFilterCount, countAtLeast, filtersFromParams, filtersFromProfile, filtersToParams, findMatches, type MatchFilters } from "@/lib/match";
+import { SEARCHABLE_PROFILES } from "@/lib/sample-data";
+import { usePostIndex } from "@/lib/search-index";
 import { useStore } from "@/lib/store";
 import { useThreads } from "@/lib/threads";
 
-const TABS = [
-  { id: "all", label: "All" },
-  { id: "creator", label: "Creators" },
-  { id: "business", label: "Businesses" },
-  { id: "opps", label: "Opportunities" },
-] as const;
-type TabId = (typeof TABS)[number]["id"];
+const digits = (v: string) => v.replace(/[^\d]/g, "");
+const numOrNull = (v: string) => (v.trim() === "" ? null : Number(digits(v)) || 0);
 
-const numOrNull = (v: string) => (v.trim() === "" ? null : Math.max(0, Math.floor(Number(v.replace(/[^\d]/g, "")) || 0)));
-
-function FilterGroup({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+function Chip({ on, onClick, children, title }: { on: boolean; onClick: () => void; children: React.ReactNode; title?: string }) {
   return (
-    <fieldset className="space-y-3 border-t border-line pt-4 first:border-t-0 first:pt-0">
-      <legend className="mb-1 flex items-center gap-1 text-sm font-bold">
+    <button type="button" aria-pressed={on} title={title} onClick={onClick} className={`press h-9 shrink-0 rounded-full px-3.5 text-[13px] font-semibold transition-colors ${on ? "bg-aurora text-white shadow-sm" : "border border-line bg-surface text-ink hover:border-brand-300"}`}>
+      {children}
+    </button>
+  );
+}
+
+function Group({ title, hint, optional, children }: { title: string; hint?: string; optional?: boolean; children: React.ReactNode }) {
+  return (
+    <fieldset className="space-y-2.5 border-t border-line pt-4 first:border-t-0 first:pt-0">
+      <legend className="mb-2 flex items-center gap-1.5 text-[14px] font-bold">
         {title}
+        {optional && <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span>}
         {hint && <InfoTip text={hint} />}
       </legend>
       {children}
@@ -37,423 +38,330 @@ function FilterGroup({ title, hint, children }: { title: string; hint?: string; 
   );
 }
 
+/** Draft form state: numbers kept as strings while typing. */
+type Draft = Omit<MatchFilters, "priceMin" | "priceMax" | "commission" | "perSale"> & { priceMin: string; priceMax: string; commission: string; perSale: string };
+const toDraft = (f: MatchFilters): Draft => ({ ...f, priceMin: f.priceMin?.toString() ?? "", priceMax: f.priceMax?.toString() ?? "", commission: f.commission?.toString() ?? "", perSale: f.perSale?.toString() ?? "" });
+const fromDraft = (d: Draft): MatchFilters => ({ ...d, priceMin: numOrNull(d.priceMin), priceMax: numOrNull(d.priceMax), commission: numOrNull(d.commission), perSale: numOrNull(d.perSale) });
+
+function FilterForm({ draft, setDraft, role, error, onSubmit, onClear }: { draft: Draft; setDraft: (fn: (d: Draft) => Draft) => void; role: "creator" | "business"; error: string; onSubmit: (e: React.FormEvent) => void; onClear: () => void }) {
+  const lookingForCreators = draft.kind !== "business";
+  const cities = draft.country ? LOCATIONS[draft.country] ?? [] : [];
+  const toggle = (key: "niches" | "earningModels" | "cities", v: string) => setDraft((d) => ({ ...d, [key]: d[key].includes(v) ? d[key].filter((x) => x !== v) : [...d[key], v] }));
+
+  return (
+    <form onSubmit={onSubmit} noValidate className="space-y-4">
+      <Group title={role === "business" ? "What type of content creator?" : lookingForCreators ? "What type of creator?" : "What are you looking for?"} hint={lookingForCreators ? "Pick one or more. We also check their posts, so creators who post about it show up even if it's not in their bio." : "Pick one or more. We also check brands' posts, so they show up even if their bio doesn't say it."}>
+        <div className="flex flex-wrap gap-1.5">
+          {NICHES.map((n) => <Chip key={n} on={draft.niches.includes(n)} onClick={() => toggle("niches", n)}>{n}</Chip>)}
+        </div>
+      </Group>
+
+      <Group title="Means of earning">
+        <div className="flex flex-wrap gap-1.5">
+          {EARNING_MODELS.map((m) => <Chip key={m.id} on={draft.earningModels.includes(m.id)} onClick={() => toggle("earningModels", m.id)} title={m.hint}>{m.label}</Chip>)}
+        </div>
+      </Group>
+
+      <Group title={lookingForCreators ? "Pay per video (₹)" : "Price range per video (₹)"} hint={lookingForCreators ? "What the creator charges for one video or reel." : "What the brand usually pays for one video or reel."}>
+        <div className="grid grid-cols-2 gap-2">
+          <label><span className="sr-only">Minimum per video</span><input inputMode="numeric" className={inputCls} placeholder="Min e.g. 3000" value={draft.priceMin} onChange={(e) => setDraft((d) => ({ ...d, priceMin: digits(e.target.value) }))} aria-invalid={!!error} /></label>
+          <label><span className="sr-only">Maximum per video</span><input inputMode="numeric" className={inputCls} placeholder="Max e.g. 25000" value={draft.priceMax} onChange={(e) => setDraft((d) => ({ ...d, priceMax: digits(e.target.value) }))} aria-invalid={!!error} /></label>
+        </div>
+        {error && <p role="alert" className="text-[12px] text-rose-600">{error}</p>}
+        <div className="grid grid-cols-2 gap-2">
+          <label className="block">
+            <span className="mb-1 block text-[12px] font-medium text-muted">{lookingForCreators ? "Commission up to %" : "Commission at least %"}</span>
+            <input inputMode="numeric" className={inputCls} placeholder="e.g. 15" value={draft.commission} onChange={(e) => setDraft((d) => ({ ...d, commission: digits(e.target.value).slice(0, 2) }))} />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-[12px] font-medium text-muted">{lookingForCreators ? "Per sale up to ₹" : "Per sale at least ₹"}</span>
+            <input inputMode="numeric" className={inputCls} placeholder="e.g. 150" value={draft.perSale} onChange={(e) => setDraft((d) => ({ ...d, perSale: digits(e.target.value) }))} />
+          </label>
+        </div>
+      </Group>
+
+      <Group title="Country / city" hint="Tap a country, then tap one or more cities. Someone in the same country but another city counts as a partial match.">
+        <div className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+          <Chip on={!draft.country} onClick={() => setDraft((d) => ({ ...d, country: "", cities: [] }))}>Anywhere</Chip>
+          {COUNTRIES.map((c) => <Chip key={c} on={draft.country === c} onClick={() => setDraft((d) => ({ ...d, country: d.country === c ? "" : c, cities: [] }))}>{c}</Chip>)}
+        </div>
+        {cities.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {cities.map((c) => <Chip key={c} on={draft.cities.includes(c)} onClick={() => toggle("cities", c)}>{c}</Chip>)}
+          </div>
+        )}
+      </Group>
+
+      <Group title="Know who you want?" optional>
+        <div className="grid grid-cols-2 gap-2">
+          <label className="block"><span className="mb-1 block text-[12px] font-medium text-muted">Search by name</span><input className={inputCls} placeholder="e.g. Aanya" value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} /></label>
+          <label className="block"><span className="mb-1 block text-[12px] font-medium text-muted">Search by handle</span><input className={inputCls} placeholder="@handle" autoCapitalize="none" value={draft.social} onChange={(e) => setDraft((d) => ({ ...d, social: e.target.value }))} /></label>
+        </div>
+      </Group>
+
+      <div className="sticky bottom-0 -mx-5 grid grid-cols-[auto_1fr] gap-2 border-t border-line bg-surface px-5 py-3 lg:static lg:mx-0 lg:border-0 lg:p-0">
+        <Button type="button" variant="secondary" onClick={onClear}><RotateCcw className="h-4 w-4" /> Clear</Button>
+        <Button type="submit"><Search className="h-4 w-4" /> Show matches</Button>
+      </div>
+    </form>
+  );
+}
+
 function ExploreInner() {
   const params = useSearchParams();
   const router = useRouter();
   const { toast } = useFeedback();
-  const { following, savedProfiles, toggle, setMany } = useStore();
-  const { startThread } = useThreads();
-  const programs = usePrograms();
+  const { session, starredProfiles, hiddenProfiles, toggle, setMany } = useStore();
+  const { startThread, bulkDaysLeft } = useThreads();
+  const posts = usePostIndex();
+  const role = session?.role ?? "creator";
+  const defaultKind = role === "business" ? "creator" : "business";
 
-  // Applied filters live in the URL so results can be shared and survive Back.
-  const applied = useMemo(() => filtersFromParams(new URLSearchParams(params.toString())), [params]);
-  const tab: TabId = params.get("tab") === "opps" ? "opps" : applied.kind;
-  const minMatch = Number(params.get("match") ?? 0) || 0;
+  const urlFilters = useMemo(() => filtersFromParams(new URLSearchParams(params.toString())), [params]);
+  const custom = params.get("mode") === "custom" || activeFilterCount({ ...urlFilters, q: "" }) > 0;
+  const kind = urlFilters.kind === "all" ? defaultKind : urlFilters.kind;
+  const matched = useMemo(() => (session ? { ...filtersFromProfile(session), kind } : { ...EMPTY_FILTERS, kind }), [session, kind]);
+  const applied: MatchFilters = custom ? { ...urlFilters, kind } : { ...matched, q: urlFilters.q };
+  const level = Number(params.get("match") ?? 0) || 0;
 
-  const [draft, setDraft] = useState<MatchFilters>(applied);
-  const [priceMin, setPriceMin] = useState(applied.priceMin?.toString() ?? "");
-  const [priceMax, setPriceMax] = useState(applied.priceMax?.toString() ?? "");
-  const [perSale, setPerSale] = useState(applied.perSaleMax?.toString() ?? "");
-  const [q, setQ] = useState(applied.q);
+  const [q, setQ] = useState(urlFilters.q);
+  const [draft, setDraftState] = useState<Draft>(toDraft(applied));
+  const [sheet, setSheet] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [panelOpen, setPanelOpen] = useState(true);
   const [selected, setSelected] = useState<string[]>([]);
-  const [priceErr, setPriceErr] = useState("");
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [error, setError] = useState("");
+  const setDraft = (fn: (d: Draft) => Draft) => setDraftState(fn);
 
-  // Collapse the filter panel on phones the first time.
+  useEffect(() => setQ(urlFilters.q), [urlFilters.q]);
+  useEffect(() => setDraftState(toDraft(applied)), [params, session]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const pool = useMemo(() => SEARCHABLE_PROFILES.filter((p) => !hiddenProfiles.includes(p.handle)), [hiddenProfiles]);
+  const live = { ...applied, q };
+  const scored = useMemo(() => findMatches(pool, live, 0, posts), [pool, JSON.stringify(live), posts]); // eslint-disable-line react-hooks/exhaustive-deps
+  const results = level ? scored.filter((r) => r.percent !== null && r.percent >= level) : scored;
+  const hasScores = scored.some((r) => r.percent !== null);
+
   useEffect(() => {
-    if (window.matchMedia("(max-width: 1023px)").matches && activeFilterCount(applied) === 0) setPanelOpen(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setSelected((s) => s.filter((h) => results.some((r) => r.profile.handle === h)));
+  }, [results.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Keep the form in sync when the URL changes (e.g. header search, Back button).
-  useEffect(() => {
-    setDraft(applied);
-    setQ(applied.q);
-    setPriceMin(applied.priceMin?.toString() ?? "");
-    setPriceMax(applied.priceMax?.toString() ?? "");
-    setPerSale(applied.perSaleMax?.toString() ?? "");
-  }, [applied]);
-
-  function go(f: MatchFilters, extra: Record<string, string> = {}) {
-    const qs = filtersToParams(f, { match: minMatch ? String(minMatch) : "", tab: tab === "opps" ? "opps" : "", ...extra });
+  function go(f: MatchFilters, extra: Record<string, string> = {}, isCustom = true) {
+    if (!isCustom) {
+      const p = new URLSearchParams();
+      if (f.q) p.set("q", f.q);
+      if (f.kind !== defaultKind) p.set("type", f.kind);
+      if (level) p.set("match", String(level));
+      router.replace(`/explore${p.size ? `?${p}` : ""}`, { scroll: false });
+      return;
+    }
+    const qs = filtersToParams({ ...f, kind: f.kind === defaultKind ? "all" : f.kind }, { mode: activeFilterCount({ ...f, q: "" }) === 0 ? "custom" : "", match: level ? String(level) : "", ...extra });
     router.replace(`/explore${qs ? `?${qs}` : ""}`, { scroll: false });
   }
 
-  // Quick search applies as you type (kept from the original Explore page).
-  const live: MatchFilters = { ...applied, q };
-  const results = useMemo(() => (tab === "opps" ? [] : findMatches(SAMPLE_PROFILES, live, minMatch)), [tab, live.q, applied, minMatch]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const needle = q.trim().toLowerCase().replace(/^#/, "");
-  const opps = useMemo(
-    () =>
-      tab === "all" || tab === "opps"
-        ? programs.filter((p) => p.status === "active" && (!needle || [p.name, p.brand, p.description].some((s) => s.toLowerCase().includes(needle))))
-        : [],
-    [programs, tab, needle],
-  );
-
-  // Drop selections that are no longer visible.
-  useEffect(() => {
-    setSelected((s) => s.filter((h) => results.some((r) => r.profile.handle === h)));
-  }, [results]);
-
-  function runSearch(e?: React.FormEvent) {
-    e?.preventDefault();
-    const min = numOrNull(priceMin);
-    const max = numOrNull(priceMax);
-    if (min !== null && max !== null && min > max) {
-      setPriceErr("The lowest price should be smaller than the highest price.");
-      return;
-    }
-    setPriceErr("");
+  function apply(e: React.FormEvent) {
+    e.preventDefault();
+    const f = fromDraft(draft);
+    if (f.priceMin !== null && f.priceMax !== null && f.priceMin > f.priceMax) return setError("The minimum should be smaller than the maximum.");
+    setError("");
+    setSheet(false);
     setLoading(true);
-    // A short pause so people can see the search happened.
     setTimeout(() => {
-      go({ ...draft, q, priceMin: min, priceMax: max, perSaleMax: numOrNull(perSale) });
+      go({ ...f, q, kind });
       setLoading(false);
-      if (window.matchMedia("(max-width: 1023px)").matches) {
-        setPanelOpen(false);
-        document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 450);
+      document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 350);
   }
 
   function clearAll() {
-    setDraft({ ...EMPTY_FILTERS, kind: draft.kind });
+    setDraftState(toDraft({ ...EMPTY_FILTERS, kind }));
     setQ("");
-    setPriceMin("");
-    setPriceMax("");
-    setPerSale("");
-    setPriceErr("");
+    setError("");
     setSelected([]);
-    router.replace(`/explore${tab !== "all" ? `?${tab === "opps" ? "tab=opps" : `type=${tab}`}` : ""}`, { scroll: false });
+    go({ ...EMPTY_FILTERS, kind });
     toast("Filters cleared", "info");
   }
 
-  function setTab(t: TabId) {
-    const f = { ...applied, q, kind: t === "opps" || t === "all" ? ("all" as const) : t };
-    setDraft((d) => ({ ...d, kind: f.kind }));
-    go(f, { tab: t === "opps" ? "opps" : "" });
+  function setLevel(v: number) {
+    const qs = new URLSearchParams(params.toString());
+    if (v) qs.set("match", String(v));
+    else qs.delete("match");
+    router.replace(`/explore${qs.size ? `?${qs}` : ""}`, { scroll: false });
   }
 
-  function save(handle: string, name: string, kind: string) {
-    const was = savedProfiles.includes(handle);
-    toggle("savedProfiles", handle);
-    toast(was ? `${name} removed from Saved` : `${kind === "creator" ? "Creator" : "Business"} saved successfully!`, was ? "info" : "success");
+  function setKind(k: "creator" | "business") {
+    go({ ...applied, q, kind: k }, {}, custom);
   }
 
-  function message(handle: string) {
-    const id = startThread(handle);
-    router.push(`/inbox/${id}`);
-  }
-
-  const visibleHandles = results.map((r) => r.profile.handle);
-  const allSelected = visibleHandles.length > 0 && visibleHandles.every((h) => selected.includes(h));
-  const selectedProfiles = SAMPLE_PROFILES.filter((p) => selected.includes(p.handle));
-  const emails = selectedProfiles.map((p) => p.email).filter(Boolean) as string[];
-  const filterCount = activeFilterCount(applied);
-  const cities = draft.country ? LOCATIONS[draft.country] ?? [] : Object.values(LOCATIONS).flat();
-
-  function saveSelected() {
-    setMany("savedProfiles", selected, true);
-    toast(`${selected.length} profile${selected.length === 1 ? "" : "s"} saved successfully!`);
-  }
+  const handles = results.map((r) => r.profile.handle);
+  const allSelected = handles.length > 0 && handles.every((h) => selected.includes(h));
+  const recipients = SEARCHABLE_PROFILES.filter((p) => selected.includes(p.handle));
+  const count = activeFilterCount(applied);
+  const who = kind === "creator" ? "creators" : "brands";
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-6xl pb-24">
       <header className="mb-4">
-        <h1 className="text-2xl font-bold tracking-tight">Search</h1>
-        <p className="mt-0.5 text-sm text-muted">Find creators and businesses to work with. Use the filters to see who matches best.</p>
+        <h1 className="text-[26px] font-extrabold tracking-tight">
+          Find <span className="text-aurora">{who}</span>
+        </h1>
+        <p className="mt-0.5 text-sm text-muted">{role === "business" ? "Creators that fit what you're looking for, ranked by match %." : "Brands that fit what you make, ranked by match %."}</p>
       </header>
 
-      <Tip id="search-intro" title="How search works">
-        Type a name or topic in the box, or open <strong>Filters</strong> to pick a category, place and price. Then press <strong>Search matches</strong>. Each result shows a
-        match bar: 100% means the profile fits every filter you picked.
-      </Tip>
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          go({ ...applied, q });
-        }}
-        className="relative"
-        role="search"
-      >
-        <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
-        <label htmlFor="explore-q" className="sr-only">Search by name, topic or username</label>
+      <form onSubmit={(e) => { e.preventDefault(); go({ ...applied, q }, {}, custom); }} className="relative" role="search">
+        <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-brand-500" />
+        <label htmlFor="explore-q" className="sr-only">Search by keyword, name or handle</label>
         <input
           id="explore-q"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Try “fitness”, “Glow Habit” or “@kavya.fit”"
-          className="h-12 w-full rounded-full border border-line bg-surface pl-12 pr-12 text-[15px] shadow-sm outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+          placeholder={`Try “skincare”: we search bios and posts`}
+          className="h-[52px] w-full rounded-full border border-line bg-surface pl-12 pr-24 text-[15px] shadow-sm outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
         />
         {q && (
-          <button type="button" onClick={() => { setQ(""); go({ ...applied, q: "" }); }} className="absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-muted hover:bg-canvas hover:text-ink" aria-label="Clear search text">
+          <button type="button" onClick={() => { setQ(""); go({ ...applied, q: "" }, {}, custom); }} className="absolute right-[58px] top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-muted hover:bg-canvas" aria-label="Clear search text">
             <X className="h-4 w-4" />
           </button>
         )}
+        <button type="button" onClick={() => setSheet(true)} className="press absolute right-1.5 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-aurora text-white lg:hidden" aria-label={`Filters${count ? `, ${count} on` : ""}`}>
+          <SlidersHorizontal className="h-[18px] w-[18px]" />
+          {count > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-ink px-1 text-[10px] font-bold text-surface">{count}</span>}
+        </button>
       </form>
 
-      <div className="no-scrollbar -mx-4 mt-3 flex items-center gap-2 overflow-x-auto px-4" role="tablist" aria-label="Show">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            role="tab"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
-            className={`press h-10 shrink-0 rounded-full px-4 text-sm font-medium ${tab === t.id ? "bg-brand-600 text-white" : "border border-line bg-surface text-ink hover:bg-canvas"}`}
-          >
-            {t.label}
+      <div className="no-scrollbar -mx-4 mt-3 flex items-center gap-2 overflow-x-auto px-4">
+        <button
+          onClick={() => router.replace(`/explore${kind !== defaultKind ? `?type=${kind}` : ""}`, { scroll: false })}
+          aria-pressed={!custom}
+          className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold ${!custom ? "bg-aurora text-white" : "border border-line bg-surface"}`}
+        >
+          <Sparkles className="h-4 w-4" /> Matched to you
+        </button>
+        <button onClick={() => setSheet(true)} aria-pressed={custom} className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold lg:hidden ${custom ? "bg-ink text-surface" : "border border-line bg-surface"}`}>
+          <SlidersHorizontal className="h-4 w-4" /> Custom search{custom && count ? ` · ${count}` : ""}
+        </button>
+        <span className="mx-1 h-5 w-px shrink-0 bg-line" />
+        {(["creator", "business"] as const).map((k) => (
+          <button key={k} onClick={() => setKind(k)} aria-pressed={kind === k} className={`press h-9 shrink-0 rounded-full px-3.5 text-[13px] font-semibold ${kind === k ? "bg-brand-50 text-brand-700 ring-1 ring-brand-200" : "text-muted hover:text-ink"}`}>
+            {k === "creator" ? "Creators" : "Brands"}
           </button>
         ))}
       </div>
 
-      <div className="mt-5 grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
-        {/* ── Filters ─────────────────────────────────────────── */}
-        {tab !== "opps" && (
-          <section aria-label="Filters" className="lg:sticky lg:top-24 lg:self-start">
-            <button
-              type="button"
-              onClick={() => setPanelOpen((o) => !o)}
-              aria-expanded={panelOpen}
-              aria-controls="filter-panel"
-              className="press card mb-3 flex h-12 w-full items-center gap-2 px-4 text-[15px] font-semibold lg:hidden"
-            >
-              <SlidersHorizontal className="h-5 w-5 text-brand-600" />
-              <span className="flex-1 text-left">{panelOpen ? "Hide filters" : "Show filters"}</span>
-              {filterCount > 0 && <span className="rounded-full bg-brand-600 px-2 py-0.5 text-xs text-white">{filterCount} on</span>}
-              <ChevronDown className={`h-5 w-5 transition-transform ${panelOpen ? "rotate-180" : ""}`} />
-            </button>
+      {!custom && (
+        <p className="bg-aurora-soft mt-3 rounded-2xl px-4 py-3 text-[13px]">
+          <Sparkles className="mr-1 inline h-4 w-4 text-brand-600" />
+          {applied.niches.length || applied.earningModels.length ? (
+            <>Showing {who} for your setup: <strong>{[...applied.niches, ...EARNING_MODELS.filter((m) => applied.earningModels.includes(m.id)).map((m) => m.short)].slice(0, 5).join(", ")}</strong>. Tap <strong>Custom search</strong> to change it.</>
+          ) : (
+            <>Tell us what you&apos;re looking for in your profile and we&apos;ll match you automatically. Or use <strong>Custom search</strong>.</>
+          )}
+        </p>
+      )}
 
-            <form id="filter-panel" onSubmit={runSearch} noValidate className={`card space-y-4 p-5 ${panelOpen ? "animate-fade-in block" : "hidden"} lg:block`}>
-              <div className="flex items-center justify-between">
-                <h2 className="flex items-center gap-2 font-bold"><SlidersHorizontal className="h-4 w-4" /> Filters</h2>
-                <button type="button" onClick={clearAll} className="press inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[13px] font-semibold text-brand-700 hover:bg-brand-50">
-                  <RotateCcw className="h-3.5 w-3.5" /> Clear filters
+      <div className="mt-5 grid gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
+        <aside className="hidden lg:block" aria-label="Filters">
+          <div className="card sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto p-5">
+            <h2 className="mb-4 flex items-center gap-2 font-bold"><SlidersHorizontal className="h-4 w-4 text-brand-600" /> Custom search</h2>
+            <FilterForm draft={draft} setDraft={setDraft} role={role} error={error} onSubmit={apply} onClear={clearAll} />
+          </div>
+        </aside>
+
+        <section id="results" aria-label="Results" aria-busy={loading} className="min-w-0 scroll-mt-24">
+          <div className="no-scrollbar -mx-4 mb-3 flex gap-2 overflow-x-auto px-4" role="radiogroup" aria-label="Minimum match">
+            {MATCH_LEVELS.map((v) => {
+              const n = countAtLeast(scored, v);
+              const on = level === v;
+              const disabled = v > 0 && !hasScores;
+              return (
+                <button
+                  key={v}
+                  role="radio"
+                  aria-checked={on}
+                  disabled={disabled}
+                  onClick={() => setLevel(v)}
+                  className={`press flex h-12 shrink-0 flex-col items-center justify-center rounded-2xl px-4 leading-tight disabled:opacity-40 ${on ? "bg-ink text-surface" : "border border-line bg-surface"}`}
+                >
+                  <span className="text-[13px] font-bold">{v === 0 ? "All" : `${v}%+`}</span>
+                  <span className={`text-[11px] ${on ? "opacity-80" : "text-muted"}`}>{n} {n === 1 ? "match" : "matches"}</span>
                 </button>
-              </div>
+              );
+            })}
+            <InfoTip className="self-center" text="The % is how many of your filters a profile meets. Pick 90%+ to see only near-perfect fits, or 50%+ to see more people." />
+          </div>
 
-              <FilterGroup title="Who are you looking for?">
-                <div role="radiogroup" aria-label="Profile type" className="grid grid-cols-3 gap-1.5 rounded-2xl bg-canvas p-1">
-                  {([["all", "Everyone"], ["creator", "Creators"], ["business", "Businesses"]] as const).map(([id, label]) => (
-                    <button
-                      key={id}
-                      type="button"
-                      role="radio"
-                      aria-checked={draft.kind === id}
-                      onClick={() => setDraft((d) => ({ ...d, kind: id }))}
-                      className={`press h-10 rounded-xl text-[13px] font-semibold ${draft.kind === id ? "bg-surface text-brand-700 shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                <Field label="Category" optional>
-                  <select className={selectCls} value={draft.category} onChange={(e) => setDraft((d) => ({ ...d, category: e.target.value }))}>
-                    <option value="">Any category</option>
-                    {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-                  </select>
-                </Field>
-              </FilterGroup>
+          <div className="mb-3 flex items-center gap-3">
+            <button type="button" onClick={() => setSelected(allSelected ? [] : handles)} disabled={!handles.length} className="press inline-flex h-10 items-center gap-2 rounded-full border border-line bg-surface px-3.5 text-[13px] font-semibold disabled:opacity-40">
+              {allSelected ? <CheckSquare className="h-4 w-4 text-brand-600" /> : <Square className="h-4 w-4" />}
+              {allSelected ? "Deselect all" : `Select all${level ? ` ${level}%+` : ""} (${handles.length})`}
+            </button>
+            <p className="ml-auto text-sm font-semibold" aria-live="polite">{loading ? "Searching…" : `${results.length} ${results.length === 1 ? who.slice(0, -1) : who}`}</p>
+          </div>
 
-              <FilterGroup title="Where?" hint="Pick a country first to see its cities. A profile in the same country but another city counts as a close match.">
-                <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
-                  <Field label="Country" optional>
-                    <select className={selectCls} value={draft.country} onChange={(e) => setDraft((d) => ({ ...d, country: e.target.value, city: "" }))}>
-                      <option value="">Any country</option>
-                      {COUNTRIES.map((c) => <option key={c}>{c}</option>)}
-                    </select>
-                  </Field>
-                  <Field label="City" optional>
-                    <select className={selectCls} value={draft.city} onChange={(e) => setDraft((d) => ({ ...d, city: e.target.value }))}>
-                      <option value="">Any city</option>
-                      {cities.map((c) => <option key={c}>{c}</option>)}
-                    </select>
-                  </Field>
-                </div>
-              </FilterGroup>
-
-              <FilterGroup title="Money" hint="Prices are in Indian rupees (₹). For creators this is what they charge; for businesses it is what they usually pay.">
-                <div>
-                  <p className="mb-1.5 flex items-center gap-2 text-[13px] font-medium">Price per post <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span></p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <label>
-                      <span className="sr-only">Lowest price per post in rupees</span>
-                      <input inputMode="numeric" className={inputCls} placeholder="From ₹ e.g. 2000" value={priceMin} onChange={(e) => setPriceMin(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!priceErr} />
-                    </label>
-                    <label>
-                      <span className="sr-only">Highest price per post in rupees</span>
-                      <input inputMode="numeric" className={inputCls} placeholder="To ₹ e.g. 20000" value={priceMax} onChange={(e) => setPriceMax(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!priceErr} />
-                    </label>
-                  </div>
-                  {priceErr && <p className="mt-1 text-[12px] text-rose-600" role="alert">{priceErr}</p>}
-                </div>
-                <Field label="Price per sale — up to ₹" optional hint="For affiliate deals: the money paid for each sale.">
-                  <input inputMode="numeric" className={inputCls} placeholder="e.g. 150" value={perSale} onChange={(e) => setPerSale(e.target.value.replace(/[^\d]/g, ""))} />
-                </Field>
-                <div>
-                  <p className="mb-1.5 flex items-center gap-2 text-[13px] font-medium">How they earn <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span></p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {EARNING_MODELS.map((m) => {
-                      const on = draft.earningModels.includes(m.id);
-                      return (
-                        <button
-                          key={m.id}
-                          type="button"
-                          aria-pressed={on}
-                          title={m.hint}
-                          onClick={() => setDraft((d) => ({ ...d, earningModels: on ? d.earningModels.filter((x) => x !== m.id) : [...d.earningModels, m.id] }))}
-                          className={`press h-9 rounded-full px-3 text-[13px] font-medium ${on ? "bg-brand-600 text-white" : "border border-line bg-surface hover:bg-canvas"}`}
-                        >
-                          {m.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </FilterGroup>
-
-              <FilterGroup title="Know who you want?" hint="These narrow results to exact people. Leave them empty to see everyone.">
-                <Field label="Creator or business name" optional>
-                  <input className={inputCls} placeholder="e.g. Aanya" value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} />
-                </Field>
-                <Field label="Social media handle" optional hint="Instagram, YouTube or X. With or without @.">
-                  <input className={inputCls} placeholder="e.g. @glowhabit" autoCapitalize="none" value={draft.social} onChange={(e) => setDraft((d) => ({ ...d, social: e.target.value }))} />
-                </Field>
-              </FilterGroup>
-
-              <Button type="submit" size="lg" className="w-full" disabled={loading}>
-                {loading ? (
-                  <><span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" /> Searching…</>
-                ) : (
-                  <><Search className="h-5 w-5" /> Search matches</>
-                )}
-              </Button>
-            </form>
-          </section>
-        )}
-
-        {/* ── Results ─────────────────────────────────────────── */}
-        <section id="results" aria-label="Results" aria-busy={loading} className={`scroll-mt-24 ${tab === "opps" ? "lg:col-span-2" : ""}`}>
-          {tab !== "opps" && (
-            <>
-              <div className="card mb-4 flex flex-wrap items-center gap-x-4 gap-y-3 p-3 pl-4">
-                <p className="text-sm font-semibold" aria-live="polite">
-                  {loading ? "Searching…" : `${results.length} ${results.length === 1 ? "match" : "matches"}`}
-                </p>
-                {results.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setSelected(allSelected ? [] : visibleHandles)}
-                    className="press h-9 rounded-full border border-line px-3 text-[13px] font-semibold hover:bg-canvas"
-                  >
-                    {allSelected ? "Deselect all" : "Select all"}
-                  </button>
-                )}
-                <label className="ml-auto flex items-center gap-1.5 text-[13px]">
-                  <span className="font-medium">Show</span>
-                  <select
-                    value={minMatch}
-                    onChange={(e) => go({ ...applied, q }, { match: e.target.value === "0" ? "" : e.target.value })}
-                    className="h-10 appearance-auto rounded-xl border border-line bg-surface px-2.5 text-[13px] font-medium outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
-                    aria-label="Minimum match"
-                  >
-                    {MIN_MATCH_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </select>
-                  <InfoTip text="The match % shows how many of YOUR filters a profile meets. 90%+ means it fits almost everything you asked for. If you haven't picked filters, everyone is shown." />
-                </label>
-              </div>
-
-              {selected.length > 0 && (
-                <div className="animate-fade-up sticky top-16 z-10 mb-4 flex flex-wrap items-center gap-2 rounded-2xl bg-ink p-2.5 pl-4 text-white shadow-xl md:top-20">
-                  <span className="mr-auto text-sm font-semibold">{selected.length} selected</span>
-                  <button onClick={saveSelected} className="press inline-flex h-9 items-center gap-1.5 rounded-full bg-white/15 px-3 text-[13px] font-semibold hover:bg-white/25">
-                    <BookmarkPlus className="h-4 w-4" /> Save selected
-                  </button>
-                  {emails.length > 0 && (
-                    <a
-                      href={`mailto:?bcc=${emails.join(",")}&subject=${encodeURIComponent("Collaboration via Money Machine")}`}
-                      onClick={() => emails.length < selected.length && toast(`${selected.length - emails.length} of them haven't shared an email, so they're left out.`, "info")}
-                      className="press inline-flex h-9 items-center gap-1.5 rounded-full bg-white/15 px-3 text-[13px] font-semibold hover:bg-white/25"
-                    >
-                      <Mail className="h-4 w-4" /> Email ({emails.length})
-                    </a>
-                  )}
-                  <button onClick={() => setSelected([])} className="press inline-flex h-9 items-center gap-1 rounded-full px-3 text-[13px] font-semibold hover:bg-white/15">
-                    <X className="h-4 w-4" /> Deselect all
-                  </button>
-                </div>
-              )}
-
-              {loading ? (
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  {[0, 1, 2].map((i) => <MatchCardSkeleton key={i} />)}
-                </div>
-              ) : results.length > 0 ? (
-                <ul key={params.toString()} className="stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  {results.map((r, i) => (
-                    <li key={r.profile.handle} style={{ ["--i" as string]: Math.min(i, 6) }}>
-                      <MatchCard
-                        result={r}
-                        selected={selected.includes(r.profile.handle)}
-                        onSelect={() => setSelected((s) => (s.includes(r.profile.handle) ? s.filter((h) => h !== r.profile.handle) : [...s, r.profile.handle]))}
-                        saved={savedProfiles.includes(r.profile.handle)}
-                        onSave={() => save(r.profile.handle, r.profile.name, r.profile.kind)}
-                        following={following.includes(r.profile.handle)}
-                        onFollow={() => {
-                          const was = following.includes(r.profile.handle);
-                          toggle("following", r.profile.handle);
-                          toast(was ? `You unfollowed ${r.profile.name}` : `You're now following ${r.profile.name}`, was ? "info" : "success");
-                        }}
-                        onMessage={() => message(r.profile.handle)}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="card">
-                  <EmptyState
-                    icon={<SearchX className="h-5 w-5" />}
-                    title="No matches found. Try changing your filters."
-                    body={minMatch > 0 ? "Try “Show everyone” instead of only the best matches, or remove a filter." : "Remove a filter or search for a broader word like “fitness” or “beauty”."}
-                    action={<Button variant="soft" onClick={clearAll}><RotateCcw className="h-4 w-4" /> Clear filters</Button>}
+          {loading ? (
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{[0, 1, 2].map((i) => <MatchCardSkeleton key={i} />)}</div>
+          ) : results.length ? (
+            <ul key={params.toString()} className="stagger grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {results.map((r, i) => (
+                <li key={r.profile.handle} style={{ ["--i" as string]: Math.min(i, 6) }}>
+                  <MatchCard
+                    result={r}
+                    selected={selected.includes(r.profile.handle)}
+                    onSelect={() => setSelected((s) => (s.includes(r.profile.handle) ? s.filter((h) => h !== r.profile.handle) : [...s, r.profile.handle]))}
+                    starred={starredProfiles.includes(r.profile.handle)}
+                    onStar={() => {
+                      const was = starredProfiles.includes(r.profile.handle);
+                      toggle("starredProfiles", r.profile.handle);
+                      toast(was ? `${r.profile.name} unstarred` : `${r.profile.name} starred ⭐`, was ? "info" : "success");
+                    }}
+                    onRemove={() => {
+                      toggle("hiddenProfiles", r.profile.handle);
+                      toast(`${r.profile.name} removed from your results`, "info");
+                    }}
+                    onMessage={() => router.push(`/inbox/${startThread(r.profile.handle)}`)}
                   />
-                </div>
-              )}
-              <p className="mt-3 text-center text-xs text-muted">Profiles shown are fictional samples for this preview. Real profiles appear once accounts go live.</p>
-            </>
-          )}
-
-          {opps.length > 0 && (
-            <section className={tab === "opps" ? "" : "mt-8"}>
-              <h2 className="mb-3 flex items-center gap-1 font-bold">
-                Opportunities <InfoTip text="Affiliate programs you can join. You earn a share (commission) of each sale made through your link." />
-              </h2>
-              <ul className="grid gap-3 md:grid-cols-2">
-                {opps.map((p) => (
-                  <li key={p.id}>
-                    <Link href={`/affiliates#${p.id}`} className="card lift flex items-center gap-3 p-4 hover:border-brand-200">
-                      <Avatar name={p.brand} tone={profileByHandle(p.ownerHandle)?.tone ?? "violet"} size="md" square />
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate font-semibold">{p.name}</span>
-                        <span className="block text-sm text-muted">Earn {p.commissionPercent}% of each sale · Affiliate</span>
-                      </span>
-                      {p.sample && <SampleTag />}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-          {tab === "opps" && opps.length === 0 && (
+                </li>
+              ))}
+            </ul>
+          ) : (
             <div className="card">
-              <EmptyState icon={<SearchX className="h-5 w-5" />} title="No opportunities found" body={`Nothing matches “${q}”. Try another word.`} />
+              <EmptyState
+                icon={<SearchX className="h-5 w-5" />}
+                title="No matches found. Try changing your filters."
+                body={level ? "Pick a lower match % like 50%+, or All." : "Remove a filter or try a broader word like “beauty” or “fitness”."}
+                action={<Button variant="soft" onClick={clearAll}><RotateCcw className="h-4 w-4" /> Clear filters</Button>}
+              />
             </div>
           )}
+
+          {hiddenProfiles.length > 0 && (
+            <button onClick={() => { setMany("hiddenProfiles", hiddenProfiles, false); toast("Removed profiles are back", "info"); }} className="mx-auto mt-4 flex items-center gap-1.5 text-[13px] font-semibold text-brand-700 hover:underline">
+              <Undo2 className="h-4 w-4" /> Restore {hiddenProfiles.length} removed {hiddenProfiles.length === 1 ? "profile" : "profiles"}
+            </button>
+          )}
+          <p className="mt-3 text-center text-xs text-muted">Profiles shown are fictional samples for this preview.</p>
         </section>
       </div>
+
+      {selected.length > 0 && (
+        <div className="animate-fade-up fixed inset-x-3 bottom-20 z-40 mx-auto flex max-w-xl items-center gap-2 rounded-full bg-ink p-1.5 pl-4 text-surface shadow-2xl md:bottom-6">
+          <span className="mr-auto text-sm font-bold">{selected.length} selected</span>
+          <button onClick={() => { setMany("starredProfiles", selected, true); toast(`${selected.length} starred ⭐`); }} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-white/10" aria-label="Star selected" title="Star selected">
+            <Star className="h-5 w-5" />
+          </button>
+          <button onClick={() => setSelected([])} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-white/10" aria-label="Clear selection" title="Clear selection">
+            <X className="h-5 w-5" />
+          </button>
+          <button onClick={() => setBulkOpen(true)} className="press btn-glow inline-flex h-10 items-center gap-1.5 rounded-full bg-aurora px-4 text-sm font-bold text-white">
+            <Send className="h-4 w-4" /> Bulk DM{bulkDaysLeft > 0 ? ` · ${bulkDaysLeft}d` : ""}
+          </button>
+        </div>
+      )}
+
+      <Sheet open={sheet} onClose={() => setSheet(false)} title="Custom search">
+        {sheet && <FilterForm draft={draft} setDraft={setDraft} role={role} error={error} onSubmit={apply} onClear={clearAll} />}
+      </Sheet>
+      <BulkDm open={bulkOpen} onClose={() => setBulkOpen(false)} recipients={recipients} onSent={() => setSelected([])} />
     </div>
   );
 }

@@ -1,23 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ChevronRight, Link2, Star, Wallet } from "lucide-react";
+import { ArrowRight, ChevronRight, Link2, Rocket, Star, Wallet } from "lucide-react";
 import { Avatar } from "./art";
 import { Sparkline } from "./sparkline";
 import { SampleTag, StatusPill } from "./ui";
 import { formatINR } from "@/lib/format";
-import { useBadges, useMoney, useMyPrograms, usePrograms } from "@/lib/hooks";
+import { useBadges, useGrowth, useMoney, useMyPrograms, usePrograms } from "@/lib/hooks";
 import { profileByHandle } from "@/lib/sample-data";
 import { useStore } from "@/lib/store";
 
 export function GrowthCard() {
-  const { kind, summary } = useMoney();
+  const { kind, summary: income } = useMoney();
+  const growth = useGrowth();
   const earned = useBadges().filter((b) => b.earned).length;
-  const label = kind === "income" ? "Income" : "Spending";
+  const isBiz = kind === "spending";
+  const label = isBiz ? "Profit" : "Earned";
+  const summary = isBiz ? { ...income, total: growth.profit, monthly: growth.monthlyProfit, changePercent: growth.roi } : income;
   return (
     <Link href="/money" className="card block p-4 lift hover:border-brand-200">
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="font-semibold">{kind === "income" ? "Your Growth" : "Your Spending"}</h2>
+        <h2 className="font-semibold">{isBiz ? "Grow & Scale" : "Your Earnings"}</h2>
         <ChevronRight className="h-4 w-4 text-muted" />
       </div>
       <div className="flex items-end gap-4">
@@ -40,7 +43,7 @@ export function GrowthCard() {
           <p className="text-xs text-muted">Badges</p>
         </div>
       </div>
-      {summary.total === 0 && <p className="mt-3 text-xs text-muted">Add your first {label.toLowerCase()} record to start tracking.</p>}
+      {summary.total === 0 && <p className="mt-3 text-xs text-muted">{isBiz ? "Add investments and revenue to see your profit." : "Add your first earning to start tracking."}</p>}
     </Link>
   );
 }
@@ -80,11 +83,14 @@ export function ProgramsCard() {
 
 export function TabletQuickCards() {
   const { kind, summary } = useMoney();
+  const growth = useGrowth();
   const mine = useMyPrograms();
   const earned = useBadges().filter((b) => b.earned).length;
   const { session } = useStore();
   const items = [
-    { href: "/money", label: "Money", value: formatINR(summary.total), sub: kind === "income" ? "Income" : "Spending", icon: Wallet, tone: "bg-emerald-50 text-emerald-600" },
+    kind === "income"
+      ? { href: "/money", label: "Earnings", value: formatINR(summary.total), sub: "Earned", icon: Wallet, tone: "bg-emerald-50 text-emerald-600" }
+      : { href: "/money", label: "Grow & Scale", value: `Profit ${formatINR(growth.profit)}`, sub: "Profit", icon: Rocket, tone: "bg-violet-50 text-violet-600" },
     { href: "/affiliates", label: "Affiliates", value: `${mine.length} Program${mine.length === 1 ? "" : "s"}`, sub: "", icon: Link2, tone: "bg-violet-50 text-violet-600" },
     { href: "/badges", label: "Badges", value: `${earned} Earned`, sub: "", icon: Star, tone: "bg-amber-50 text-amber-500" },
   ];

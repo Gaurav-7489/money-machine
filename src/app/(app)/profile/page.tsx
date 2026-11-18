@@ -3,17 +3,17 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AtSign, Bookmark, Grid3x3, Link2, Lock, LogOut, Mail, MapPin, Palette, Pencil, Repeat2, Settings, Smartphone, Star, Tag, Users, Wallet } from "lucide-react";
+import { AtSign, BadgeCheck, Bookmark, FolderOpen, Grid3x3, Link2, LogOut, Mail, MapPin, Palette, Pencil, Repeat2, Rocket, Settings, Smartphone, Star, Users, Wallet } from "lucide-react";
 import { Avatar, TONES } from "@/components/art";
 import { useFeedback } from "@/components/feedback";
 import { PostCard } from "@/components/feed/post-card";
 import { InstallGuide } from "@/components/install-prompt";
 import { ThemePicker } from "@/components/theme";
 import { Button, DeviceNote, EmptyState, Field, InfoTip, Sheet, inputCls, selectCls } from "@/components/ui";
-import { CATEGORIES, COUNTRIES, EARNING_MODELS, LOCATIONS, earningLabel } from "@/lib/catalog";
+import { COUNTRIES, EARNING_MODELS, LOCATIONS, NICHES, earningLabel } from "@/lib/catalog";
 import { useFeed } from "@/lib/feed";
 import { formatINR } from "@/lib/format";
-import { useBadges, useMoney, useMyPrograms } from "@/lib/hooks";
+import { useBadges, useGrowth, useMoney, useMyPrograms } from "@/lib/hooks";
 import { useStore } from "@/lib/store";
 import type { Session } from "@/lib/types";
 import { fieldErrors, profileInput, type FieldErrors } from "@/lib/validation";
@@ -22,6 +22,9 @@ type Form = {
   displayName: string;
   bio: string;
   category: string;
+  niches: string[];
+  lookingFor: string[];
+  commissionPercent: string;
   country: string;
   city: string;
   priceFrom: string;
@@ -40,6 +43,9 @@ function toForm(s: Session): Form {
     displayName: s.displayName,
     bio: s.bio ?? "",
     category: s.category ?? "",
+    niches: s.niches ?? (s.category ? [s.category] : []),
+    lookingFor: s.lookingFor ?? [],
+    commissionPercent: str(s.commissionPercent),
     country: s.country ?? "",
     city: s.city ?? "",
     priceFrom: str(s.priceFrom),
@@ -57,13 +63,32 @@ function toForm(s: Session): Form {
 function completeness(s: Session) {
   const steps = [
     { done: !!s.bio, label: "Add a short bio" },
-    { done: !!s.category, label: "Pick a category" },
+    { done: (s.niches ?? []).length > 0 || !!s.category, label: "Pick your niches" },
     { done: !!s.city, label: "Add your city" },
-    { done: s.priceFrom !== undefined || s.priceTo !== undefined, label: "Add your prices" },
-    { done: (s.earningModels ?? []).length > 0, label: "Choose how you earn" },
+    { done: s.priceFrom !== undefined || s.priceTo !== undefined, label: "Add your pay per video" },
+    { done: (s.earningModels ?? []).length > 0, label: s.role === "business" ? "Choose how you work with creators" : "Choose how you earn" },
     { done: !!(s.instagram || s.youtube || s.x), label: "Add a social media handle" },
   ];
   return { percent: Math.round((steps.filter((x) => x.done).length / steps.length) * 100), next: steps.find((x) => !x.done) };
+}
+
+function ChipField({ label, hint, options, value, onChange }: { label: string; hint?: string; options: { id: string; label: string }[]; value: string[]; onChange: (v: string[]) => void }) {
+  return (
+    <div>
+      <p className="mb-1.5 text-[13px] font-medium">{label} <span className="ml-1 rounded-full bg-canvas px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span></p>
+      {hint && <p className="mb-2 text-[12px] text-muted">{hint}</p>}
+      <div className="flex flex-wrap gap-1.5">
+        {options.map((o) => {
+          const on = value.includes(o.id);
+          return (
+            <button key={o.id} type="button" aria-pressed={on} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-aurora text-white" : "border border-line bg-surface hover:bg-canvas"}`}>
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 function EditProfile({ session, onDone }: { session: Session; onDone: () => void }) {
@@ -86,7 +111,7 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
       toast("Please fix the highlighted fields.", "error");
       return;
     }
-    update((s) => (s.session ? { ...s, session: { ...s.session, ...parsed.data } } : s));
+    update((s) => (s.session ? { ...s, session: { ...s.session, ...parsed.data, category: parsed.data.niches[0] ?? parsed.data.category, payPerVideoMin: parsed.data.priceFrom, payPerVideoMax: parsed.data.priceTo } } : s));
     toast("Profile saved!");
     onDone();
   }
@@ -101,12 +126,8 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
         <Field label="Bio" optional error={errors.bio} hint={`${form.bio.length}/160 · One or two sentences about what you do.`}>
           <textarea className={`${inputCls} min-h-20`} maxLength={160} value={form.bio} onChange={set("bio")} placeholder={isBiz ? "e.g. Clean skincare made in India." : "e.g. Fitness creator sharing 20-minute home workouts."} />
         </Field>
-        <Field label="Category" optional hint="People can filter Search by this.">
-          <select className={selectCls} value={form.category} onChange={set("category")}>
-            <option value="">Choose a category</option>
-            {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-          </select>
-        </Field>
+        <ChipField label={isBiz ? "What your business does" : "Content you create"} options={NICHES.map((n) => ({ id: n, label: n }))} value={form.niches} onChange={(v) => setForm((f) => ({ ...f, niches: v }))} />
+        {isBiz && <ChipField label="Creators you're looking for" hint="We use this to match you automatically." options={NICHES.map((n) => ({ id: n, label: n }))} value={form.lookingFor} onChange={(v) => setForm((f) => ({ ...f, lookingFor: v }))} />}
         <div className="grid grid-cols-2 gap-2">
           <Field label="Country" optional>
             <select className={selectCls} value={form.country} onChange={set("country")}>
@@ -128,18 +149,24 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
           Working together <InfoTip text={isBiz ? "Your usual budget. This helps creators know if you're a good fit." : "Your usual prices. This helps businesses know if you're a good fit."} />
         </h3>
         <div className="grid grid-cols-2 gap-2">
-          <Field label={isBiz ? "Budget per post from ₹" : "Price per post from ₹"} optional error={errors.priceFrom}>
+          <Field label={isBiz ? "Budget per video from ₹" : "Pay per video from ₹"} optional error={errors.priceFrom}>
             <input inputMode="numeric" className={inputCls} placeholder="e.g. 2000" value={form.priceFrom} onChange={set("priceFrom")} aria-invalid={!!errors.priceFrom} />
           </Field>
           <Field label="To ₹" optional error={errors.priceTo}>
             <input inputMode="numeric" className={inputCls} placeholder="e.g. 10000" value={form.priceTo} onChange={set("priceTo")} aria-invalid={!!errors.priceTo} />
           </Field>
         </div>
-        <Field label={isBiz ? "You pay per sale ₹" : "You ask per sale ₹"} optional error={errors.perSale} hint="For affiliate deals. Leave empty if you don't do them.">
-          <input inputMode="numeric" className={inputCls} placeholder="e.g. 100" value={form.perSale} onChange={set("perSale")} aria-invalid={!!errors.perSale} />
-        </Field>
+        <div className="grid grid-cols-2 gap-2">
+          <Field label={isBiz ? "Commission you pay %" : "Commission you ask %"} optional error={errors.commissionPercent}>
+            <input inputMode="numeric" className={inputCls} placeholder="e.g. 15" value={form.commissionPercent} onChange={set("commissionPercent")} aria-invalid={!!errors.commissionPercent} />
+          </Field>
+          <Field label={isBiz ? "You pay per sale ₹" : "You ask per sale ₹"} optional error={errors.perSale}>
+            <input inputMode="numeric" className={inputCls} placeholder="e.g. 100" value={form.perSale} onChange={set("perSale")} aria-invalid={!!errors.perSale} />
+          </Field>
+        </div>
         <div>
-          <p className="mb-1.5 text-[13px] font-medium">How you like to work</p>
+          <p className="mb-1.5 text-[13px] font-medium">{isBiz ? "How you work with creators" : "Means of earning"}</p>
+          {!isBiz && <p className="mb-2 flex items-center gap-1 text-[12px] text-muted"><FolderOpen className="h-3.5 w-3.5" /> Each one is a folder in your DMs.</p>}
           <div className="flex flex-wrap gap-1.5">
             {EARNING_MODELS.map((m) => {
               const on = form.earningModels.includes(m.id);
@@ -150,7 +177,7 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
                   aria-pressed={on}
                   title={m.hint}
                   onClick={() => setForm((f) => ({ ...f, earningModels: on ? f.earningModels.filter((x) => x !== m.id) : [...f.earningModels, m.id] }))}
-                  className={`press h-9 rounded-full px-3 text-[13px] font-medium ${on ? "bg-brand-600 text-white" : "border border-line bg-surface hover:bg-canvas"}`}
+                  className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-aurora text-white" : "border border-line bg-surface hover:bg-canvas"}`}
                 >
                   {m.label}
                 </button>
@@ -188,7 +215,8 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
 
 export default function Profile() {
   const { session, posts, following, reposts, saved, savedProfiles, reset } = useStore();
-  const { kind, summary } = useMoney();
+  const { summary } = useMoney();
+  const growth = useGrowth();
   const programs = useMyPrograms();
   const earned = useBadges().filter((b) => b.earned).length;
   const feed = useFeed();
@@ -217,7 +245,9 @@ export default function Profile() {
   }
 
   const tools = [
-    { href: "/money", label: kind === "income" ? "Money earned" : "Money spent", value: formatINR(summary.total), icon: Wallet, tone: "bg-emerald-50 text-emerald-600", private: true },
+    isBiz
+      ? { href: "/money", label: "Profit", value: `${growth.profit < 0 ? "−" : ""}${formatINR(Math.abs(growth.profit))}`, icon: Rocket, tone: "bg-aurora text-white" }
+      : { href: "/money", label: "Earned", value: formatINR(summary.total), icon: Wallet, tone: "bg-money text-white" },
     { href: "/affiliates", label: isBiz ? "Programs running" : "Programs joined", value: String(programs.length), icon: Link2, tone: "bg-violet-50 text-violet-600" },
     { href: "/badges", label: "Badges earned", value: String(earned), icon: Star, tone: "bg-amber-50 text-amber-500" },
   ];
@@ -237,14 +267,17 @@ export default function Profile() {
       <section className="card flex flex-col items-center p-5 text-center">
         <Avatar name={session.displayName} tone={isBiz ? "violet" : "rose"} size="xl" square={isBiz} />
         <h1 className="mt-3 text-xl font-bold">{session.displayName}</h1>
-        <p className="text-sm text-muted">@{session.handle} · <span className="capitalize">{session.role}</span></p>
+        <p className="text-sm text-muted">@{session.handle} · {isBiz ? "Business" : "Creator"}</p>
         {session.bio && <p className="mt-2 max-w-md text-[15px]">{session.bio}</p>}
-        {(session.city || session.category) && (
-          <ul className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-muted">
-            {session.city && <li className="flex items-center gap-1"><MapPin className="h-4 w-4" /> {session.city}, {session.country}</li>}
-            {session.category && <li className="flex items-center gap-1"><Tag className="h-4 w-4" /> {session.category}</li>}
-          </ul>
+        {session.city && (
+          <p className="mt-2 flex items-center gap-1 text-sm text-muted"><MapPin className="h-4 w-4" /> {session.city}, {session.country}</p>
         )}
+        {(session.niches ?? []).length > 0 && (
+          <p className="mt-2 flex flex-wrap justify-center gap-1.5">
+            {session.niches!.map((n) => <span key={n} className="bg-aurora-soft rounded-full px-2.5 py-0.5 text-xs font-semibold text-brand-700">{n}</span>)}
+          </p>
+        )}
+        {isBiz && (session.lookingFor ?? []).length > 0 && <p className="mt-2 text-xs text-muted">Looking for: <span className="font-semibold text-ink">{session.lookingFor!.join(", ")}</span> creators</p>}
         {(socials.length > 0 || session.email) && (
           <ul className="mt-2 flex flex-wrap justify-center gap-2 text-xs">
             {socials.map(([k, v]) => (
@@ -255,16 +288,16 @@ export default function Profile() {
         )}
         {(session.earningModels ?? []).length > 0 && (
           <p className="mt-2 flex flex-wrap justify-center gap-1.5">
-            {session.earningModels!.map((m) => <span key={m} className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700">{earningLabel(m)}</span>)}
+            {session.earningModels!.map((m) => <span key={m} className="rounded-full bg-canvas px-2.5 py-0.5 text-xs font-medium text-muted ring-1 ring-line">{earningLabel(m)}</span>)}
           </p>
         )}
         <dl className="mt-4 grid w-full max-w-sm grid-cols-3 text-center">
           <div className="flex flex-col"><dt className="text-xs text-muted">Posts</dt><dd className="order-first text-lg font-bold">{myPosts.length}</dd></div>
           <div className="flex flex-col">
-            <dt className="flex items-center justify-center gap-0.5 text-xs text-muted">Followers <InfoTip text="Followers will count up once real accounts go live. In this preview nobody else can follow you yet." className="-my-1" /></dt>
-            <dd className="order-first text-lg font-bold">0</dd>
+            <dt className="flex items-center justify-center gap-0.5 text-xs text-muted">Reposts</dt>
+            <dd className="order-first text-lg font-bold">{reposts.length}</dd>
           </div>
-          <Link href="/friends" className="flex flex-col rounded-xl hover:bg-canvas"><dt className="text-xs text-muted">Following</dt><dd className="order-first text-lg font-bold">{following.length}</dd></Link>
+          <Link href="/friends" className="flex flex-col rounded-xl hover:bg-canvas"><dt className="text-xs text-muted">Friends</dt><dd className="order-first text-lg font-bold">{following.length}</dd></Link>
         </dl>
         <Button variant="secondary" className="mt-4 w-full max-w-sm" onClick={() => setEditing(true)}>
           <Pencil className="h-4 w-4" /> Edit Profile
@@ -285,21 +318,20 @@ export default function Profile() {
       )}
 
       <section className="mt-4 grid grid-cols-3 gap-3">
-        {tools.map(({ href, label, value, icon: Icon, tone, private: priv }) => (
+        {tools.map(({ href, label, value, icon: Icon, tone }) => (
           <Link key={href} href={href} className="card lift flex flex-col items-center p-3.5 text-center hover:border-brand-200">
             <span className={`grid h-10 w-10 place-items-center rounded-xl ${tone}`}><Icon className="h-5 w-5" /></span>
             <span className="mt-2 max-w-full truncate text-base font-bold">{value}</span>
             <span className="text-[12px] leading-tight text-muted">{label}</span>
-            {priv && <span className="mt-1 inline-flex items-center gap-0.5 text-[10px] text-muted"><Lock className="h-3 w-3" /> Only you</span>}
           </Link>
         ))}
       </section>
-      <p className="mt-2 text-center text-[12px] text-muted">{kind === "income" ? "Your income" : "Your spending"} is private. Only you can see it.</p>
+      <p className="mt-2 flex items-center justify-center gap-1 text-center text-[12px] text-muted"><BadgeCheck className="h-3.5 w-3.5" /> {isBiz ? "Your profit is shown on your profile. What you spend stays private." : "Your earnings are shown on your profile. Connect Stripe to verify them."}</p>
 
       <section className="mt-4 grid grid-cols-2 gap-3">
         <Link href="/friends" className="card lift flex items-center gap-3 p-3.5 hover:border-brand-200">
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-sky-50 text-sky-600"><Users className="h-5 w-5" /></span>
-          <span><span className="block text-sm font-semibold">Friends</span><span className="block text-xs text-muted">{following.length} following</span></span>
+          <span><span className="block text-sm font-semibold">Friends</span><span className="block text-xs text-muted">{following.length} {following.length === 1 ? "friend" : "friends"}</span></span>
         </Link>
         <Link href="/saved" className="card lift flex items-center gap-3 p-3.5 hover:border-brand-200">
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-600"><Bookmark className="h-5 w-5" /></span>
@@ -360,7 +392,7 @@ export default function Profile() {
       <Sheet open={settings} onClose={() => setSettings(false)} title="Settings">
         <div className="space-y-6">
           <section>
-            <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold"><Palette className="h-4 w-4" /> Appearance</h3>
+            <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold"><Palette className="h-4 w-4" /> Theme</h3>
             <ThemePicker />
           </section>
           <section className="border-t border-line pt-4">

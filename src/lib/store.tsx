@@ -9,7 +9,7 @@
  * presented as verified.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { AffiliateApplication, AffiliateProgram, Comment, FinancialRecord, Message, Post, Session, Thread } from "./types";
+import type { AffiliateApplication, AffiliateProgram, Comment, FinancialRecord, Message, Opportunity, Post, Session, Thread } from "./types";
 
 interface StoreState {
   session: Session | null;
@@ -36,9 +36,21 @@ interface StoreState {
   deletedThreads: string[];
   /** onboarding tips the user has closed */
   dismissedTips: string[];
+  /** profiles starred from Search or a profile page */
+  starredProfiles: string[];
+  /** profiles removed from Search results ("Remove"); restorable */
+  hiddenProfiles: string[];
+  /** emoji reaction per post id */
+  reactions: Record<string, string>;
+  /** opportunities the business posted */
+  opportunities: Opportunity[];
+  /** opportunity ids the creator applied to */
+  oppApplied: string[];
+  /** ISO time of the last bulk DM (one every BULK_DM_COOLDOWN_DAYS) */
+  lastBulkDmAt: string | null;
 }
 
-export type ListKey = "liked" | "saved" | "following" | "readThreads" | "savedProfiles" | "reposts" | "starredThreads" | "trashedThreads" | "deletedThreads" | "dismissedTips";
+export type ListKey = "liked" | "saved" | "following" | "readThreads" | "savedProfiles" | "reposts" | "starredThreads" | "trashedThreads" | "deletedThreads" | "dismissedTips" | "starredProfiles" | "hiddenProfiles" | "oppApplied";
 
 const EMPTY: StoreState = {
   session: null,
@@ -59,6 +71,12 @@ const EMPTY: StoreState = {
   trashedThreads: [],
   deletedThreads: [],
   dismissedTips: [],
+  starredProfiles: [],
+  hiddenProfiles: [],
+  reactions: {},
+  opportunities: [],
+  oppApplied: [],
+  lastBulkDmAt: null,
 };
 
 const KEY = "mm.preview.v1";
@@ -85,6 +103,8 @@ function load(): StoreState {
     return EMPTY;
   }
 }
+
+export type { StoreState };
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<StoreState>(EMPTY);

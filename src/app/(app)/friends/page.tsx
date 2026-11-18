@@ -6,7 +6,7 @@ import { MessageCircle, UserPlus, Users } from "lucide-react";
 import { Avatar, VerifiedMark } from "@/components/art";
 import { useFeedback } from "@/components/feedback";
 import { ButtonLink, EmptyState, InfoTip, SampleTag } from "@/components/ui";
-import { SAMPLE_PROFILES, type Profile } from "@/lib/sample-data";
+import { SEARCHABLE_PROFILES as SAMPLE_PROFILES, type Profile } from "@/lib/sample-data";
 import { useStore } from "@/lib/store";
 import { useThreads } from "@/lib/threads";
 
@@ -18,12 +18,12 @@ function PersonRow({ p, followingNow }: { p: Profile; followingNow: boolean }) {
 
   async function follow() {
     if (followingNow) {
-      if (!(await confirm({ title: `Unfollow ${p.name}?`, body: "Their posts will no longer show in your Friends feed.", confirmLabel: "Unfollow" }))) return;
+      if (!(await confirm({ title: `Remove ${p.name} from friends?`, body: "Their posts will no longer show in your Friends feed.", confirmLabel: "Remove friend" }))) return;
       toggle("following", p.handle);
-      toast(`You unfollowed ${p.name}`, "info");
+      toast(`${p.name} removed from friends`, "info");
     } else {
       toggle("following", p.handle);
-      toast(`You're now following ${p.name}`);
+      toast(`${p.name} added to friends 🤝`);
     }
   }
 
@@ -44,9 +44,9 @@ function PersonRow({ p, followingNow }: { p: Profile; followingNow: boolean }) {
         {followingNow && (
           <button
             onClick={() => router.push(`/inbox/${startThread(p.handle)}`)}
-            className="press inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-brand-600 px-4 text-[13px] font-semibold text-white hover:bg-brand-700 sm:flex-none"
+            className="press btn-glow inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-aurora px-4 text-[13px] font-semibold text-white sm:flex-none"
           >
-            <MessageCircle className="h-4 w-4" /> Message
+            <MessageCircle className="h-4 w-4" /> DM
           </button>
         )}
         <button
@@ -54,7 +54,7 @@ function PersonRow({ p, followingNow }: { p: Profile; followingNow: boolean }) {
           aria-pressed={followingNow}
           className={`press inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-[13px] font-semibold sm:flex-none ${followingNow ? "border border-line bg-surface hover:bg-canvas" : "bg-brand-50 text-brand-700 hover:bg-brand-100"}`}
         >
-          {followingNow ? "Following" : <><UserPlus className="h-4 w-4" /> Follow</>}
+          {followingNow ? "Friends ✓" : <><UserPlus className="h-4 w-4" /> Add friend</>}
         </button>
       </div>
     </li>
@@ -69,11 +69,11 @@ export default function Friends() {
   return (
     <div className="mx-auto max-w-2xl">
       <h1 className="flex items-center gap-1 text-2xl font-bold tracking-tight">
-        Friends <InfoTip text="Friends are the creators and businesses you follow. Their posts appear in the Friends tab of your feed." />
+        Friends <InfoTip text="Friends are the creators and businesses you've added. Their posts appear in the Friends tab of your feed, and chats with them in the Friends tab of your DMs." />
       </h1>
-      <p className="mb-5 text-sm text-muted">People you follow, plus a few suggestions.</p>
+      <p className="mb-5 text-sm text-muted">Your people, plus a few suggestions.</p>
 
-      <h2 className="mb-2 text-sm font-semibold text-muted">You follow ({friends.length})</h2>
+      <h2 className="mb-2 text-sm font-semibold text-muted">Your friends ({friends.length})</h2>
       {friends.length ? (
         <ul className="card divide-y divide-line">
           {friends.map((p) => <PersonRow key={p.handle} p={p} followingNow />)}
@@ -82,8 +82,8 @@ export default function Friends() {
         <div className="card">
           <EmptyState
             icon={<Users className="h-5 w-5" />}
-            title="You're not following anyone yet"
-            body="Follow creators and businesses to see their posts and message them quickly."
+            title="No friends yet"
+            body="Add creators and businesses as friends to see their posts and DM them quickly."
             action={<ButtonLink href="/explore" variant="soft">Find people in Search</ButtonLink>}
           />
         </div>

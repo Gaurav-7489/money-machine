@@ -1,32 +1,35 @@
 @import "tailwindcss";
 
-/* Money Machine design tokens — from the approved design system:
-   deep green #0E7A5C, aqua #2DE3C8, lime #A6E88E, cream #FBF3CC */
+/* Money Machine design tokens — "Aurora Luxe" palette.
+   Royal violet primary, magenta + molten-gold accents, emerald for money.
+   Light = white, Dark = true black (OLED). */
 @theme {
-  --color-brand-50: #ecfbf5;
-  --color-brand-100: #d2f5e7;
-  --color-brand-200: #a6ebd2;
-  --color-brand-300: #6fd9b7;
-  --color-brand-400: #34c497;
-  --color-brand-500: #14a77d;
-  --color-brand-600: #0e7a5c;
-  --color-brand-700: #0c654d;
-  --color-brand-800: #0b503e;
-  --color-brand-900: #093f32;
-  --color-aqua: #2de3c8;
-  --color-lime: #a6e88e;
-  --color-cream: #fbf3cc;
-  --color-ink: #0f1a17;
-  --color-muted: #5f6f69;
-  --color-line: #e6ece9;
-  --color-canvas: #f5f8f7;
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ede9fe;
+  --color-brand-200: #ddd6fe;
+  --color-brand-300: #c4b5fd;
+  --color-brand-400: #a78bfa;
+  --color-brand-500: #8b5cf6;
+  --color-brand-600: #7c3aed;
+  --color-brand-700: #6d28d9;
+  --color-brand-800: #5b21b6;
+  --color-brand-900: #4c1d95;
+  --color-aqua: #ec4899;
+  --color-magenta: #ec4899;
+  --color-gold: #f5b942;
+  --color-lime: #f59e0b;
+  --color-cream: #f3efff;
+  --color-ink: #0d0b14;
+  --color-muted: #6b6780;
+  --color-line: #ebe8f2;
+  --color-canvas: #f7f6fb;
   --color-surface: #ffffff;
 
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --radius-card: 1.25rem;
-  --shadow-card: 0 1px 2px rgb(15 26 23 / 0.04), 0 8px 24px -12px rgb(15 26 23 / 0.08);
-  --shadow-lift: 0 2px 4px rgb(15 26 23 / 0.04), 0 18px 40px -16px rgb(14 122 92 / 0.22);
+  --shadow-card: 0 1px 2px rgb(13 11 20 / 0.04), 0 8px 24px -12px rgb(13 11 20 / 0.10);
+  --shadow-lift: 0 2px 4px rgb(13 11 20 / 0.04), 0 18px 40px -16px rgb(124 58 237 / 0.28);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -53,19 +56,20 @@
    sun/moon switch, and applied before paint by a tiny script in layout.tsx. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --color-canvas: #0b1311;
-  --color-surface: #121c19;
-  --color-line: #24332e;
-  --color-ink: #e8f0ed;
-  --color-muted: #9fb0aa;
-  --color-cream: #2e2a14;
+  --color-canvas: #000000;
+  --color-surface: #0b0b0f;
+  --color-line: #1f1e27;
+  --color-ink: #f5f4fa;
+  --color-muted: #a19db4;
+  --color-cream: #1a1430;
 
-  --color-brand-50: #10291f;
-  --color-brand-100: #143628;
-  --color-brand-200: #1f4c39;
-  --color-brand-700: #17a37b;
-  --color-brand-800: #8fe5c6;
-  --color-brand-900: #c2f3e1;
+  --color-brand-50: #170f2e;
+  --color-brand-100: #21143f;
+  --color-brand-200: #2e1a5a;
+  --color-brand-300: #4c2d8f;
+  --color-brand-700: #b99cff;
+  --color-brand-800: #d4c5ff;
+  --color-brand-900: #ece5ff;
 
   --color-emerald-50: #0f2a20;
   --color-emerald-700: #6ee7b7;
@@ -100,9 +104,9 @@
   --color-slate-300: #3c4d47;
   --color-slate-600: #b4c2bd;
 
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
 }
-:root[data-theme="dark"] .skeleton { background-image: linear-gradient(90deg, #17221f 25%, #1e2b27 50%, #17221f 75%); }
+:root[data-theme="dark"] .skeleton { background-image: linear-gradient(90deg, #111017 25%, #1a1922 50%, #111017 75%); }
+:root[data-theme="dark"] { --shadow-card: 0 0 0 1px rgb(255 255 255 / 0.02), 0 8px 24px -12px rgb(0 0 0 / 0.9); --shadow-lift: 0 18px 40px -16px rgb(139 92 246 / 0.35); }
 
 html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
@@ -112,6 +116,13 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
+
+/* Signature gradients */
+@utility bg-aurora { background-image: linear-gradient(135deg, #7c3aed 0%, #c026d3 48%, #f59e0b 100%); }
+@utility bg-aurora-soft { background-image: linear-gradient(135deg, rgb(124 58 237 / 0.14), rgb(236 72 153 / 0.10) 55%, rgb(245 158 11 / 0.12)); }
+@utility text-aurora { background-image: linear-gradient(120deg, #8b5cf6, #ec4899 55%, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+@utility bg-money { background-image: linear-gradient(135deg, #059669, #10b981 50%, #f5b942); }
+@utility ring-aurora { box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px #a855f7; }
 
 @utility card {
   background: var(--color-surface);
@@ -149,7 +160,7 @@ dialog[open]::backdrop { animation: var(--animate-fade-in); }
 @keyframes tab-in { from { transform: scaleX(0.3); opacity: 0; } to { transform: none; opacity: 1; } }
 
 /* Skeleton shimmer */
-.skeleton { background: linear-gradient(90deg, #eef2f1 25%, #f7faf9 50%, #eef2f1 75%); background-size: 200% 100%; animation: var(--animate-shimmer); border-radius: 0.75rem; }
+.skeleton { background: linear-gradient(90deg, #efedf5 25%, #f8f7fc 50%, #efedf5 75%); background-size: 200% 100%; animation: var(--animate-shimmer); border-radius: 0.75rem; }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
@@ -163,3 +174,21 @@ dialog[open]::backdrop { animation: var(--animate-fade-in); }
   *, *::before, *::after, dialog[open], dialog[open]::backdrop { animation: none !important; transition: none !important; }
 }
 
+
+/* Primary buttons glow a little */
+.btn-glow { box-shadow: 0 8px 24px -10px rgb(124 58 237 / 0.55); }
+.btn-glow:hover { filter: brightness(1.08); }
+
+/* Built-in reaction GIFs */
+@keyframes gif-bounce { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-12%) scale(1.08); } }
+@keyframes gif-spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+@keyframes gif-wiggle { 0%,100% { transform: rotate(-10deg); } 50% { transform: rotate(10deg); } }
+@keyframes gif-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.18); } }
+@keyframes gif-rise { 0% { transform: translateY(30%); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-60%); opacity: 0; } }
+@keyframes gif-hue { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(360deg); } }
+.gif-bounce { animation: gif-bounce 0.9s ease-in-out infinite; }
+.gif-spin { animation: gif-spin 2.4s linear infinite; }
+.gif-wiggle { animation: gif-wiggle 0.5s ease-in-out infinite; }
+.gif-pulse { animation: gif-pulse 0.8s ease-in-out infinite; }
+.gif-rise { animation: gif-rise 1.8s ease-out infinite; }
+.gif-hue { animation: gif-hue 4s linear infinite; }

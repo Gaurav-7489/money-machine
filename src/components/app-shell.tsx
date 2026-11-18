@@ -6,19 +6,19 @@ import { Suspense, useEffect, useState, type ReactNode } from "react";
 import { Bell, ChevronRight, Menu, Plus, Search } from "lucide-react";
 import { Logo, LogoMark } from "./logo";
 import { Avatar } from "./art";
-import { MESSAGE_FOLDERS, PRIMARY_NAV, SOCIAL_NAV, TOOLS_NAV, isActive } from "./nav";
+import { MESSAGE_FOLDERS, SOCIAL_NAV, isActive, primaryNav, toolsNav } from "./nav";
 import { useStore } from "@/lib/store";
 import { useThreads } from "@/lib/threads";
 import { InstallBanner } from "./install-prompt";
 import { ThemeToggle } from "./theme";
 import { Sheet } from "./ui";
 
-const MAIN = PRIMARY_NAV.filter((i) => i.href !== "/profile" && i.href !== "/create");
+const mainNav = (role: Parameters<typeof primaryNav>[0]) => primaryNav(role).filter((i) => i.href !== "/profile" && i.href !== "/create");
 
 function CountBadge({ n }: { n: number }) {
   if (n <= 0) return null;
   return (
-    <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand-600 px-1.5 text-[11px] font-bold text-white" aria-label={`${n} unread`}>
+    <span className="grid h-5 min-w-5 place-items-center rounded-full bg-rose-500 px-1.5 text-[11px] font-bold text-white" aria-label={`${n} unread`}>
       {n}
     </span>
   );
@@ -29,7 +29,7 @@ function NavLink({ href, label, icon: Icon, active, badge, small }: { href: stri
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`press flex items-center gap-3 rounded-xl px-3 transition-colors ${small ? "py-1.5 text-[14px]" : "py-2.5 text-[15px]"} ${active ? "bg-brand-50 font-semibold text-brand-700" : "text-ink hover:bg-canvas"}`}
+      className={`press flex items-center gap-3 rounded-xl px-3 transition-colors ${small ? "py-1.5 text-[14px]" : "py-2.5 text-[15px]"} ${active ? "bg-aurora-soft font-semibold text-brand-700" : "text-ink hover:bg-canvas"}`}
     >
       <Icon className={small ? "h-4 w-4" : "h-5 w-5"} strokeWidth={active ? 2.4 : 1.9} />
       <span className="flex-1">{label}</span>
@@ -41,10 +41,10 @@ function NavLink({ href, label, icon: Icon, active, badge, small }: { href: stri
 function FolderLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const params = useSearchParams();
-  const current = pathname === "/inbox" ? params.get("folder") ?? "inbox" : null;
+  const current = pathname === "/inbox" ? params.get("box") ?? "all" : null;
   return (
     <div className="ml-5 mt-0.5 space-y-0.5 border-l border-line pl-2" onClick={onNavigate}>
-      {MESSAGE_FOLDERS.filter((f) => f.folder !== "inbox").map((f) => (
+      {MESSAGE_FOLDERS.filter((f) => f.folder !== "all").map((f) => (
         <NavLink key={f.href} href={f.href} label={f.label} icon={f.icon} active={current === f.folder} small />
       ))}
     </div>
@@ -55,6 +55,8 @@ function Sidebar() {
   const pathname = usePathname();
   const { session } = useStore();
   const { unreadCount } = useThreads();
+  const MAIN = mainNav(session?.role);
+  const TOOLS_NAV = toolsNav(session?.role);
   return (
     <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col overflow-y-auto border-r border-line bg-surface px-4 py-6 lg:flex">
       <Link href="/home" className="mb-6 px-3" aria-label="Money Machine home">
@@ -78,11 +80,8 @@ function Sidebar() {
         {TOOLS_NAV.map((i) => (
           <NavLink key={i.href} {...i} active={isActive(pathname, i.href)} />
         ))}
-        <Link
-          href={session?.role === "business" ? "/affiliates/new" : "/create"}
-          className="press mt-5 inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-brand-600 text-[15px] font-semibold text-white shadow-sm hover:bg-brand-700"
-        >
-          <Plus className="h-5 w-5" /> {session?.role === "business" ? "New Program" : "New Post"}
+        <Link href="/create" className="press btn-glow mt-5 inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-aurora text-[15px] font-semibold text-white">
+          <Plus className="h-5 w-5" /> New post
         </Link>
       </nav>
       <ThemeToggle withLabel className="mt-4 w-full justify-start" />
@@ -91,7 +90,7 @@ function Sidebar() {
           <Avatar name={session.displayName} tone={session.role === "business" ? "violet" : "rose"} />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-semibold">{session.displayName}</span>
-            <span className="block truncate text-xs text-muted">@{session.handle} · <span className="capitalize">{session.role}</span></span>
+            <span className="block truncate text-xs text-muted">@{session.handle} · {session.role === "business" ? "Business" : "Creator"}</span>
           </span>
           <ChevronRight className="h-4 w-4 text-muted" />
         </Link>
@@ -104,7 +103,8 @@ function Sidebar() {
 function Rail() {
   const pathname = usePathname();
   const { unreadCount } = useThreads();
-  const items = [...MAIN, { href: "/create", label: "Create", icon: Plus }, ...SOCIAL_NAV.filter((i) => i.href !== "/notifications"), ...TOOLS_NAV];
+  const { session } = useStore();
+  const items = [...mainNav(session?.role), { href: "/create", label: "Create", icon: Plus }, ...SOCIAL_NAV.filter((i) => i.href !== "/notifications"), ...toolsNav(session?.role)];
   return (
     <aside className="sticky top-0 hidden h-dvh w-[88px] shrink-0 flex-col items-center gap-1 overflow-y-auto border-r border-line bg-surface py-5 md:flex lg:hidden">
       <Link href="/home" className="mb-4" aria-label="Money Machine home">
@@ -118,11 +118,11 @@ function Rail() {
               key={href}
               href={href}
               aria-current={active ? "page" : undefined}
-              className={`press relative flex w-[72px] flex-col items-center gap-0.5 rounded-2xl py-2 text-[11px] font-medium transition-colors ${active ? "bg-brand-50 text-brand-700" : "text-ink hover:bg-canvas"}`}
+              className={`press relative flex w-[72px] flex-col items-center gap-0.5 rounded-2xl py-2 text-center text-[11px] font-medium leading-tight transition-colors ${active ? "bg-aurora-soft text-brand-700" : "text-ink hover:bg-canvas"}`}
             >
               <Icon className="h-[22px] w-[22px]" strokeWidth={active ? 2.4 : 1.9} />
               {label}
-              {href === "/inbox" && unreadCount > 0 && <span className="absolute right-3 top-1.5 h-2.5 w-2.5 rounded-full bg-brand-500 ring-2 ring-surface" aria-label={`${unreadCount} unread`} />}
+              {href === "/inbox" && unreadCount > 0 && <span className="absolute right-3 top-1.5 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-surface" aria-label={`${unreadCount} unread`} />}
             </Link>
           );
         })}
@@ -145,11 +145,12 @@ function ProfileDot() {
 function MenuSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const pathname = usePathname();
   const { unreadCount } = useThreads();
+  const { session } = useStore();
   const groups = [
-    { title: "Main", items: PRIMARY_NAV },
-    { title: "Messages", items: MESSAGE_FOLDERS.map(({ href, label, icon }) => ({ href, label: label === "Inbox" ? "Inbox" : `${label} messages`, icon })) },
+    { title: "Main", items: primaryNav(session?.role) },
+    { title: "DMs", items: MESSAGE_FOLDERS.map(({ href, label, icon }) => ({ href, label: label === "All" ? "All DMs" : label, icon })) },
     { title: "People", items: SOCIAL_NAV },
-    { title: "Your tools", items: TOOLS_NAV },
+    { title: "Your tools", items: toolsNav(session?.role) },
   ];
   return (
     <Sheet open={open} onClose={onClose} title="Menu">
@@ -162,7 +163,7 @@ function MenuSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
                 <Link
                   key={href + label}
                   href={href}
-                  className={`press flex min-h-12 items-center gap-2.5 rounded-2xl border px-3 py-2.5 text-sm font-medium ${!href.includes("?") && isActive(pathname, href) ? "border-brand-300 bg-brand-50 text-brand-700" : "border-line hover:bg-canvas"}`}
+                  className={`press flex min-h-12 items-center gap-2.5 rounded-2xl border px-3 py-2.5 text-sm font-medium ${!href.includes("?") && isActive(pathname, href) ? "border-brand-300 bg-aurora-soft text-brand-700" : "border-line hover:bg-canvas"}`}
                 >
                   <Icon className="h-5 w-5 shrink-0" />
                   <span className="flex-1">{label}</span>
@@ -183,18 +184,18 @@ function MenuSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
 function TopBar() {
   const [menu, setMenu] = useState(false);
   return (
-    <header className="sticky top-0 z-30 flex items-center gap-1 border-b border-line/70 bg-surface/90 px-3 py-2 backdrop-blur pt-safe md:hidden">
+    <header className="sticky top-0 z-30 flex items-center gap-1 border-b border-line/70 bg-surface/85 px-3 py-2 backdrop-blur-xl pt-safe md:hidden">
       <Link href="/home" aria-label="Money Machine home" className="flex items-center gap-2 pl-1">
         <LogoMark className="h-8 w-8" />
-        <span className="text-[15px] font-bold tracking-tight">Money Machine</span>
+        <span className="text-[16px] font-extrabold tracking-tight">Money <span className="text-aurora">Machine</span></span>
       </Link>
       <div className="flex-1" />
       <ThemeToggle />
       <Link href="/notifications" className="grid h-10 w-10 place-items-center rounded-full hover:bg-canvas" aria-label="Notifications" title="Notifications">
         <Bell className="h-[22px] w-[22px]" />
       </Link>
-      <button onClick={() => setMenu(true)} className="press flex h-10 items-center gap-1.5 rounded-full border border-line px-3 text-sm font-semibold hover:bg-canvas" aria-haspopup="dialog">
-        <Menu className="h-[18px] w-[18px]" /> Menu
+      <button onClick={() => setMenu(true)} className="press grid h-10 w-10 place-items-center rounded-full border border-line hover:bg-canvas" aria-haspopup="dialog" aria-label="Menu">
+        <Menu className="h-[18px] w-[18px]" />
       </button>
       <MenuSheet open={menu} onClose={() => setMenu(false)} />
     </header>
@@ -204,10 +205,11 @@ function TopBar() {
 function BottomNav() {
   const pathname = usePathname();
   const { unreadCount } = useThreads();
+  const { session } = useStore();
   return (
-    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 backdrop-blur pb-safe md:hidden">
+    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/90 backdrop-blur-xl pb-safe md:hidden">
       <ul className="mx-auto grid max-w-md grid-cols-5 px-1">
-        {PRIMARY_NAV.map(({ href, label, icon: Icon }) => {
+        {primaryNav(session?.role).map(({ href, label, icon: Icon }) => {
           const active =
             isActive(pathname, href) ||
             (href === "/profile" && ["/money", "/badges", "/affiliates", "/friends", "/saved"].some((p) => isActive(pathname, p))) ||
@@ -219,12 +221,12 @@ function BottomNav() {
                 aria-current={active ? "page" : undefined}
                 className={`press relative flex h-16 flex-col items-center justify-center gap-0.5 text-[11px] font-medium transition-colors ${active ? "text-brand-700" : "text-muted"}`}
               >
-                <span className={`grid h-8 w-12 place-items-center rounded-full transition-colors ${active ? "bg-brand-50" : ""}`}>
-                  <Icon className="h-[22px] w-[22px]" strokeWidth={active ? 2.5 : 1.9} />
+                <span className={`grid h-8 w-12 place-items-center rounded-full transition-colors ${href === "/create" ? "bg-aurora text-white shadow-md" : active ? "bg-aurora-soft" : ""}`}>
+                  <Icon className="h-[22px] w-[22px]" strokeWidth={active || href === "/create" ? 2.5 : 1.9} />
                 </span>
                 {label}
                 {href === "/inbox" && unreadCount > 0 && (
-                  <span className="absolute right-[calc(50%-22px)] top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-brand-600 px-1 text-[10px] font-bold text-white">{unreadCount}</span>
+                  <span className="absolute right-[calc(50%-22px)] top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">{unreadCount}</span>
                 )}
               </Link>
             </li>
@@ -245,7 +247,7 @@ function DesktopHeader() {
         <input
           id="global-search"
           name="q"
-          placeholder="Search creators, brands, niches…"
+          placeholder="Search anything: skincare, @handle, a brand…"
           className="h-10 w-full max-w-md rounded-full border border-line bg-surface pl-10 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
         />
       </form>

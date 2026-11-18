@@ -3,7 +3,7 @@ import { z } from "zod";
 const today = () => new Date().toISOString().slice(0, 10);
 
 export const financialRecordInput = z.object({
-  kind: z.enum(["income", "spending"]),
+  kind: z.enum(["income", "spending", "revenue"]),
   title: z.string().trim().min(2, "Add a short description").max(80),
   amount: z.coerce
     .number({ message: "Enter an amount" })
@@ -33,7 +33,7 @@ export const applicationInput = z.object({
 });
 
 export const postInput = z.object({
-  caption: z.string().trim().min(1, "Write a caption").max(2200),
+  caption: z.string().min(1, "Write something first").max(2200),
   tags: z.string().max(200).optional(),
 });
 
@@ -75,6 +75,9 @@ export const profileInput = z
     displayName: z.string().trim().min(2, "Name must be 2–50 characters").max(50, "Name must be 2–50 characters"),
     bio: z.string().trim().max(160, "Keep your bio under 160 characters").transform((v) => v || undefined),
     category: z.string().transform((v) => v || undefined),
+    niches: z.array(z.string()).max(16).default([]),
+    lookingFor: z.array(z.string()).max(16).default([]),
+    commissionPercent: z.union([z.literal(""), z.coerce.number({ message: "Use numbers only" }).min(0, "Can't be below 0").max(90, "Commission can't exceed 90%")]).optional().transform((v) => (v === "" || v === undefined ? undefined : v)),
     country: z.string().transform((v) => v || undefined),
     city: z.string().transform((v) => v || undefined),
     priceFrom: optionalRupees,

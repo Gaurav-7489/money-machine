@@ -9,12 +9,12 @@ export function Sparkline({ values, className = "h-12 w-full" }: { values: numbe
     <svg viewBox={`0 0 ${w} ${h}`} className={className} preserveAspectRatio="none" aria-hidden="true">
       <defs>
         <linearGradient id="spark-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#2DE3C8" stopOpacity="0.35" />
-          <stop offset="1" stopColor="#2DE3C8" stopOpacity="0" />
+          <stop offset="0" stopColor="#A78BFA" stopOpacity="0.35" />
+          <stop offset="1" stopColor="#A78BFA" stopOpacity="0" />
         </linearGradient>
       </defs>
       <path d={`${d} L${w},${h} L0,${h} Z`} fill="url(#spark-fill)" />
-      <path d={d} fill="none" stroke="#14A77D" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+      <path d={d} fill="none" stroke="#8B5CF6" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
     </svg>
   );
 }

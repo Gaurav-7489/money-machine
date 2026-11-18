@@ -1,36 +1,56 @@
-import { Archive, Bell, Bookmark, Compass, Home, Inbox, Link2, MessageCircle, PlusSquare, Search, Send, Star, Trash2, User, Users, Wallet } from "lucide-react";
+import { Archive, Bell, Bookmark, Compass, Home, Inbox, Link2, MessageCircle, PlusSquare, Rocket, Search, Send, Star, Trash2, TrendingUp, User, Users, Wallet } from "lucide-react";
+import type { Role } from "@/lib/types";
 
-/** Mobile bottom bar: the five things people do most. Always shown with text labels. */
-export const PRIMARY_NAV = [
-  { href: "/home", label: "Feed", icon: Home },
-  { href: "/explore", label: "Search", icon: Search },
-  { href: "/create", label: "Create", icon: PlusSquare },
-  { href: "/inbox", label: "Messages", icon: MessageCircle },
-  { href: "/profile", label: "Profile", icon: User },
-] as const;
+type Item = { href: string; label: string; icon: typeof Home };
+
+/** Mobile bottom bar: the five things people do most. Labels differ for creators and businesses. */
+export function primaryNav(role: Role | undefined): Item[] {
+  return [
+    { href: "/home", label: "Feed", icon: Home },
+    { href: "/explore", label: role === "business" ? "Creators" : "Brands", icon: Search },
+    { href: "/create", label: "Create", icon: PlusSquare },
+    { href: "/inbox", label: "DMs", icon: MessageCircle },
+    { href: "/profile", label: "Profile", icon: User },
+  ];
+}
+
+/** Kept for older imports; creator labels. */
+export const PRIMARY_NAV = primaryNav("creator");
 
 /** People & saved things. */
-export const SOCIAL_NAV = [
+export const SOCIAL_NAV: Item[] = [
   { href: "/friends", label: "Friends", icon: Users },
   { href: "/saved", label: "Saved", icon: Bookmark },
   { href: "/notifications", label: "Notifications", icon: Bell },
-] as const;
+];
 
-/** Message folders, shown under Messages in the sidebar and as tabs in the inbox. */
+/** Message boxes, shown under DMs in the sidebar. */
 export const MESSAGE_FOLDERS = [
-  { href: "/inbox", folder: "inbox", label: "Inbox", icon: Inbox },
-  { href: "/inbox?folder=sent", folder: "sent", label: "Sent", icon: Send },
-  { href: "/inbox?folder=starred", folder: "starred", label: "Starred", icon: Star },
-  { href: "/inbox?folder=trash", folder: "trash", label: "Trash", icon: Trash2 },
+  { href: "/inbox", folder: "all", label: "All", icon: Inbox },
+  { href: "/inbox?box=sent", folder: "sent", label: "Sent", icon: Send },
+  { href: "/inbox?box=friends", folder: "friends", label: "Friends", icon: Users },
+  { href: "/inbox?box=starred", folder: "starred", label: "Starred", icon: Star },
+  { href: "/inbox?box=trash", folder: "trash", label: "Trash", icon: Trash2 },
 ] as const;
 
-export const TOOLS_NAV = [
-  { href: "/affiliates", label: "Affiliates", icon: Link2 },
-  { href: "/money", label: "Money", icon: Wallet },
-  { href: "/badges", label: "Badges", icon: Star },
-] as const;
+/** Tools differ by role: creators see real earnings, businesses see growth & scaling. */
+export function toolsNav(role: Role | undefined): Item[] {
+  return role === "business"
+    ? [
+        { href: "/money", label: "Grow & Scale", icon: Rocket },
+        { href: "/affiliates", label: "Programs", icon: Link2 },
+        { href: "/badges", label: "Badges", icon: Star },
+      ]
+    : [
+        { href: "/money", label: "Earnings", icon: Wallet },
+        { href: "/affiliates", label: "Affiliate deals", icon: Link2 },
+        { href: "/badges", label: "Badges", icon: Star },
+      ];
+}
 
-export { Archive, Bell, Compass };
+export const TOOLS_NAV = toolsNav("creator");
+
+export { Archive, Bell, Compass, TrendingUp };
 
 export function isActive(pathname: string, href: string) {
   const path = href.split("?")[0]!;

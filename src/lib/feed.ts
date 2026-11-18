@@ -16,12 +16,17 @@ export function useFeed(): FeedPost[] {
       caption: p.caption,
       tags: p.tags,
       createdAt: p.createdAt,
-      tone: p.tone ?? "mint",
+      tone: p.tone ?? "violet",
       image: p.image,
+      images: p.images,
+      videoId: p.videoId,
+      gif: p.gif,
+      quoteOf: p.quoteOf,
       authorKind: session?.role ?? "creator",
       mine: true,
       likes: 0,
       comments: 0,
+      reposts: 0,
     }));
     const samples: FeedPost[] = SAMPLE_POSTS.map((p) => {
       const prof = profileByHandle(p.authorHandle)!;
