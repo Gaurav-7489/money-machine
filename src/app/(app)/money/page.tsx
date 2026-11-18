@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { BadgeCheck, CreditCard, Handshake, Link2, Megaphone, Package, PlusCircle, Rocket, ShoppingCart, Sparkles, Trash2, TrendingDown, TrendingUp, Video, Wallet } from "lucide-react";
 import { useFeedback } from "@/components/feedback";
-import { Button, DeviceNote, EmptyState, Field, InfoTip, PageHeader, Sheet, inputCls, selectCls } from "@/components/ui";
+import { Button, EmptyState, Field, PageHeader, Sheet, inputCls, selectCls } from "@/components/ui";
 import { formatDate, formatINR, uid } from "@/lib/format";
 import { useGrowth, useMoney } from "@/lib/hooks";
 import { useStore } from "@/lib/store";
@@ -82,7 +82,6 @@ function RecordForm({ kind, open, onClose }: { kind: Kind; open: boolean; onClos
         <Field label={LABEL[kind].from}>
           <input className={inputCls} value={form.counterparty} onChange={set("counterparty")} />
         </Field>
-        <DeviceNote>Saved on this device as a self-reported record. Verified records come from connected payments (Stripe).</DeviceNote>
         <Button type="submit" className="w-full">Save</Button>
       </form>
     </Sheet>
@@ -204,7 +203,6 @@ function CreatorEarnings() {
       <section className="mt-4">
         <RecordList kind="income" />
         <Button variant="secondary" className="mt-4 w-full" onClick={() => setOpen(true)}><PlusCircle className="h-4 w-4" /> Add earning</Button>
-        <p className="mt-3 text-center text-xs text-muted">Your earnings show on your profile. Only real records count: nothing is estimated.</p>
       </section>
       <RecordForm kind="income" open={open} onClose={() => setOpen(false)} />
     </div>
@@ -241,7 +239,6 @@ function BusinessGrowth() {
           <div><p className="flex items-center gap-1 text-xs text-on-accent/75"><TrendingUp className="h-3.5 w-3.5" /> Revenue</p><p className="font-bold">{formatINR(g.revenue.total)}</p></div>
         </div>
       </section>
-      <p className="mt-2 flex items-center justify-center gap-1 text-center text-[12px] text-muted">Your profit shows on your profile. Spending stays private. <InfoTip text="Profit = revenue minus what you invested in creators, commissions and campaigns." /></p>
 
       <div role="tablist" aria-label="Show" className="mt-4 grid grid-cols-2 gap-1 rounded-2xl bg-surface p-1 ring-1 ring-line">
         {([["spending", "Invest", TrendingDown], ["revenue", "Scaling", TrendingUp]] as const).map(([id, label, Icon]) => (

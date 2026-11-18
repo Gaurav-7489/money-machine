@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { MessageCircle, UserPlus, Users } from "lucide-react";
 import { Avatar, VerifiedMark } from "@/components/art";
 import { useFeedback } from "@/components/feedback";
-import { ButtonLink, EmptyState, InfoTip, SampleTag } from "@/components/ui";
+import { ButtonLink, EmptyState, SampleTag } from "@/components/ui";
 import { SEARCHABLE_PROFILES as SAMPLE_PROFILES, type Profile } from "@/lib/sample-data";
 import { useStore } from "@/lib/store";
 import { useThreads } from "@/lib/threads";
@@ -68,8 +68,8 @@ export default function Friends() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="mb-5 flex items-center gap-1 text-2xl font-bold tracking-tight">
-        Friends <InfoTip text="Friends are the creators and businesses you've added. Their posts appear in the Friends tab of your feed, and chats with them in the Friends tab of your DMs." />
+      <h1 className="mb-5 text-2xl font-bold tracking-tight">
+        Friends
       </h1>
 
       <h2 className="mb-2 text-sm font-semibold text-muted">Your friends ({friends.length})</h2>

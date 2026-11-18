@@ -244,7 +244,6 @@ function InboxInner() {
           })}
         </ul>
       )}
-      <p className="mt-3 text-center text-xs text-muted">Sample conversations are labelled. Messages you send are saved on this device and delivered once accounts go live.</p>
       <NewMessage open={composing} onClose={() => setComposing(false)} />
     </div>
   );

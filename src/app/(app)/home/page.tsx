@@ -9,7 +9,7 @@ import { Composer } from "@/components/feed/composer";
 import { PostCard, type FeedPost } from "@/components/feed/post-card";
 import { OpportunityList } from "@/components/opportunities";
 import { GrowthCard, ProgramsCard, TabletQuickCards } from "@/components/side-panels";
-import { EmptyState, Tip } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
 import { useFeed } from "@/lib/feed";
 import { filtersFromProfile, findMatches } from "@/lib/match";
 import { SEARCHABLE_PROFILES } from "@/lib/sample-data";
@@ -93,9 +93,6 @@ export default function Home() {
           <OpportunityList />
         ) : (
           <>
-            <Tip id="feed-intro-v2" title="Your feed, Threads-style">
-              Share a thought, photos, a video or a GIF. React with emojis, repost, quote, and jump into the comments. <strong>For you</strong> is the fun stuff; <strong>Friends</strong> is just your people.
-            </Tip>
             <Composer />
             {list.length ? (
               <div key={tab} className="stagger space-y-3">

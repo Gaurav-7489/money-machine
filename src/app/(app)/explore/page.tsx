@@ -7,7 +7,7 @@ import { CheckSquare, RotateCcw, Search, SearchX, Send, SlidersHorizontal, Spark
 import { useFeedback } from "@/components/feedback";
 import { BulkDm } from "@/components/search/bulk-dm";
 import { MatchCard, MatchCardSkeleton } from "@/components/search/match-card";
-import { Button, EmptyState, InfoTip, Sheet, inputCls } from "@/components/ui";
+import { Button, EmptyState, Sheet, inputCls } from "@/components/ui";
 import { COUNTRIES, EARNING_MODELS, LOCATIONS, NICHES } from "@/lib/catalog";
 import { EMPTY_FILTERS, MATCH_LEVELS, activeFilterCount, countAtLeast, filtersFromParams, filtersFromProfile, filtersToParams, findMatches, type MatchFilters } from "@/lib/match";
 import { SEARCHABLE_PROFILES } from "@/lib/sample-data";
@@ -26,13 +26,12 @@ function Chip({ on, onClick, children, title }: { on: boolean; onClick: () => vo
   );
 }
 
-function Group({ title, hint, optional, children }: { title: string; hint?: string; optional?: boolean; children: React.ReactNode }) {
+function Group({ title, optional, children }: { title: string; optional?: boolean; children: React.ReactNode }) {
   return (
     <fieldset className="space-y-2.5 border-t border-line pt-4 first:border-t-0 first:pt-0">
       <legend className="mb-2 flex items-center gap-1.5 text-[14px] font-bold">
         {title}
         {optional && <span className="rounded-full bg-elevated px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span>}
-        {hint && <InfoTip text={hint} />}
       </legend>
       {children}
     </fieldset>
@@ -51,7 +50,7 @@ function FilterForm({ draft, setDraft, role, error, onSubmit, onClear }: { draft
 
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-4">
-      <Group title={role === "business" ? "What type of content creator?" : lookingForCreators ? "What type of creator?" : "What are you looking for?"} hint={lookingForCreators ? "Pick one or more. We also check their posts, so creators who post about it show up even if it's not in their bio." : "Pick one or more. We also check brands' posts, so they show up even if their bio doesn't say it."}>
+      <Group title={role === "business" ? "What type of content creator?" : lookingForCreators ? "What type of creator?" : "What are you looking for?"}>
         <div className="flex flex-wrap gap-1.5">
           {NICHES.map((n) => <Chip key={n} on={draft.niches.includes(n)} onClick={() => toggle("niches", n)}>{n}</Chip>)}
         </div>
@@ -63,7 +62,7 @@ function FilterForm({ draft, setDraft, role, error, onSubmit, onClear }: { draft
         </div>
       </Group>
 
-      <Group title={lookingForCreators ? "Pay per video (₹)" : "Price range per video (₹)"} hint={lookingForCreators ? "What the creator charges for one video or reel." : "What the brand usually pays for one video or reel."}>
+      <Group title={lookingForCreators ? "Pay per video (₹)" : "Price range per video (₹)"}>
         <div className="grid grid-cols-2 gap-2">
           <label><span className="sr-only">Minimum per video</span><input inputMode="numeric" className={inputCls} placeholder="Min e.g. 3000" value={draft.priceMin} onChange={(e) => setDraft((d) => ({ ...d, priceMin: digits(e.target.value) }))} aria-invalid={!!error} /></label>
           <label><span className="sr-only">Maximum per video</span><input inputMode="numeric" className={inputCls} placeholder="Max e.g. 25000" value={draft.priceMax} onChange={(e) => setDraft((d) => ({ ...d, priceMax: digits(e.target.value) }))} aria-invalid={!!error} /></label>
@@ -81,7 +80,7 @@ function FilterForm({ draft, setDraft, role, error, onSubmit, onClear }: { draft
         </div>
       </Group>
 
-      <Group title="Country / city" hint="Tap a country, then tap one or more cities. Someone in the same country but another city counts as a partial match.">
+      <Group title="Country / city">
         <div className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
           <Chip on={!draft.country} onClick={() => setDraft((d) => ({ ...d, country: "", cities: [] }))}>Anywhere</Chip>
           {COUNTRIES.map((c) => <Chip key={c} on={draft.country === c} onClick={() => setDraft((d) => ({ ...d, country: d.country === c ? "" : c, cities: [] }))}>{c}</Chip>)}
@@ -288,7 +287,6 @@ function ExploreInner() {
                 </button>
               );
             })}
-            <InfoTip className="self-center" text="The % is how many of your filters a profile meets. Pick 90%+ to see only near-perfect fits, or 50%+ to see more people." />
           </div>
 
           <div className="mb-3 flex items-center gap-3">
@@ -340,7 +338,6 @@ function ExploreInner() {
               <Undo2 className="h-4 w-4" /> Restore {hiddenProfiles.length} removed {hiddenProfiles.length === 1 ? "profile" : "profiles"}
             </button>
           )}
-          <p className="mt-3 text-center text-xs text-muted">Profiles shown are fictional samples for this preview.</p>
         </section>
       </div>
 

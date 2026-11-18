@@ -328,7 +328,6 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
               })}
             </ul>
           )}
-          {showComments && post.sample && post.comments > 0 && <p className="ml-12 mt-2 text-[11px] text-muted">Comment counts on sample posts are illustrative.</p>}
           {showComments && (
             <form onSubmit={addComment} className="mt-3">
               {draftGif && (

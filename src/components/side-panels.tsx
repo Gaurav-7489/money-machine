@@ -43,7 +43,6 @@ export function GrowthCard() {
           <p className="text-xs text-muted">Badges</p>
         </div>
       </div>
-      {summary.total === 0 && <p className="mt-3 text-xs text-muted">{isBiz ? "Add investments and revenue to see your profit." : "Add your first earning to start tracking."}</p>}
     </Link>
   );
 }
@@ -118,9 +117,6 @@ export function TabletQuickCards() {
             <ArrowRight className="h-4 w-4" />
           </span>
         </div>
-        <p className="mt-2 text-xs text-muted">
-          {session?.role === "business" ? "Invite creators to an affiliate program and grow your brand." : "Show brands what you create and get discovered."}
-        </p>
       </Link>
     </div>
   );

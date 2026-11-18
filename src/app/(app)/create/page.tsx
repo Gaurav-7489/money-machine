@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import { ChevronRight, ImagePlus, Link2, Loader2, Wallet, X } from "lucide-react";
 import { TONES } from "@/components/art";
 import { useFeedback } from "@/components/feedback";
-import { Button, DeviceNote, Field, inputCls } from "@/components/ui";
+import { Button, Field, inputCls } from "@/components/ui";
 import { compressImage, usePublishPost } from "@/lib/posts";
 import { useStore } from "@/lib/store";
 import type { FieldErrors } from "@/lib/validation";
@@ -52,7 +52,6 @@ export default function Create() {
     <div className="mx-auto grid max-w-4xl gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
       <form onSubmit={submit} className="card p-5" noValidate>
         <h1 className="text-2xl font-bold tracking-tight">New post</h1>
-        <p className="mb-4 mt-0.5 text-sm text-muted">Write a caption, add a photo if you like, then press Share post.</p>
         {image ? (
           <div className="relative mb-4 overflow-hidden rounded-2xl ring-1 ring-line">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -88,10 +87,9 @@ export default function Create() {
           <Field label="Caption" error={errors.caption}>
             <textarea className={`${inputCls} min-h-24`} value={caption} onChange={(e) => setCaption(e.target.value)} aria-invalid={!!errors.caption} maxLength={2200} />
           </Field>
-          <Field label="Tags" optional hint="Words that help people find your post. Separate with spaces, e.g. #collab #skincare">
+          <Field label="Tags" optional>
             <input className={inputCls} value={tags} onChange={(e) => setTags(e.target.value)} />
           </Field>
-          <DeviceNote>Preview build: posts and photos are saved on this device only. Video uploads arrive with cloud storage.</DeviceNote>
           <Button type="submit" size="lg" className="w-full" disabled={busy}>Share post</Button>
         </div>
       </form>

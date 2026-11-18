@@ -1,6 +1,6 @@
 "use client";
 
-import { ImagePlay, Loader2, Upload } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { useFeedback } from "@/components/feedback";
 import { Sheet } from "@/components/ui";
@@ -98,7 +98,6 @@ export function GifPicker({ open, onClose, onPick }: { open: boolean; onClose: (
       <button type="button" onClick={() => fileRef.current?.click()} disabled={busy} className="press mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-brand-300 text-sm font-semibold text-brand-700 hover:bg-brand-50">
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} Upload your own GIF
       </button>
-      <p className="mt-2 flex items-center justify-center gap-1 text-center text-[11px] text-muted"><ImagePlay className="h-3.5 w-3.5" /> Uploaded GIFs stay on this device in the preview.</p>
     </Sheet>
   );
 }

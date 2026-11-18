@@ -1,9 +1,8 @@
 "use client";
 
-import { HelpCircle, Lightbulb, X } from "lucide-react";
+import { X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useId, useRef, useState, type ComponentProps, type ReactNode } from "react";
-import { useStore } from "@/lib/store";
+import { useEffect, useRef, type ComponentProps, type ReactNode } from "react";
 
 type Variant = "primary" | "secondary" | "ghost" | "soft";
 
@@ -89,14 +88,6 @@ export function EmptyState({ icon, title, body, action }: { icon: ReactNode; tit
       <p className="mt-1 max-w-xs text-sm text-muted">{body}</p>
       {action && <div className="mt-4">{action}</div>}
     </div>
-  );
-}
-
-export function DeviceNote({ children }: { children: ReactNode }) {
-  return (
-    <p className="rounded-xl bg-cream/70 px-3 py-2 text-[12px] leading-snug text-amber-900">
-      {children}
-    </p>
   );
 }
 
@@ -188,65 +179,6 @@ export function Toast({ message, onDone }: { message: string | null; onDone: () 
   return (
     <div role="status" className="fixed inset-x-0 bottom-24 z-50 flex justify-center px-4 md:bottom-8">
       <div className="animate-fade-up rounded-full bg-ink px-4 py-2.5 text-sm font-medium text-surface shadow-xl">{message}</div>
-    </div>
-  );
-}
-
-/** Small "?" button that explains something in plain words. Works with hover, keyboard focus and tap. */
-export function InfoTip({ text, label = "What does this mean?", className = "" }: { text: string; label?: string; className?: string }) {
-  const [open, setOpen] = useState(false);
-  const id = useId();
-  const ref = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const close = (e: PointerEvent) => ref.current && !ref.current.contains(e.target as Node) && setOpen(false);
-    document.addEventListener("pointerdown", close);
-    return () => document.removeEventListener("pointerdown", close);
-  }, [open]);
-  return (
-    <span ref={ref} className={`group relative inline-flex align-middle ${className}`} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
-      <button
-        type="button"
-        aria-label={label}
-        aria-describedby={open ? id : undefined}
-        aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setOpen(false)}
-        onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
-        className="grid h-6 w-6 place-items-center rounded-full text-muted hover:bg-elevated hover:text-ink"
-      >
-        <HelpCircle className="h-4 w-4" />
-      </button>
-      {open && (
-        <span
-          id={id}
-          role="tooltip"
-          className="animate-fade-in absolute bottom-full left-1/2 z-50 mb-2 w-60 -translate-x-1/2 rounded-xl bg-ink px-3 py-2 text-left text-[12px] font-normal leading-snug text-surface shadow-xl"
-        >
-          {text}
-        </span>
-      )}
-    </span>
-  );
-}
-
-/** A friendly one-time hint. Closing it is remembered on this device. */
-export function Tip({ id, title, children }: { id: string; title: string; children: ReactNode }) {
-  const { dismissedTips, toggle, ready } = useStore();
-  if (!ready || dismissedTips.includes(id)) return null;
-  return (
-    <div role="note" className="animate-fade-up mb-4 flex gap-3 rounded-[var(--radius-card)] border border-brand-200 bg-brand-50 p-4">
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-surface text-brand-600">
-        <Lightbulb className="h-5 w-5" />
-      </span>
-      <div className="min-w-0 flex-1 text-sm">
-        <p className="font-semibold text-brand-800">{title}</p>
-        <div className="mt-0.5 text-ink/80">{children}</div>
-      </div>
-      <button onClick={() => toggle("dismissedTips", id)} className="-m-1 grid h-8 w-8 shrink-0 place-items-center rounded-full text-muted hover:bg-surface hover:text-ink" aria-label="Close tip">
-        <X className="h-4 w-4" />
-      </button>
     </div>
   );
 }

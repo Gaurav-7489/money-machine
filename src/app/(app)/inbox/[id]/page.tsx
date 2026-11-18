@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useRef, useState } from "react";
-import { ArchiveRestore, Check, CheckCheck, Handshake, MessageCircleOff, Pin, SendHorizontal, Sparkles, Star, Sticker, Trash2, X } from "lucide-react";
+import { ArchiveRestore, Check, CheckCheck, Handshake, MessageCircleOff, Pin, SendHorizontal, Star, Sticker, Trash2, X } from "lucide-react";
 import { Avatar, VerifiedMark } from "@/components/art";
 import { DealFields, DealSummary, checkDeal, emptyDeal, type DealDraft } from "@/components/deal-form";
 import { GifPicker, GifView } from "@/components/feed/gifs";
 import { useFeedback } from "@/components/feedback";
-import { Button, ButtonLink, DeviceNote, EmptyState, PageHeader, SampleTag, Sheet } from "@/components/ui";
+import { Button, ButtonLink, EmptyState, PageHeader, SampleTag, Sheet } from "@/components/ui";
 import { earningShort } from "@/lib/catalog";
 import { timeAgo } from "@/lib/format";
 import { profileByHandle } from "@/lib/sample-data";
@@ -211,11 +211,9 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
           </span>
         </Link>
         <div className="flex-1 space-y-3" aria-live="polite">
-          {thread.messages.length === 0 && <p className="py-8 text-center text-sm text-muted">This is the start of your conversation with {p.name}. Say hello! 👋</p>}
           {thread.messages.map((m) => <Bubble key={m.id} m={m} name={p.name} tone={p.tone} square={p.kind === "business"} onReply={reply} />)}
           <div ref={endRef} />
         </div>
-        <div className="mt-4"><DeviceNote>Preview: your messages are saved on this device and are not delivered yet.</DeviceNote></div>
         <form onSubmit={submit} className="sticky bottom-20 mt-3 md:bottom-4" noValidate>
           {gif && (
             <div className="relative mb-2 inline-block">
@@ -252,9 +250,6 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
           {error && <p id="msg-err" role="alert" className="mt-1 px-3 text-[12px] text-rose-600">{error}</p>}
         </form>
       </div>
-      {thread.pinned && (
-        <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-muted"><Sparkles className="h-3.5 w-3.5 text-brand-500" /> New matches arrive here as people who fit you join.</p>
-      )}
 
       <GifPicker open={gifOpen} onClose={() => setGifOpen(false)} onPick={setGif} />
       <Sheet open={offerOpen} onClose={() => setOfferOpen(false)} title={`Deal offer to ${p.name}`}>

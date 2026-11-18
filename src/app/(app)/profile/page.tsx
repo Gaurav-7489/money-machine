@@ -4,13 +4,13 @@ import { TabIndicator } from "@/components/motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AtSign, BadgeCheck, Bookmark, FolderOpen, Grid3x3, Link2, LogOut, Mail, MapPin, Palette, Pencil, Repeat2, Rocket, Settings, Smartphone, Star, Users, Wallet } from "lucide-react";
+import { AtSign, Bookmark, Grid3x3, Link2, LogOut, Mail, MapPin, Palette, Pencil, Repeat2, Rocket, Settings, Smartphone, Star, Users, Wallet } from "lucide-react";
 import { Avatar, TONES } from "@/components/art";
 import { useFeedback } from "@/components/feedback";
 import { PostCard } from "@/components/feed/post-card";
 import { InstallGuide } from "@/components/install-prompt";
 import { ThemePicker } from "@/components/theme";
-import { Button, DeviceNote, EmptyState, Field, InfoTip, Sheet, inputCls, selectCls } from "@/components/ui";
+import { Button, EmptyState, Field, Sheet, inputCls, selectCls } from "@/components/ui";
 import { COUNTRIES, EARNING_MODELS, LOCATIONS, NICHES, earningLabel } from "@/lib/catalog";
 import { useFeed } from "@/lib/feed";
 import { formatINR } from "@/lib/format";
@@ -73,11 +73,10 @@ function completeness(s: Session) {
   return { percent: Math.round((steps.filter((x) => x.done).length / steps.length) * 100), next: steps.find((x) => !x.done) };
 }
 
-function ChipField({ label, hint, options, value, onChange }: { label: string; hint?: string; options: { id: string; label: string }[]; value: string[]; onChange: (v: string[]) => void }) {
+function ChipField({ label, options, value, onChange }: { label: string; options: { id: string; label: string }[]; value: string[]; onChange: (v: string[]) => void }) {
   return (
     <div>
       <p className="mb-1.5 text-[13px] font-medium">{label} <span className="ml-1 rounded-full bg-elevated px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span></p>
-      {hint && <p className="mb-2 text-[12px] text-muted">{hint}</p>}
       <div className="flex flex-wrap gap-1.5">
         {options.map((o) => {
           const on = value.includes(o.id);
@@ -124,11 +123,11 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
         <Field label={isBiz ? "Brand name" : "Name"} error={errors.displayName}>
           <input className={inputCls} value={form.displayName} onChange={set("displayName")} aria-invalid={!!errors.displayName} />
         </Field>
-        <Field label="Bio" optional error={errors.bio} hint={`${form.bio.length}/160 · One or two sentences about what you do.`}>
+        <Field label="Bio" optional error={errors.bio} hint={`${form.bio.length}/160`}>
           <textarea className={`${inputCls} min-h-20`} maxLength={160} value={form.bio} onChange={set("bio")} placeholder={isBiz ? "e.g. Clean skincare made in India." : "e.g. Fitness creator sharing 20-minute home workouts."} />
         </Field>
         <ChipField label={isBiz ? "What your business does" : "Content you create"} options={NICHES.map((n) => ({ id: n, label: n }))} value={form.niches} onChange={(v) => setForm((f) => ({ ...f, niches: v }))} />
-        {isBiz && <ChipField label="Creators you're looking for" hint="We use this to match you automatically." options={NICHES.map((n) => ({ id: n, label: n }))} value={form.lookingFor} onChange={(v) => setForm((f) => ({ ...f, lookingFor: v }))} />}
+        {isBiz && <ChipField label="Creators you're looking for" options={NICHES.map((n) => ({ id: n, label: n }))} value={form.lookingFor} onChange={(v) => setForm((f) => ({ ...f, lookingFor: v }))} />}
         <div className="grid grid-cols-2 gap-2">
           <Field label="Country" optional>
             <select className={selectCls} value={form.country} onChange={set("country")}>
@@ -147,7 +146,7 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
 
       <section className="space-y-4 border-t border-line pt-4">
         <h3 className="flex items-center gap-1 text-sm font-bold">
-          Working together <InfoTip text={isBiz ? "Your usual budget. This helps creators know if you're a good fit." : "Your usual prices. This helps businesses know if you're a good fit."} />
+          Working together
         </h3>
         <div className="grid grid-cols-2 gap-2">
           <Field label={isBiz ? "Budget per video from ₹" : "Pay per video from ₹"} optional error={errors.priceFrom}>
@@ -167,7 +166,6 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
         </div>
         <div>
           <p className="mb-1.5 text-[13px] font-medium">{isBiz ? "How you work with creators" : "Means of earning"}</p>
-          {!isBiz && <p className="mb-2 flex items-center gap-1 text-[12px] text-muted"><FolderOpen className="h-3.5 w-3.5" /> Each one is a folder in your DMs.</p>}
           <div className="flex flex-wrap gap-1.5">
             {EARNING_MODELS.map((m) => {
               const on = form.earningModels.includes(m.id);
@@ -201,7 +199,7 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
             <input className={inputCls} autoCapitalize="none" placeholder="@yourname" value={form.x} onChange={set("x")} aria-invalid={!!errors.x} />
           </Field>
         </div>
-        <Field label="Public email" optional error={errors.email} hint="Only add this if you're happy for others to email you.">
+        <Field label="Public email" optional error={errors.email}>
           <input type="email" className={inputCls} autoCapitalize="none" placeholder="name@example.com" value={form.email} onChange={set("email")} aria-invalid={!!errors.email} />
         </Field>
       </section>
@@ -314,7 +312,7 @@ export default function Profile() {
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-elevated ring-1 ring-line" role="progressbar" aria-valuenow={done.percent} aria-valuemin={0} aria-valuemax={100} aria-label="Profile completeness">
             <div className="h-full rounded-full bg-aurora transition-[width] duration-700" style={{ width: `${done.percent}%` }} />
           </div>
-          {done.next && <p className="mt-2 text-xs text-muted">Next step: {done.next.label}. Complete profiles show up better in Search.</p>}
+          {done.next && <p className="mt-2 text-xs text-muted">Next step: {done.next.label}</p>}
         </section>
       )}
 
@@ -327,7 +325,6 @@ export default function Profile() {
           </Link>
         ))}
       </section>
-      <p className="mt-2 flex items-center justify-center gap-1 text-center text-[12px] text-muted"><BadgeCheck className="h-3.5 w-3.5" /> {isBiz ? "Your profit is shown on your profile. What you spend stays private." : "Your earnings are shown on your profile. Connect Stripe to verify them."}</p>
 
       <section className="mt-4 grid grid-cols-2 gap-3">
         <Link href="/friends" className="card lift flex items-center gap-3 p-3.5 hover:border-brand-200">
@@ -401,7 +398,6 @@ export default function Profile() {
             <InstallGuide />
           </section>
           <section className="space-y-3 border-t border-line pt-4">
-            <DeviceNote>Preview build — your profile, posts, records and programs are stored only in this browser.</DeviceNote>
             <Button variant="secondary" className="w-full text-rose-600" onClick={signOut}>
               <LogOut className="h-4 w-4" /> Sign out & clear preview data
             </Button>

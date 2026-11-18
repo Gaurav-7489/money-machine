@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button, DeviceNote, Field, PageHeader, inputCls } from "@/components/ui";
+import { Button, Field, PageHeader, inputCls } from "@/components/ui";
 import { uid } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import { affiliateProgramInput, fieldErrors, type FieldErrors } from "@/lib/validation";
@@ -39,16 +39,15 @@ export default function NewProgram() {
         <Field label="Program name" error={errors.name}>
           <input className={inputCls} value={form.name} onChange={set("name")} aria-invalid={!!errors.name} placeholder={`${session.displayName} Affiliate`} />
         </Field>
-        <Field label="Commission (%)" error={errors.commissionPercent} hint="Paid on confirmed sales only.">
+        <Field label="Commission (%)" error={errors.commissionPercent}>
           <input className={inputCls} inputMode="decimal" value={form.commissionPercent} onChange={set("commissionPercent")} aria-invalid={!!errors.commissionPercent} />
         </Field>
         <Field label="Description" error={errors.description}>
           <textarea className={`${inputCls} min-h-20`} value={form.description} onChange={set("description")} aria-invalid={!!errors.description} />
         </Field>
-        <Field label="Terms" error={errors.terms} hint="Attribution window, disclosure rules, restricted claims.">
+        <Field label="Terms" error={errors.terms}>
           <textarea className={`${inputCls} min-h-28`} value={form.terms} onChange={set("terms")} aria-invalid={!!errors.terms} />
         </Field>
-        <DeviceNote>Preview: programs are saved on this device. Tracking links and conversion reporting arrive with the backend.</DeviceNote>
         <div className="flex gap-2">
           <Button type="button" variant="secondary" className="flex-1" onClick={(e) => submit(e, "draft")}>Save draft</Button>
           <Button type="submit" className="flex-1">Publish</Button>

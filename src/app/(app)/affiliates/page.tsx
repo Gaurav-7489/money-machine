@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Inbox, Link2, Plus, Receipt } from "lucide-react";
 import { Avatar } from "@/components/art";
-import { Button, ButtonLink, DeviceNote, EmptyState, Field, PageHeader, SampleTag, Sheet, StatusPill, Toast, inputCls } from "@/components/ui";
+import { Button, ButtonLink, EmptyState, Field, PageHeader, SampleTag, Sheet, StatusPill, Toast, inputCls } from "@/components/ui";
 import { formatDate, uid } from "@/lib/format";
 import { useMyPrograms, usePrograms } from "@/lib/hooks";
 import { profileByHandle } from "@/lib/sample-data";
@@ -131,10 +131,9 @@ function CreatorView() {
 
       <Sheet open={!!applyTo} onClose={() => setApplyTo(null)} title={`Apply to ${applyTo?.name ?? ""}`}>
         <form onSubmit={apply} className="space-y-4" noValidate>
-          <Field label="Message to the brand" error={errors.message} hint="Your niche, audience and why this fits.">
+          <Field label="Message to the brand" error={errors.message}>
             <textarea className={`${inputCls} min-h-28`} value={message} onChange={(e) => setMessage(e.target.value)} aria-invalid={!!errors.message} />
           </Field>
-          {applyTo?.sample && <DeviceNote>This is a sample program, so your application will stay pending.</DeviceNote>}
           <Button type="submit" className="w-full">Send application</Button>
         </form>
       </Sheet>

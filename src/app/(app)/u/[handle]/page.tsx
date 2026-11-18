@@ -7,7 +7,7 @@ import { Avatar, VerifiedMark } from "@/components/art";
 import { useFeedback } from "@/components/feedback";
 import { PostCard } from "@/components/feed/post-card";
 import { priceText } from "@/components/search/match-card";
-import { Button, ButtonLink, EmptyState, InfoTip, PageHeader, SampleTag } from "@/components/ui";
+import { Button, ButtonLink, EmptyState, PageHeader, SampleTag } from "@/components/ui";
 import { earningLabel } from "@/lib/catalog";
 import { MatchRing } from "@/components/search/match-card";
 import { filtersFromProfile, scoreProfile } from "@/lib/match";
@@ -142,7 +142,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
 
       <section className="card mt-4 p-5">
         <h3 className="mb-3 flex items-center gap-1 font-bold">
-          Working together <InfoTip text="What this profile usually charges or pays. Prices are in Indian rupees (₹) and are shared by the profile, not checked by Money Machine." />
+          Working together
         </h3>
         <dl className="grid grid-cols-2 gap-3 text-sm">
           <div className="rounded-2xl bg-elevated p-3">

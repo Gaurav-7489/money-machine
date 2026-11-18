@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Briefcase, Check, ChevronLeft, FolderOpen, Sparkles, UserRound } from "lucide-react";
+import { Briefcase, Check, ChevronLeft, Sparkles, UserRound } from "lucide-react";
 import Link from "next/link";
-import { Button, DeviceNote, Field, inputCls, selectCls } from "@/components/ui";
+import { Button, Field, inputCls, selectCls } from "@/components/ui";
 import { COUNTRIES, EARNING_MODELS, LOCATIONS, NICHES } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
 import { fieldErrors, onboardingInput, type FieldErrors } from "@/lib/validation";
@@ -107,7 +107,6 @@ export default function Onboarding() {
           {step === 0 && (
             <>
               <h1 className="text-[28px] font-extrabold tracking-tight">Who are you?</h1>
-              <p className="mt-1 text-sm text-muted">Creators and businesses get different pages, made for what you do.</p>
               <fieldset className="mt-6 grid grid-cols-2 gap-3">
                 <legend className="sr-only">Account type</legend>
                 {ROLES.map(({ id, title, body, icon: Icon }) => {
@@ -126,7 +125,7 @@ export default function Onboarding() {
                 <Field label={isBiz ? "Brand name" : "Your name"} error={errors.displayName}>
                   <input className={inputCls} value={displayName} onChange={(e) => setDisplayName(e.target.value)} aria-invalid={!!errors.displayName} autoComplete="name" />
                 </Field>
-                <Field label="Username" error={errors.handle} hint="This is how people find you.">
+                <Field label="Username" error={errors.handle}>
                   <div className="relative">
                     <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted">@</span>
                     <input className={`${inputCls} pl-8`} value={handle} onChange={(e) => setHandle(e.target.value)} aria-invalid={!!errors.handle} autoCapitalize="none" autoComplete="username" />
@@ -139,7 +138,6 @@ export default function Onboarding() {
           {step === 1 && (
             <>
               <h1 className="text-[28px] font-extrabold tracking-tight">{isBiz ? "What does your business do?" : "What content do you create?"}</h1>
-              <p className="mb-5 mt-1 text-sm text-muted">Pick all that fit. {isBiz ? "Creators searching for these will find you." : "Brands searching for these will find you."}</p>
               <Chips options={nicheOpts} value={niches} onChange={setNiches} />
               {errors.niches && <p role="alert" className="mt-3 text-[13px] text-rose-600">{errors.niches}</p>}
             </>
@@ -150,7 +148,6 @@ export default function Onboarding() {
               {isBiz ? (
                 <>
                   <h1 className="text-[28px] font-extrabold tracking-tight">What creators are you looking for?</h1>
-                  <p className="mb-5 mt-1 text-sm text-muted">We&apos;ll match you with them automatically and send intros to your Money Machine folder.</p>
                   <Chips options={nicheOpts} value={lookingFor} onChange={setLookingFor} />
                   <h2 className="mb-2 mt-6 font-bold">How do you want to work with them?</h2>
                   <Chips options={earnOpts} value={earning} onChange={setEarning} />
@@ -158,8 +155,6 @@ export default function Onboarding() {
               ) : (
                 <>
                   <h1 className="text-[28px] font-extrabold tracking-tight">How do you want to earn?</h1>
-                  <p className="mt-1 text-sm text-muted">Pick all you&apos;re open to.</p>
-                  <p className="bg-aurora-soft mb-5 mt-3 flex items-start gap-2 rounded-2xl px-3.5 py-2.5 text-[13px]"><FolderOpen className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" /> Each one becomes a folder in your Messages, so brand deals, affiliate offers and PR packages never get mixed up.</p>
                   <Chips options={earnOpts} value={earning} onChange={setEarning} />
                 </>
               )}
@@ -170,7 +165,6 @@ export default function Onboarding() {
           {step === 3 && (
             <>
               <h1 className="text-[28px] font-extrabold tracking-tight">Almost there</h1>
-              <p className="mb-5 mt-1 text-sm text-muted">Optional, but it makes your matches much better.</p>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-2">
                   <Field label="Country" optional>
@@ -194,7 +188,6 @@ export default function Onboarding() {
                   </div>
                   {errors.pay && <p role="alert" className="mt-1 text-[12px] text-rose-600">{errors.pay}</p>}
                 </div>
-                <DeviceNote>Preview build: your profile is saved on this device only. Secure accounts arrive with sign-in.</DeviceNote>
               </div>
             </>
           )}

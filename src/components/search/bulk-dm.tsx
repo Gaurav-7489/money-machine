@@ -57,7 +57,6 @@ export function BulkDm({ open, onClose, recipients, onSent }: { open: boolean; o
         <div className="py-6 text-center">
           <span className="bg-aurora-soft mx-auto grid h-14 w-14 place-items-center rounded-2xl text-brand-600"><CalendarClock className="h-7 w-7" /></span>
           <p className="mt-3 font-bold">Your next bulk DM unlocks in {bulkDaysLeft} {bulkDaysLeft === 1 ? "day" : "days"}</p>
-          <p className="mx-auto mt-1 max-w-xs text-sm text-muted">To keep inboxes spam-free, everyone gets one bulk DM every {BULK_DM_COOLDOWN_DAYS} days. You can still message people one by one.</p>
           <Button variant="secondary" className="mt-4" onClick={close}>Got it</Button>
         </div>
       ) : (
@@ -77,7 +76,6 @@ export function BulkDm({ open, onClose, recipients, onSent }: { open: boolean; o
           {review ? (
             <div className="space-y-4">
               <DealSummary deal={review} />
-              <p className="text-center text-xs text-muted">Each person gets this as a private message. It lands in their “{review.type === "brand_deal" ? "Brand deals" : "deal"}” folder if they chose this type.</p>
               <div className="grid grid-cols-3 gap-2">
                 <Button variant="secondary" onClick={() => setReview(null)}><Pencil className="h-4 w-4" /> Change</Button>
                 <Button variant="ghost" onClick={close}>Cancel</Button>
