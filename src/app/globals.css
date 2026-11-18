@@ -44,6 +44,7 @@
   --font-sans: var(--font-body), "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: var(--font-head), var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  --font-condensed: var(--font-barlow), "Arial Narrow", Impact, sans-serif;
 
   --radius-card: 1.5rem;
   --shadow-card: 0 1px 2px rgb(22 21 34 / 0.04), 0 10px 30px -14px rgb(92 63 194 / 0.16);
@@ -356,3 +357,60 @@ dialog[data-closing]::backdrop { animation: fade-out 0.2s ease-in both; }
   background-color: color-mix(in srgb, var(--cine-accent) 12%, transparent);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--cine-accent) 16%, transparent);
 }
+
+/* ── Dark theme, sharp edition: charcoal, white primary actions, condensed caps headlines ── */
+:root[data-theme="dark"] {
+  --color-canvas: #121212;
+  --color-surface: #1a1a1a;
+  --color-elevated: #242424;
+  --color-line: #2e2e2e;
+  --color-muted: #9b9b9b;
+  --color-ink: #ffffff;
+  --color-on-accent: #000000;
+  --color-cream: #242424;
+
+  /* monochrome brand scale: chips and tints become greys */
+  --color-brand-50: #1f1f1f;
+  --color-brand-100: #292929;
+  --color-brand-200: #333333;
+  --color-brand-300: #4a4a4a;
+  --color-brand-400: #6b6b6b;
+  --color-brand-500: #9b9b9b;
+  --color-brand-600: #c8c8c8;
+  --color-brand-700: #e6e6e6;
+  --color-brand-800: #f2f2f2;
+  --color-brand-900: #ffffff;
+
+  /* gradients collapse to solid white / grey */
+  --gradient-primary: linear-gradient(#ffffff, #ffffff);
+  --gradient-soft: linear-gradient(rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.05));
+  --gradient-text: linear-gradient(#ffffff, #ffffff);
+  --gradient-money: linear-gradient(#ffffff, #ffffff);
+  --blob-1: rgb(255 255 255 / 0.06);
+  --blob-2: rgb(255 255 255 / 0.05);
+  --blob-3: rgb(255 255 255 / 0.05);
+  --blob-4: rgb(255 255 255 / 0.04);
+  --glass: rgb(26 26 26 / 0.85);
+  --wave-stroke: rgb(255 255 255 / 0.08);
+  --ring: #ffffff;
+
+  --radius-card: 0.25rem;
+  --shadow-card: none;
+  --shadow-lift: 0 22px 44px -22px rgb(0 0 0 / 0.9);
+}
+:root[data-theme="dark"] h1,
+:root[data-theme="dark"] h2,
+:root[data-theme="dark"] h3 {
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+:root[data-theme="dark"] .hero-cinematic h1 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+:root[data-theme="dark"] .btn-glow { box-shadow: none; }
+:root[data-theme="dark"] .rounded-full.press { border-radius: 0; }

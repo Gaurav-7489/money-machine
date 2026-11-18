@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 export type ThemeChoice = "light" | "dark";
 const KEY = "mm.theme";
 const EVENT = "mm-theme";
-const COLORS = { light: "#FAFAFD", dark: "#0D0B12" };
+const COLORS = { light: "#FAFAFD", dark: "#121212" };
 
 /** Runs before first paint (inlined in <head>) so there is no flash. First visit follows the device. */
 export const THEME_INIT_SCRIPT = `(function(){try{var c=localStorage.getItem("${KEY}");var d=c?c==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=d?"dark":"light";}catch(e){}})();`;
@@ -106,7 +106,7 @@ export function ThemePicker() {
   const { choice, set } = useTheme();
   const opts = [
     { id: "light", label: "White", sub: "Creative pastel", swatch: "bg-[#FAFAFD] ring-1 ring-black/10", dot: "linear-gradient(110deg,#8edbff,#b9a0ff,#ffb4d5,#ffd1ae)" },
-    { id: "dark", label: "Dark", sub: "Editorial neon", swatch: "bg-[#0D0B12] ring-1 ring-white/15", dot: "linear-gradient(110deg,#ff8748,#f452a1,#965bff,#35c8f5)" },
+    { id: "dark", label: "Dark", sub: "Charcoal, sharp", swatch: "bg-[#121212] ring-1 ring-white/15", dot: "linear-gradient(110deg,#ffffff,#9b9b9b)" },
   ] as const;
   return (
     <div role="radiogroup" aria-label="Theme" className="grid grid-cols-2 gap-2">
