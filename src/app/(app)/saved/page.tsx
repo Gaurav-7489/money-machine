@@ -25,8 +25,7 @@ export default function Saved() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-2xl font-bold tracking-tight">Saved</h1>
-      <p className="mb-4 text-sm text-muted">People you starred and posts you saved, to come back to later.</p>
+      <h1 className="mb-4 text-2xl font-bold tracking-tight">Saved</h1>
 
       <div role="tablist" aria-label="Saved items" className="mb-4 grid grid-cols-2 gap-1.5 rounded-2xl bg-surface p-1 ring-1 ring-line">
         {([["people", `Starred people (${people.length})`], ["posts", `Posts (${posts.length})`]] as const).map(([id, label]) => (

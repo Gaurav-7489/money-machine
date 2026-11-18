@@ -30,7 +30,6 @@ export default function Notifications() {
   return (
     <div className="mx-auto max-w-2xl">
       <PageHeader title="Notifications" back="/home" />
-      <p className="-mt-2 mb-4 text-sm text-muted">New messages, badges you earn and updates on affiliate applications.</p>
       {items.length === 0 ? (
         <div className="card">
           <EmptyState icon={<Bell className="h-5 w-5" />} title="You're all caught up" body="New messages, badges and application updates will show up here." />

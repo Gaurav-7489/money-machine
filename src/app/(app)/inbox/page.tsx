@@ -7,7 +7,7 @@ import { Suspense, useState } from "react";
 import { ArchiveRestore, BadgeCheck, Crown, Folder as FolderIcon, Handshake, Inbox as InboxIcon, Link2, MessageSquareText, PenSquare, Pin, Search, Star, Trash2 } from "lucide-react";
 import { Avatar, VerifiedMark } from "@/components/art";
 import { useFeedback } from "@/components/feedback";
-import { Button, EmptyState, SampleTag, Sheet, Tip } from "@/components/ui";
+import { Button, EmptyState, SampleTag, Sheet } from "@/components/ui";
 import { earningShort } from "@/lib/catalog";
 import { timeAgo } from "@/lib/format";
 import { SEARCHABLE_PROFILES } from "@/lib/sample-data";
@@ -137,7 +137,6 @@ function InboxInner() {
       <div className="mb-4 flex items-center gap-3">
         <div className="flex-1">
           <h1 className="text-[26px] font-extrabold tracking-tight">Messages</h1>
-          <p className="text-sm text-muted">Deals, intros and chats, sorted into folders.</p>
         </div>
         <Button onClick={() => setComposing(true)} aria-label="New message"><PenSquare className="h-4 w-4" /> <span className="max-sm:hidden">New</span></Button>
       </div>
@@ -169,10 +168,6 @@ function InboxInner() {
           </div>
         </section>
       )}
-
-      <Tip id="inbox-folders" title="Your folders">
-        <strong>Money Machine</strong> is our team: we send you matches there. Deal messages land in the folder for their type (Brand deals, Affiliate…), based on what you chose when you set up your account.
-      </Tip>
 
       <div className="relative mb-3">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />

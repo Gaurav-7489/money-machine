@@ -68,10 +68,9 @@ export default function Friends() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="flex items-center gap-1 text-2xl font-bold tracking-tight">
+      <h1 className="mb-5 flex items-center gap-1 text-2xl font-bold tracking-tight">
         Friends <InfoTip text="Friends are the creators and businesses you've added. Their posts appear in the Friends tab of your feed, and chats with them in the Friends tab of your DMs." />
       </h1>
-      <p className="mb-5 text-sm text-muted">Your people, plus a few suggestions.</p>
 
       <h2 className="mb-2 text-sm font-semibold text-muted">Your friends ({friends.length})</h2>
       {friends.length ? (
