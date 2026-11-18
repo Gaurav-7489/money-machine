@@ -206,7 +206,6 @@ function ExploreInner() {
         <h1 className="text-[26px] font-extrabold tracking-tight">
           Find <span className="text-aurora">{who}</span>
         </h1>
-        <p className="mt-0.5 text-sm text-muted">{role === "business" ? "Creators that fit what you're looking for, ranked by match %." : "Brands that fit what you make, ranked by match %."}</p>
       </header>
 
       <form onSubmit={(e) => { e.preventDefault(); go({ ...applied, q }, {}, custom); }} className="relative" role="search">
