@@ -4,52 +4,26 @@ import { BadgeCheck, Handshake, Heart, Link2, Sparkles } from "lucide-react";
 import { useRef } from "react";
 
 /**
- * Original editorial collage for the landing hero: two "cutout" portrait
+ * Original editorial collage for the landing hero: two photographic portrait
  * panels, geometric shapes and floating UI chips, layered at different depths.
  * Every colour comes from the theme tokens, so the same artwork reads as
  * pastel in White and neon in Dark. Pointer parallax on desktop only.
  */
 function Portrait({ variant }: { variant: "creator" | "brand" }) {
-  const c = variant === "creator";
+  const creator = variant === "creator";
+  // Independent editorial photographs instead of using the reference brand's imagery.
+  const photo = creator
+    ? "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=720&q=85&auto=format&fit=crop"
+    : "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=720&q=85&auto=format&fit=crop";
   return (
-    <svg viewBox="0 0 200 260" className="h-full w-full" aria-hidden="true">
-      <defs>
-        <linearGradient id={`bg-${variant}`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" style={{ stopColor: c ? "var(--color-accent-2)" : "var(--color-accent-1)" }} />
-          <stop offset="1" style={{ stopColor: c ? "var(--color-accent-3)" : "var(--color-accent-4)" }} />
-        </linearGradient>
-        <clipPath id={`clip-${variant}`}>
-          <rect width="200" height="260" rx="34" />
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#clip-${variant})`}>
-        <rect width="200" height="260" fill={`url(#bg-${variant})`} />
-        {/* halftone-ish rings */}
-        <circle cx={c ? 160 : 40} cy="60" r="70" fill="none" stroke="rgb(255 255 255 / 0.35)" strokeWidth="1.5" />
-        <circle cx={c ? 160 : 40} cy="60" r="48" fill="none" stroke="rgb(255 255 255 / 0.28)" strokeWidth="1.5" />
-        {/* figure */}
-        <path d={c ? "M28 260 C 34 196, 70 176, 100 176 S 168 196, 174 260 Z" : "M20 260 C 30 200, 66 182, 100 182 S 172 200, 180 260 Z"} fill="rgb(13 11 18 / 0.88)" />
-        <path d="M86 150 h28 v34 a14 14 0 0 1 -28 0 Z" fill={c ? "#c98a6b" : "#8d5b44"} />
-        <ellipse cx="100" cy="118" rx="38" ry="44" fill={c ? "#e0a586" : "#a26a4f"} />
-        {c ? (
-          <path d="M60 116 C 56 66, 96 58, 112 66 C 140 64, 150 96, 140 128 C 136 104, 124 92, 104 92 C 84 92, 70 100, 64 132 Z" fill="#241329" />
-        ) : (
-          <path d="M64 104 C 64 70, 136 66, 138 104 C 128 92, 112 88, 100 88 C 86 88, 72 92, 64 104 Z" fill="#1b1220" />
-        )}
-        {/* sunglasses for the creator, collar for the brand */}
-        {c ? (
-          <g fill="rgb(13 11 18 / 0.9)">
-            <rect x="72" y="110" width="24" height="14" rx="6" />
-            <rect x="104" y="110" width="24" height="14" rx="6" />
-            <rect x="94" y="114" width="12" height="3" />
-          </g>
-        ) : (
-          <path d="M78 196 L100 222 L122 196" fill="none" stroke="rgb(255 255 255 / 0.85)" strokeWidth="5" strokeLinejoin="round" />
-        )}
-        {/* cutout stripe */}
-        <rect x={c ? -20 : 120} y="0" width="34" height="260" fill="rgb(255 255 255 / 0.18)" transform={c ? "skewX(-8)" : "skewX(8)"} />
-      </g>
-    </svg>
+    <div
+      className="relative h-full w-full overflow-hidden bg-gradient-to-br from-brand-200 via-rose-100 to-amber-100"
+      style={{ backgroundImage: `linear-gradient(180deg, transparent 65%, rgba(13,11,20,.28)), url("${photo}")`, backgroundPosition: "center", backgroundSize: "cover" }}
+      role="img"
+      aria-label={creator ? "Editorial creator portrait" : "Editorial business collaboration photograph"}
+    >
+      <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/15" />
+    </div>
   );
 }
 
