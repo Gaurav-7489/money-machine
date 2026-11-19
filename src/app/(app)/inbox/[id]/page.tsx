@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useRef, useState } from "react";
-import { ArchiveRestore, Check, CheckCheck, Handshake, MessageCircleOff, Pin, SendHorizontal, Star, Sticker, Trash2, X } from "lucide-react";
+import { ArchiveRestore, Check, CheckCheck, Handshake, ImagePlus, Loader2, MessageCircleOff, Pin, SendHorizontal, Star, Sticker, Trash2, X } from "lucide-react";
+import { MediaImage, storePhoto } from "@/components/image-slot";
+import { deleteMedia } from "@/lib/media";
 import { Avatar, VerifiedMark } from "@/components/art";
 import { DealFields, DealSummary, checkDeal, emptyDeal, type DealDraft } from "@/components/deal-form";
 import { GifPicker, GifView } from "@/components/feed/gifs";
@@ -13,7 +15,7 @@ import { earningShort } from "@/lib/catalog";
 import { timeAgo } from "@/lib/format";
 import { profileByHandle } from "@/lib/sample-data";
 import { useStore } from "@/lib/store";
-import { useThreads, type ViewMessage } from "@/lib/threads";
+import { folderHref, useThreads, type ViewMessage } from "@/lib/threads";
 import type { DealOffer } from "@/lib/types";
 
 const MAX = 2000;
@@ -62,6 +64,7 @@ function Bubble({ m, name, tone, square, onReply }: { m: ViewMessage; name: stri
       <div className="animate-fade-up flex flex-col items-end">
         {m.deal && <div className="mb-1 w-[85%] max-w-sm"><DealSummary deal={{ ...m.deal, note: "" }} compact /></div>}
         {m.gif && <div className="mb-1"><GifView id={m.gif} size="md" /></div>}
+        {m.imageId && <MediaImage id={m.imageId} alt="Photo you sent" className="mb-1 max-h-80 w-auto max-w-[80%] rounded-[14px]" fallback={<span className="mb-1 rounded-[14px] border border-line px-3 py-2 text-[13px] text-muted">Photo saved on another device</span>} />}
         {m.body && <p className="bg-aurora max-w-[80%] whitespace-pre-wrap break-words rounded-[18px] rounded-br-[6px] px-4 py-2.5 text-[15px] text-on-accent">{m.body}</p>}
         <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted"><CheckCheck className="h-3.5 w-3.5 text-gain" /> Sent · {timeAgo(m.at)}</span>
       </div>
@@ -92,10 +95,13 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
   const { id } = use(params);
   const { all, send, folders } = useThreads();
   const thread = all.find((t) => t.id === id);
-  const { update, readThreads, toggle } = useStore();
+  const { update, readThreads, toggle, session } = useStore();
   const { toast, confirm } = useFeedback();
   const [body, setBody] = useState("");
   const [gif, setGif] = useState<string | undefined>();
+  const [photo, setPhoto] = useState<string | undefined>();
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const photoRef = useRef<HTMLInputElement>(null);
   const [gifOpen, setGifOpen] = useState(false);
   const [offerOpen, setOfferOpen] = useState(false);
   const [deal, setDeal] = useState<DealDraft>(() => emptyDeal(thread?.dealType));
@@ -129,22 +135,23 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
   function submit(e?: React.FormEvent) {
     e?.preventDefault();
     const text = body.trim();
-    if (!text && !gif) {
+    if (!text && !gif && !photo) {
       setError("Type a message first.");
       inputRef.current?.focus();
       return;
     }
     if (text.length > MAX) return setError(`Messages can be up to ${MAX} characters. Yours has ${text.length}.`);
-    send(id, { body: text, gif });
+    send(id, { body: text, gif, imageId: photo });
     setBody("");
     setGif(undefined);
+    setPhoto(undefined);
     setError("");
     inputRef.current?.focus();
   }
 
   function sendOffer(e: React.FormEvent) {
     e.preventDefault();
-    const r = checkDeal(deal);
+    const r = checkDeal(deal, { currency: session?.currency });
     setDealErrors(r.errors);
     if (!r.offer) return;
     send(id, { body: r.offer.note, deal: r.offer });
@@ -185,7 +192,7 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
     <div className="mx-auto flex max-w-2xl flex-col">
       <PageHeader
         title={p.name}
-        back={`/inbox${folder ? `?folder=${encodeURIComponent(folder.id)}` : ""}`}
+        back={folder ? folderHref(folder.id) : "/inbox"}
         action={
           <div className="flex items-center gap-1">
             {thread.sample && <SampleTag className="mr-1" />}
@@ -215,6 +222,12 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
           <div ref={endRef} />
         </div>
         <form onSubmit={submit} className="sticky bottom-20 mt-3 md:bottom-4" noValidate>
+          {photo && (
+            <div className="relative mb-2 inline-block">
+              <MediaImage id={photo} alt="Photo to send" className="h-28 w-auto rounded-[12px]" />
+              <button type="button" onClick={() => { void deleteMedia(photo); setPhoto(undefined); }} className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-black/70 text-white" aria-label="Remove photo"><X className="h-3.5 w-3.5" /></button>
+            </div>
+          )}
           {gif && (
             <div className="relative mb-2 inline-block">
               <GifView id={gif} size="sm" />
@@ -229,6 +242,32 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
             )}
             <button type="button" onClick={() => setGifOpen(true)} className="press grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted hover:bg-elevated hover:text-ink" aria-label="Add a GIF" title="GIF">
               <Sticker className="h-5 w-5" />
+            </button>
+            <input
+              ref={photoRef}
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              tabIndex={-1}
+              aria-hidden="true"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                e.target.value = "";
+                if (!file) return;
+                setPhotoBusy(true);
+                try {
+                  if (photo) void deleteMedia(photo);
+                  setPhoto(await storePhoto(file));
+                  setGif(undefined);
+                } catch (err) {
+                  toast(err instanceof Error ? err.message : "We couldn't use that photo.", "error");
+                } finally {
+                  setPhotoBusy(false);
+                }
+              }}
+            />
+            <button type="button" onClick={() => photoRef.current?.click()} disabled={photoBusy} className="press grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted hover:bg-elevated hover:text-ink disabled:opacity-50" aria-label="Add a photo" title="Photo">
+              {photoBusy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImagePlus className="h-5 w-5" />}
             </button>
             <label htmlFor="msg" className="sr-only">Write a message to {p.name}</label>
             <textarea
@@ -254,7 +293,7 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
       <GifPicker open={gifOpen} onClose={() => setGifOpen(false)} onPick={setGif} />
       <Sheet open={offerOpen} onClose={() => setOfferOpen(false)} title={`Deal offer to ${p.name}`}>
         <form onSubmit={sendOffer} noValidate className="space-y-5">
-          <DealFields draft={deal} onChange={setDeal} errors={dealErrors} />
+          <DealFields draft={deal} onChange={setDeal} errors={dealErrors} currency={session?.currency} />
           <div className="sticky bottom-0 -mx-5 grid grid-cols-2 gap-2 border-t border-line bg-surface px-5 py-3">
             <Button type="button" variant="secondary" onClick={() => setOfferOpen(false)}>Cancel</Button>
             <Button type="submit"><Handshake className="h-4 w-4" /> Send offer</Button>

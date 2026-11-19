@@ -1,10 +1,17 @@
 "use client";
 
 import { useMemo } from "react";
+import { DEFAULT_CURRENCY } from "./format";
 import { evaluateBadges } from "./badges";
 import { summarize } from "./money";
 import { SAMPLE_PROGRAMS } from "./sample-data";
 import { useStore } from "./store";
+
+/** The signed-in account's currency (from its country); rupees until a country is chosen. */
+export function useCurrency(): string {
+  const { session } = useStore();
+  return session?.currency ?? DEFAULT_CURRENCY;
+}
 
 export function useMoney() {
   const { records, session } = useStore();

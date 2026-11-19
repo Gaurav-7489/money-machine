@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { formatINR } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 
 const MONTH = new Intl.DateTimeFormat("en-IN", { month: "short", timeZone: "UTC" });
 const label = (ym: string) => MONTH.format(new Date(`${ym}-01T00:00:00Z`));
@@ -12,7 +12,8 @@ const label = (ym: string) => MONTH.format(new Date(`${ym}-01T00:00:00Z`));
  * Hover or focus a month to read its exact value. The figures are also given
  * as a visually hidden table for screen readers.
  */
-export function MonthChart({ data, caption }: { data: { month: string; total: number }[]; caption: string }) {
+export function MonthChart({ data, caption, currency }: { data: { month: string; total: number }[]; caption: string; currency?: string }) {
+  const money = (v: number) => formatMoney(v, currency);
   const [active, setActive] = useState<number | null>(null);
   const max = Math.max(...data.map((d) => Math.abs(d.total)), 1);
   const hasNeg = data.some((d) => d.total < 0);
@@ -22,7 +23,7 @@ export function MonthChart({ data, caption }: { data: { month: string; total: nu
     <figure className="w-full">
       <div className="mb-4 flex items-baseline justify-between text-[13px]" aria-hidden="true">
         <span className="text-muted">{cur ? `${label(cur.month)}` : ""}</span>
-        <span className={`font-semibold tabular-nums ${cur && cur.total < 0 ? "text-loss" : ""}`}>{cur ? `${cur.total < 0 ? "−" : ""}${formatINR(Math.abs(cur.total))}` : ""}</span>
+        <span className={`font-semibold tabular-nums ${cur && cur.total < 0 ? "text-loss" : ""}`}>{cur ? `${cur.total < 0 ? "−" : ""}${money(Math.abs(cur.total))}` : ""}</span>
       </div>
       <div className={`relative grid h-40 grid-cols-6 gap-2 sm:gap-3 ${hasNeg ? "items-center" : "items-end"}`} onPointerLeave={() => setActive(null)} aria-hidden="true">
         {/* baseline */}
@@ -55,7 +56,7 @@ export function MonthChart({ data, caption }: { data: { month: string; total: nu
         <caption>{caption}</caption>
         <tbody>
           {data.map((d) => (
-            <tr key={d.month}><th scope="row">{label(d.month)}</th><td>{d.total < 0 ? "−" : ""}{formatINR(Math.abs(d.total))}</td></tr>
+            <tr key={d.month}><th scope="row">{label(d.month)}</th><td>{d.total < 0 ? "−" : ""}{money(Math.abs(d.total))}</td></tr>
           ))}
         </tbody>
       </table>

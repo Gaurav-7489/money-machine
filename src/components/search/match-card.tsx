@@ -8,7 +8,7 @@ import { SampleTag } from "@/components/ui";
 import { Photo } from "@/components/photo";
 import { nichePhoto } from "@/lib/photos";
 import { earningShort } from "@/lib/catalog";
-import { formatINR } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { matchLabel, type MatchResult } from "@/lib/match";
 import type { Profile } from "@/lib/sample-data";
 
@@ -22,8 +22,9 @@ export interface MatchCardProps {
   onMessage: () => void;
 }
 
-export function priceText(p: Pick<Profile, "priceFrom" | "priceTo">) {
-  return p.priceFrom === p.priceTo ? formatINR(p.priceFrom) : `${formatINR(p.priceFrom)} – ${formatINR(p.priceTo)}`;
+export function priceText(p: Pick<Profile, "priceFrom" | "priceTo" | "currency">) {
+  const f = (v: number) => formatMoney(v, p.currency);
+  return p.priceFrom === p.priceTo ? f(p.priceFrom) : `${f(p.priceFrom)} – ${f(p.priceTo)}`;
 }
 
 /** Circular match meter: a marigold arc that sweeps in once. */
@@ -113,7 +114,7 @@ export function MatchCard({ result, selected, onSelect, starred, onStar, onRemov
           </div>
           <div className="border-l border-line py-2.5 pl-3">
             <dt className="text-muted">{isCreator ? "Asks commission" : "Pays commission"}</dt>
-            <dd className="mt-0.5 text-[14px] font-semibold tabular-nums">{p.commissionPercent !== undefined ? `${p.commissionPercent}%` : "—"}{p.perSale !== undefined ? ` · ${formatINR(p.perSale)}/sale` : ""}</dd>
+            <dd className="mt-0.5 text-[14px] font-semibold tabular-nums">{p.commissionPercent !== undefined ? `${p.commissionPercent}%` : "—"}{p.perSale !== undefined ? ` · ${formatMoney(p.perSale, p.currency)}/sale` : ""}</dd>
           </div>
         </dl>
 

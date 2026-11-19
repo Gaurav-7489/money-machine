@@ -33,7 +33,7 @@ export function BulkDm({ open, onClose, recipients, onSent }: { open: boolean; o
 
   function next(e: React.FormEvent) {
     e.preventDefault();
-    const r = checkDeal(draft);
+    const r = checkDeal(draft, { currency: session?.currency });
     setErrors(r.errors);
     if (r.offer) setReview(r.offer);
   }
@@ -84,7 +84,7 @@ export function BulkDm({ open, onClose, recipients, onSent }: { open: boolean; o
             </div>
           ) : (
             <form onSubmit={next} noValidate className="space-y-5">
-              <DealFields draft={draft} onChange={setDraft} errors={errors} />
+              <DealFields draft={draft} onChange={setDraft} errors={errors} currency={session?.currency} />
               <p className="rounded-xl bg-amber-50 px-3 py-2 text-[12px] text-amber-700 ring-1 ring-amber-200">You can send one bulk DM every {BULK_DM_COOLDOWN_DAYS} days, so make it count.</p>
               <div className="sticky bottom-0 -mx-5 grid grid-cols-2 gap-2 border-t border-line bg-surface px-5 py-3">
                 <Button type="button" variant="secondary" onClick={close}>Cancel</Button>

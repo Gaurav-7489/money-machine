@@ -27,18 +27,6 @@ export const NICHES = [
 /** Kept for older saved profiles and the badges/affiliate pages. */
 export const CATEGORIES = NICHES;
 
-/** Countries and their main cities. Kept short on purpose. */
-export const LOCATIONS: Record<string, string[]> = {
-  India: ["Mumbai", "Delhi", "Bengaluru", "Pune", "Hyderabad", "Chennai", "Kolkata", "Jaipur", "Ahmedabad", "Goa"],
-  "United Arab Emirates": ["Dubai", "Abu Dhabi", "Sharjah"],
-  "United Kingdom": ["London", "Manchester", "Birmingham"],
-  "United States": ["New York", "Los Angeles", "Miami"],
-  Singapore: ["Singapore"],
-  Canada: ["Toronto", "Vancouver"],
-};
-
-export const COUNTRIES = Object.keys(LOCATIONS);
-
 /** Means of earning. Each one also becomes a message folder for creators who choose it. */
 export const EARNING_MODELS = [
   { id: "affiliate", label: "Affiliate marketing", short: "Affiliate", hint: "Money for every sale made through your link or code." },

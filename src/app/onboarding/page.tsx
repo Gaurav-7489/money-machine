@@ -8,7 +8,9 @@ import { Photo } from "@/components/photo";
 import { STORY } from "@/lib/photos";
 import Link from "next/link";
 import { Button, Field, inputCls, selectCls } from "@/components/ui";
-import { COUNTRIES, EARNING_MODELS, LOCATIONS, NICHES } from "@/lib/catalog";
+import { EARNING_MODELS, NICHES } from "@/lib/catalog";
+import { LocationPicker } from "@/components/location-picker";
+import { DEFAULT_CURRENCY, currencySymbol } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import { fieldErrors, onboardingInput, type FieldErrors } from "@/lib/validation";
 import type { Role } from "@/lib/types";
@@ -47,7 +49,8 @@ export default function Onboarding() {
   const [lookingFor, setLookingFor] = useState<string[]>([]);
   const [earning, setEarning] = useState<string[]>([]);
   const [country, setCountry] = useState("");
-  const [city, setCity] = useState("");
+  const [region, setRegion] = useState("");
+  const [currency, setCurrency] = useState("");
   const [payMin, setPayMin] = useState("");
   const [payMax, setPayMax] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -78,7 +81,8 @@ export default function Onboarding() {
           lookingFor: isBiz ? lookingFor : niches,
           earningModels: earning,
           country: country || undefined,
-          city: city || undefined,
+          region: region || undefined,
+          currency: currency || DEFAULT_CURRENCY,
           payPerVideoMin: lo,
           payPerVideoMax: hi,
           priceFrom: lo,
@@ -187,22 +191,16 @@ export default function Onboarding() {
             <>
               <h1 className="mb-6 text-[clamp(2.6rem,7vw,3.75rem)] leading-[0.9]">Almost there</h1>
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-2">
-                  <Field label="Country" optional>
-                    <select className={selectCls} value={country} onChange={(e) => { setCountry(e.target.value); setCity(""); }}>
-                      <option value="">Choose</option>
-                      {COUNTRIES.map((c) => <option key={c}>{c}</option>)}
-                    </select>
-                  </Field>
-                  <Field label="City" optional>
-                    <select className={selectCls} value={city} onChange={(e) => setCity(e.target.value)} disabled={!country}>
-                      <option value="">{country ? "Choose" : "Country first"}</option>
-                      {(LOCATIONS[country] ?? []).map((c) => <option key={c}>{c}</option>)}
-                    </select>
-                  </Field>
-                </div>
+                <LocationPicker
+                  value={{ country, region }}
+                  onChange={(v) => {
+                    setCountry(v.country);
+                    setRegion(v.region);
+                    setCurrency(v.currency);
+                  }}
+                />
                 <div>
-                  <p className="mb-1.5 text-[13px] font-medium">{isBiz ? "Your budget per video (₹)" : "What you charge per video (₹)"}</p>
+                  <p className="mb-1.5 text-[13px] font-medium">{isBiz ? "Your budget per video" : "What you charge per video"} ({currencySymbol(currency || DEFAULT_CURRENCY)})</p>
                   <div className="grid grid-cols-2 gap-2">
                     <label><span className="sr-only">Minimum</span><input inputMode="numeric" className={inputCls} placeholder="Min" value={payMin} onChange={(e) => setPayMin(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!errors.pay} /></label>
                     <label><span className="sr-only">Maximum</span><input inputMode="numeric" className={inputCls} placeholder="Max" value={payMax} onChange={(e) => setPayMax(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!errors.pay} /></label>

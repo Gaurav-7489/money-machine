@@ -23,7 +23,11 @@ export interface Profile {
   category: string;
   niches: string[];
   country: string;
+  /** state / province (ISO 3166-2 name) */
+  region?: string;
   city: string;
+  /** ISO 4217; every sample amount is written in rupees */
+  currency: string;
   /** creators: what they charge per video; businesses: their usual budget per video (whole ₹) */
   priceFrom: number;
   priceTo: number;
@@ -38,7 +42,8 @@ export interface Profile {
   system?: "admin" | "owner";
 }
 
-const P = (p: Omit<Profile, "category"> & { category?: string }): Profile => ({ ...p, category: p.category ?? p.niches[0]! });
+const CITY_REGION: Record<string, string> = { Mumbai: "Maharashtra", Pune: "Maharashtra", Bengaluru: "Karnataka", Delhi: "Delhi", Hyderabad: "Telangana", Chennai: "Tamil Nadu", Jaipur: "Rajasthan", Dubai: "Dubai", London: "England" };
+const P = (p: Omit<Profile, "category" | "currency"> & { category?: string }): Profile => ({ ...p, region: p.region ?? CITY_REGION[p.city], currency: "INR", category: p.category ?? p.niches[0]! });
 
 export const SAMPLE_PROFILES: Profile[] = [
   // ── creators ──

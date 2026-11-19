@@ -8,104 +8,14 @@ import { useFeedback } from "@/components/feedback";
 import { BulkDm } from "@/components/search/bulk-dm";
 import { MatchCard, MatchCardSkeleton } from "@/components/search/match-card";
 import { Button, EmptyState, Sheet, inputCls } from "@/components/ui";
-import { COUNTRIES, EARNING_MODELS, LOCATIONS, NICHES } from "@/lib/catalog";
+import { EARNING_MODELS } from "@/lib/catalog";
+import { DEFAULT_CURRENCY } from "@/lib/format";
+import { FilterBuilder, fromDraft, toDraft, type Draft } from "@/components/search/filter-builder";
 import { EMPTY_FILTERS, MATCH_LEVELS, activeFilterCount, countAtLeast, filtersFromParams, filtersFromProfile, filtersToParams, findMatches, type MatchFilters } from "@/lib/match";
 import { SEARCHABLE_PROFILES } from "@/lib/sample-data";
 import { usePostIndex } from "@/lib/search-index";
 import { useStore } from "@/lib/store";
 import { useThreads } from "@/lib/threads";
-
-const digits = (v: string) => v.replace(/[^\d]/g, "");
-const numOrNull = (v: string) => (v.trim() === "" ? null : Number(digits(v)) || 0);
-
-function Chip({ on, onClick, children, title }: { on: boolean; onClick: () => void; children: React.ReactNode; title?: string }) {
-  return (
-    <button type="button" aria-pressed={on} title={title} onClick={onClick} className={`press h-9 shrink-0 rounded-full px-3.5 text-[13px] font-semibold transition-colors ${on ? "bg-aurora text-on-accent " : "border border-line bg-surface text-ink hover:border-ink"}`}>
-      {children}
-    </button>
-  );
-}
-
-function Group({ title, optional, children }: { title: string; optional?: boolean; children: React.ReactNode }) {
-  return (
-    <fieldset className="space-y-2.5 border-t border-line pt-4 first:border-t-0 first:pt-0">
-      <legend className="mb-2 flex items-center gap-1.5 text-[14px] font-bold">
-        {title}
-        {optional && <span className="rounded-full bg-elevated px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span>}
-      </legend>
-      {children}
-    </fieldset>
-  );
-}
-
-/** Draft form state: numbers kept as strings while typing. */
-type Draft = Omit<MatchFilters, "priceMin" | "priceMax" | "commission" | "perSale"> & { priceMin: string; priceMax: string; commission: string; perSale: string };
-const toDraft = (f: MatchFilters): Draft => ({ ...f, priceMin: f.priceMin?.toString() ?? "", priceMax: f.priceMax?.toString() ?? "", commission: f.commission?.toString() ?? "", perSale: f.perSale?.toString() ?? "" });
-const fromDraft = (d: Draft): MatchFilters => ({ ...d, priceMin: numOrNull(d.priceMin), priceMax: numOrNull(d.priceMax), commission: numOrNull(d.commission), perSale: numOrNull(d.perSale) });
-
-function FilterForm({ draft, setDraft, role, error, onSubmit, onClear }: { draft: Draft; setDraft: (fn: (d: Draft) => Draft) => void; role: "creator" | "business"; error: string; onSubmit: (e: React.FormEvent) => void; onClear: () => void }) {
-  const lookingForCreators = draft.kind !== "business";
-  const cities = draft.country ? LOCATIONS[draft.country] ?? [] : [];
-  const toggle = (key: "niches" | "earningModels" | "cities", v: string) => setDraft((d) => ({ ...d, [key]: d[key].includes(v) ? d[key].filter((x) => x !== v) : [...d[key], v] }));
-
-  return (
-    <form onSubmit={onSubmit} noValidate className="space-y-4">
-      <Group title={role === "business" ? "What type of content creator?" : lookingForCreators ? "What type of creator?" : "What are you looking for?"}>
-        <div className="flex flex-wrap gap-1.5">
-          {NICHES.map((n) => <Chip key={n} on={draft.niches.includes(n)} onClick={() => toggle("niches", n)}>{n}</Chip>)}
-        </div>
-      </Group>
-
-      <Group title="Means of earning">
-        <div className="flex flex-wrap gap-1.5">
-          {EARNING_MODELS.map((m) => <Chip key={m.id} on={draft.earningModels.includes(m.id)} onClick={() => toggle("earningModels", m.id)} title={m.hint}>{m.label}</Chip>)}
-        </div>
-      </Group>
-
-      <Group title={lookingForCreators ? "Pay per video (₹)" : "Price range per video (₹)"}>
-        <div className="grid grid-cols-2 gap-2">
-          <label><span className="sr-only">Minimum per video</span><input inputMode="numeric" className={inputCls} placeholder="Min e.g. 3000" value={draft.priceMin} onChange={(e) => setDraft((d) => ({ ...d, priceMin: digits(e.target.value) }))} aria-invalid={!!error} /></label>
-          <label><span className="sr-only">Maximum per video</span><input inputMode="numeric" className={inputCls} placeholder="Max e.g. 25000" value={draft.priceMax} onChange={(e) => setDraft((d) => ({ ...d, priceMax: digits(e.target.value) }))} aria-invalid={!!error} /></label>
-        </div>
-        {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
-        <div className="grid grid-cols-2 gap-2">
-          <label className="block">
-            <span className="mb-1 block text-[12px] font-medium text-muted">{lookingForCreators ? "Commission up to %" : "Commission at least %"}</span>
-            <input inputMode="numeric" className={inputCls} placeholder="e.g. 15" value={draft.commission} onChange={(e) => setDraft((d) => ({ ...d, commission: digits(e.target.value).slice(0, 2) }))} />
-          </label>
-          <label className="block">
-            <span className="mb-1 block text-[12px] font-medium text-muted">{lookingForCreators ? "Per sale up to ₹" : "Per sale at least ₹"}</span>
-            <input inputMode="numeric" className={inputCls} placeholder="e.g. 150" value={draft.perSale} onChange={(e) => setDraft((d) => ({ ...d, perSale: digits(e.target.value) }))} />
-          </label>
-        </div>
-      </Group>
-
-      <Group title="Country / city">
-        <div className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-          <Chip on={!draft.country} onClick={() => setDraft((d) => ({ ...d, country: "", cities: [] }))}>Anywhere</Chip>
-          {COUNTRIES.map((c) => <Chip key={c} on={draft.country === c} onClick={() => setDraft((d) => ({ ...d, country: d.country === c ? "" : c, cities: [] }))}>{c}</Chip>)}
-        </div>
-        {cities.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {cities.map((c) => <Chip key={c} on={draft.cities.includes(c)} onClick={() => toggle("cities", c)}>{c}</Chip>)}
-          </div>
-        )}
-      </Group>
-
-      <Group title="Know who you want?" optional>
-        <div className="grid grid-cols-2 gap-2">
-          <label className="block"><span className="mb-1 block text-[12px] font-medium text-muted">Search by name</span><input className={inputCls} placeholder="e.g. Aanya" value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} /></label>
-          <label className="block"><span className="mb-1 block text-[12px] font-medium text-muted">Search by handle</span><input className={inputCls} placeholder="@handle" autoCapitalize="none" value={draft.social} onChange={(e) => setDraft((d) => ({ ...d, social: e.target.value }))} /></label>
-        </div>
-      </Group>
-
-      <div className="sticky bottom-0 -mx-5 grid grid-cols-[auto_1fr] gap-2 border-t border-line bg-surface px-5 py-3 lg:static lg:mx-0 lg:border-0 lg:p-0">
-        <Button type="button" variant="secondary" onClick={onClear}><RotateCcw className="h-4 w-4" /> Clear</Button>
-        <Button type="submit"><Search className="h-4 w-4" /> Show matches</Button>
-      </div>
-    </form>
-  );
-}
 
 function ExploreInner() {
   const params = useSearchParams();
@@ -115,13 +25,16 @@ function ExploreInner() {
   const { startThread, bulkDaysLeft } = useThreads();
   const posts = usePostIndex();
   const role = session?.role ?? "creator";
-  const defaultKind = role === "business" ? "creator" : "business";
+  const defaultKind: "creator" | "business" = role === "business" ? "creator" : "business";
 
   const urlFilters = useMemo(() => filtersFromParams(new URLSearchParams(params.toString())), [params]);
   const custom = params.get("mode") === "custom" || activeFilterCount({ ...urlFilters, q: "" }) > 0;
-  const kind = urlFilters.kind === "all" ? defaultKind : urlFilters.kind;
+  // Explore always looks across: creators find businesses, businesses find creators.
+  // People on your own side are found from Friends.
+  const kind = defaultKind;
+  const currency = session?.currency ?? DEFAULT_CURRENCY;
   const matched = useMemo(() => (session ? { ...filtersFromProfile(session), kind } : { ...EMPTY_FILTERS, kind }), [session, kind]);
-  const applied: MatchFilters = custom ? { ...urlFilters, kind } : { ...matched, q: urlFilters.q };
+  const applied: MatchFilters = custom ? { ...urlFilters, kind, currency } : { ...matched, q: urlFilters.q };
   const level = Number(params.get("match") ?? 0) || 0;
 
   const [q, setQ] = useState(urlFilters.q);
@@ -141,6 +54,8 @@ function ExploreInner() {
   const scored = useMemo(() => findMatches(pool, live, 0, posts), [pool, JSON.stringify(live), posts]); // eslint-disable-line react-hooks/exhaustive-deps
   const results = level ? scored.filter((r) => r.percent !== null && r.percent >= level) : scored;
   const hasScores = scored.some((r) => r.percent !== null);
+  const draftFilters = fromDraft(draft);
+  const liveCount = useMemo(() => findMatches(pool, { ...draftFilters, q, kind, currency }, 0, posts).filter((r) => !level || (r.percent ?? 0) >= level).length, [pool, JSON.stringify(draftFilters), q, kind, currency, level, posts]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     setSelected((s) => s.filter((h) => results.some((r) => r.profile.handle === h)));
@@ -189,10 +104,6 @@ function ExploreInner() {
     router.replace(`/explore${qs.size ? `?${qs}` : ""}`, { scroll: false });
   }
 
-  function setKind(k: "creator" | "business") {
-    go({ ...applied, q, kind: k }, {}, custom);
-  }
-
   const handles = results.map((r) => r.profile.handle);
   const allSelected = handles.length > 0 && handles.every((h) => selected.includes(h));
   const recipients = SEARCHABLE_PROFILES.filter((p) => selected.includes(p.handle));
@@ -237,12 +148,6 @@ function ExploreInner() {
         <button onClick={() => setSheet(true)} aria-pressed={custom} className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold lg:hidden ${custom ? "bg-ink text-canvas" : "border border-line hover:border-ink"}`}>
           <SlidersHorizontal className="h-4 w-4" /> Custom search{custom && count ? ` · ${count}` : ""}
         </button>
-        <span className="mx-1 h-5 w-px shrink-0 bg-line" />
-        {(["creator", "business"] as const).map((k) => (
-          <button key={k} onClick={() => setKind(k)} aria-pressed={kind === k} className={`press h-9 shrink-0 rounded-full px-3.5 text-[13px] font-semibold ${kind === k ? "text-ink underline decoration-signal decoration-[3px] underline-offset-[10px]" : "text-muted hover:text-ink"}`}>
-            {k === "creator" ? "Creators" : "Brands"}
-          </button>
-        ))}
       </div>
 
       {!custom && (
@@ -258,8 +163,8 @@ function ExploreInner() {
       <div className="mt-8 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[300px_minmax(0,1fr)]">
         <aside className="hidden lg:block" aria-label="Filters">
           <div className="no-scrollbar sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto border-t border-ink pt-3">
-            <h2 className="font-text mb-4 flex items-center gap-2 text-[14px] font-semibold"><SlidersHorizontal className="h-4 w-4" /> Custom search</h2>
-            <FilterForm draft={draft} setDraft={setDraft} role={role} error={error} onSubmit={apply} onClear={clearAll} />
+            <h2 className="sr-only">Custom search</h2>
+            <FilterBuilder draft={draft} setDraft={setDraft} who={who} lookingForCreators={kind === "creator"} currency={currency} error={error} liveCount={liveCount} onSubmit={apply} onClear={clearAll} />
           </div>
         </aside>
 
@@ -354,7 +259,7 @@ function ExploreInner() {
       )}
 
       <Sheet open={sheet} onClose={() => setSheet(false)} title="Custom search">
-        {sheet && <FilterForm draft={draft} setDraft={setDraft} role={role} error={error} onSubmit={apply} onClear={clearAll} />}
+        {sheet && <FilterBuilder draft={draft} setDraft={setDraft} who={who} lookingForCreators={kind === "creator"} currency={currency} error={error} liveCount={liveCount} onSubmit={apply} onClear={clearAll} />}
       </Sheet>
       <BulkDm open={bulkOpen} onClose={() => setBulkOpen(false)} recipients={recipients} onSent={() => setSelected([])} />
     </div>

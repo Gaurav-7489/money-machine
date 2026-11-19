@@ -101,7 +101,7 @@ export function Composer({ autoFocus = false, onDone }: { autoFocus?: boolean; o
   return (
     <form onSubmit={submit} className="card mb-2 p-4 transition-colors focus-within:border-ink" aria-label="Create a post" noValidate>
       <div className="flex gap-3">
-        <Avatar name={session.displayName} tone={session.role === "business" ? "violet" : "rose"} square={session.role === "business"} />
+        <Avatar name={session.displayName} tone={session.role === "business" ? "violet" : "rose"} square={session.role === "business"} photoId={session.avatarId} />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold">{session.displayName}</p>
           <label htmlFor="composer" className="sr-only">Write a post</label>

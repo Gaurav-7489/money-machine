@@ -1,7 +1,33 @@
-const inr = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
+/** The currency used when an account hasn't picked a country yet (Money Machine launched in India). */
+export const DEFAULT_CURRENCY = "INR";
 
+const formatters = new Map<string, Intl.NumberFormat>();
+function fmt(currency: string): Intl.NumberFormat {
+  let f = formatters.get(currency);
+  if (!f) {
+    try {
+      f = new Intl.NumberFormat(currency === "INR" ? "en-IN" : undefined, { style: "currency", currency, maximumFractionDigits: 0 });
+    } catch {
+      f = new Intl.NumberFormat("en-IN", { style: "currency", currency: DEFAULT_CURRENCY, maximumFractionDigits: 0 });
+    }
+    formatters.set(currency, f);
+  }
+  return f;
+}
+
+/** Whole-unit money in the given ISO 4217 currency, e.g. ₹2,500, $2,500, AED 2,500. Amounts are never converted. */
+export function formatMoney(amount: number, currency: string = DEFAULT_CURRENCY): string {
+  return fmt(currency).format(amount);
+}
+
+/** The symbol (or code) people recognise for a currency, e.g. ₹, $, £, AED. */
+export function currencySymbol(currency: string = DEFAULT_CURRENCY): string {
+  return fmt(currency).formatToParts(0).find((p) => p.type === "currency")?.value ?? currency;
+}
+
+/** Kept for existing callers: rupees. */
 export function formatINR(amount: number): string {
-  return inr.format(amount);
+  return formatMoney(amount, "INR");
 }
 
 export function formatCompact(n: number): string {

@@ -212,7 +212,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
       <div className="flex gap-3">
         <div className="flex flex-col items-center">
           <Link href={authorHref} aria-label={`View ${post.authorName}'s profile`}>
-            <Avatar name={post.authorName} tone={post.authorTone} square={post.authorKind === "business"} />
+            <Avatar name={post.authorName} tone={post.authorTone} square={post.authorKind === "business"} photoId={post.mine ? session?.avatarId : undefined} />
           </Link>
           {allComments.length > 0 && <span className="mt-2 w-0.5 flex-1 rounded-full bg-line" aria-hidden="true" />}
         </div>
@@ -309,7 +309,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
                 const isMe = c.authorHandle === session?.handle;
                 return (
                   <li key={c.id} className="flex items-start gap-3">
-                    <Avatar name={c.authorName} tone={prof?.tone ?? (session?.role === "business" ? "violet" : "rose")} size="sm" square={prof?.kind === "business"} />
+                    <Avatar name={c.authorName} tone={prof?.tone ?? (session?.role === "business" ? "violet" : "rose")} size="sm" square={prof?.kind === "business"} photoId={isMe ? session?.avatarId : undefined} />
                     <div className="min-w-0 flex-1">
                       <p className="text-[13px]">
                         <Link href={isMe ? "/profile" : `/u/${c.authorHandle}`} className="font-semibold hover:underline">{c.authorName}</Link>{" "}

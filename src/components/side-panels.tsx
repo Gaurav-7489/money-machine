@@ -5,13 +5,15 @@ import { ArrowRight, ChevronRight, Link2, Rocket, Star, Wallet } from "lucide-re
 import { Avatar } from "./art";
 import { Sparkline } from "./sparkline";
 import { SampleTag, StatusPill } from "./ui";
-import { formatINR } from "@/lib/format";
-import { useBadges, useGrowth, useMoney, useMyPrograms, usePrograms } from "@/lib/hooks";
+import { formatMoney } from "@/lib/format";
+import { useBadges, useCurrency, useGrowth, useMoney, useMyPrograms, usePrograms } from "@/lib/hooks";
 import { profileByHandle } from "@/lib/sample-data";
 import { useStore } from "@/lib/store";
 
 export function GrowthCard() {
   const { kind, summary: income } = useMoney();
+  const currency = useCurrency();
+  const money = (v: number) => formatMoney(v, currency);
   const growth = useGrowth();
   const earned = useBadges().filter((b) => b.earned).length;
   const isBiz = kind === "spending";
@@ -25,7 +27,7 @@ export function GrowthCard() {
       </div>
       <div className="mt-3 flex items-end gap-4">
         <div className="min-w-0 flex-1">
-          <p className="font-display text-[44px] leading-none tabular-nums">{formatINR(summary.total)}</p>
+          <p className="font-display text-[44px] leading-none tabular-nums">{money(summary.total)}</p>
           <p className="mt-2 flex items-center gap-2 text-xs text-muted">
             {label}
             {summary.changePercent !== null && (
@@ -82,13 +84,15 @@ export function ProgramsCard() {
 export function TabletQuickCards() {
   const { kind, summary } = useMoney();
   const growth = useGrowth();
+  const currency = useCurrency();
+  const money = (v: number) => formatMoney(v, currency);
   const mine = useMyPrograms();
   const earned = useBadges().filter((b) => b.earned).length;
   const { session } = useStore();
   const items = [
     kind === "income"
-      ? { href: "/money", label: "Earnings", value: formatINR(summary.total), sub: "Earned", icon: Wallet }
-      : { href: "/money", label: "Grow & Scale", value: `Profit ${formatINR(growth.profit)}`, sub: "Profit", icon: Rocket },
+      ? { href: "/money", label: "Earnings", value: money(summary.total), sub: "Earned", icon: Wallet }
+      : { href: "/money", label: "Grow & Scale", value: `Profit ${money(growth.profit)}`, sub: "Profit", icon: Rocket },
     { href: "/affiliates", label: "Affiliates", value: `${mine.length} program${mine.length === 1 ? "" : "s"}`, sub: "", icon: Link2 },
     { href: "/badges", label: "Badges", value: `${earned} earned`, sub: "", icon: Star },
   ];

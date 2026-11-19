@@ -18,7 +18,7 @@ export default function OgImage() {
           <div style={{ display: "flex", fontSize: 132, fontWeight: 800, letterSpacing: -4, lineHeight: 0.92 }}>
             <span style={{ background: "#F2B705", padding: "0 18px" }}>Cash out.</span>
           </div>
-          <div style={{ marginTop: 36, fontSize: 30, color: "#5B675F" }}>{SITE.name} · Brand deals, affiliate programs and UGC for creators and businesses</div>
+          <div style={{ marginTop: 36, fontSize: 30, color: "#5B675F" }}>{`${SITE.name} · Brand deals, affiliate programs and UGC for creators and businesses`}</div>
         </div>
       </div>
     ),

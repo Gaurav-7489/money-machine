@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Briefcase, Check, Megaphone, Plus, Trash2 } from "lucide-react";
 import { Photo } from "./photo";
+import { ImageSlot, MediaImage } from "./image-slot";
+import { DEFAULT_CURRENCY } from "@/lib/format";
 import { nichePhoto } from "@/lib/photos";
 import { Avatar, VerifiedMark } from "./art";
 import { DealFields, budgetText, checkDeal, emptyDeal, type DealDraft } from "./deal-form";
@@ -29,19 +31,22 @@ function PostOpportunity({ open, onClose }: { open: boolean; onClose: () => void
   const [niches, setNiches] = useState<string[]>(session?.lookingFor ?? []);
   const [draft, setDraft] = useState<DealDraft>(emptyDeal());
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [coverId, setCoverId] = useState<string | undefined>();
+  const currency = session?.currency ?? DEFAULT_CURRENCY;
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const r = checkDeal(draft);
+    const r = checkDeal(draft, { currency });
     const errs = { ...r.errors };
     if (title.trim().length < 4) errs.title = "Give it a short title (at least 4 characters).";
     setErrors(errs);
     if (Object.keys(errs).length || !r.offer || !session) return;
-    const opp: Opportunity = { id: uid("opp"), ownerHandle: session.handle, title: title.trim(), type: r.offer.type, niches, budgetMin: r.offer.budgetMin, budgetMax: r.offer.budgetMax, deliverables: r.offer.deliverables, details: r.offer.note, createdAt: new Date().toISOString() };
+    const opp: Opportunity = { id: uid("opp"), ownerHandle: session.handle, title: title.trim(), type: r.offer.type, niches, budgetMin: r.offer.budgetMin, budgetMax: r.offer.budgetMax, deliverables: r.offer.deliverables, details: r.offer.note, createdAt: new Date().toISOString(), currency, coverId };
     update((s) => ({ ...s, opportunities: [opp, ...s.opportunities] }));
     toast("Opportunity posted! Creators can apply now 🚀");
     setTitle("");
     setDraft(emptyDeal());
+    setCoverId(undefined);
     onClose();
   }
 
@@ -57,14 +62,15 @@ function PostOpportunity({ open, onClose }: { open: boolean; onClose: () => void
             {NICHES.map((n) => {
               const on = niches.includes(n);
               return (
-                <button key={n} type="button" aria-pressed={on} onClick={() => setNiches((x) => (on ? x.filter((y) => y !== n) : [...x, n]))} className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-aurora text-on-accent" : "border border-line"}`}>
+                <button key={n} type="button" aria-pressed={on} onClick={() => setNiches((x) => (on ? x.filter((y) => y !== n) : [...x, n]))} className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-ink text-canvas" : "border border-line hover:border-ink"}`}>
                   {n}
                 </button>
               );
             })}
           </div>
         </div>
-        <DealFields draft={draft} onChange={setDraft} errors={errors} noteLabel="Details" />
+        <DealFields draft={draft} onChange={setDraft} errors={errors} noteLabel="Details" currency={currency} />
+        <ImageSlot label="Cover photo (optional)" id={coverId} onChange={setCoverId} />
         <div className="sticky bottom-0 -mx-5 grid grid-cols-2 gap-2 border-t border-line bg-surface px-5 py-3">
           <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
           <Button type="submit"><Megaphone className="h-4 w-4" /> Post</Button>
@@ -103,9 +109,9 @@ export function OpportunityCard({ o }: { o: Opportunity }) {
 
   return (
     <article className="card overflow-hidden" aria-label={o.title}>
-      {o.sample ? (
+      {o.sample || o.coverId ? (
         <div className="group relative aspect-[16/7] overflow-hidden bg-elevated">
-          <Photo photo={nichePhoto(o.niches[0])} sizes="(min-width: 768px) 576px, 100vw" className="photo-zoom" decorative />
+          <MediaImage id={o.coverId} alt="" className="photo-zoom absolute inset-0 h-full w-full" fallback={<Photo photo={nichePhoto(o.niches[0])} sizes="(min-width: 768px) 576px, 100vw" className="photo-zoom" decorative />} />
           <span className="photo-shade absolute inset-0" aria-hidden="true" />
           <span className="font-display absolute bottom-3 left-4 text-[28px] leading-none text-white">{o.niches[0] ?? "Campaign"}</span>
         </div>
@@ -125,7 +131,7 @@ export function OpportunityCard({ o }: { o: Opportunity }) {
         <p className="mt-2 text-[14px]">{o.details}</p>
         <div className="mt-3 flex flex-wrap gap-1.5 text-[12px]">
           <span className="rounded-full bg-ink px-2.5 py-1 font-semibold text-canvas">{earningLabel(o.type)}</span>
-          <span className="rounded-full bg-signal px-2.5 py-1 font-semibold tabular-nums text-on-signal">{budgetText(o.budgetMin, o.budgetMax)}</span>
+          <span className="rounded-full bg-signal px-2.5 py-1 font-semibold tabular-nums text-on-signal">{budgetText(o.budgetMin, o.budgetMax, o.currency)}</span>
           {o.deliverables.length > 0 && <span className="rounded-full border border-line px-2.5 py-1 font-medium">{deliverablesText(o.deliverables)}</span>}
           {o.niches.map((n) => <span key={n} className="rounded-full bg-elevated px-2.5 py-1 font-medium">{n}</span>)}
         </div>

@@ -15,7 +15,14 @@ export interface ProfileDetails {
   /** affiliate commission in percent */
   commissionPercent?: number;
   country?: string;
+  /** state / province / region within the country (ISO 3166-2 name) */
+  region?: string;
   city?: string;
+  /** ISO 4217 code of the account's country; every amount this account enters is in it */
+  currency?: string;
+  /** on-device media ids (IndexedDB) for the profile photo and cover photo */
+  avatarId?: string;
+  coverId?: string;
   /** whole rupees per post / deliverable */
   priceFrom?: number;
   priceTo?: number;
@@ -54,6 +61,8 @@ export interface FinancialRecord {
   category: IncomeCategory | SpendingCategory | RevenueCategory;
   date: string; // ISO yyyy-mm-dd
   counterparty?: string;
+  /** ISO 4217 code the amount was entered in; rupees when missing */
+  currency?: string;
   source: RecordSource;
   createdAt: string;
 }
@@ -72,6 +81,8 @@ export interface AffiliateProgram {
   createdAt: string;
   /** true for clearly-labelled sample programs shown in preview mode */
   sample?: boolean;
+  /** optional on-device image for the program */
+  imageId?: string;
 }
 
 export type ApplicationStatus = "pending" | "approved" | "rejected" | "withdrawn";
@@ -126,6 +137,8 @@ export interface DealOffer {
   budgetMax?: number;
   deliverables: { count: number; type: string }[];
   note: string;
+  /** ISO 4217 code the budget is written in (the sender's currency); rupees when missing */
+  currency?: string;
 }
 
 /** An opportunity a business posts for creators. */
@@ -141,6 +154,10 @@ export interface Opportunity {
   details: string;
   createdAt: string;
   sample?: boolean;
+  /** ISO 4217 code of the budget; rupees when missing */
+  currency?: string;
+  /** optional on-device cover photo */
+  coverId?: string;
 }
 
 /** A conversation the user started themselves (e.g. "Message" from Search). */
@@ -159,5 +176,7 @@ export interface Message {
   body: string;
   gif?: string;
   deal?: DealOffer;
+  /** optional on-device photo attached to the message */
+  imageId?: string;
   createdAt: string;
 }

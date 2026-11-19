@@ -3,6 +3,7 @@ import type { Tone } from "@/lib/sample-data";
 import { initials } from "@/lib/format";
 import { NICHE_PHOTOS, STORY, type Photo as PhotoT } from "@/lib/photos";
 import { Photo } from "./photo";
+import { MediaImage } from "./image-slot";
 
 export const TONES: Record<Tone, { bg: string; fg: string; soft: string }> = {
   rose: { bg: "from-tone-rose to-tone-rose", fg: "text-tone-rose-ink", soft: "bg-tone-rose text-tone-rose-ink" },
@@ -21,19 +22,29 @@ export function Avatar({
   size = "sm",
   ring = false,
   square = false,
+  photoId,
 }: {
   name: string;
   tone?: Tone;
   size?: keyof typeof SIZES;
   ring?: boolean;
   square?: boolean;
+  /** on-device media id of a profile photo; initials show until it loads */
+  photoId?: string;
 }) {
   return (
     <span
       className={`inline-grid shrink-0 place-items-center bg-gradient-to-br font-semibold ${TONES[tone].bg} ${TONES[tone].fg} ${SIZES[size]} ${square ? "rounded-[28%]" : "rounded-full"} ${ring ? "ring-2 ring-surface outline-2 outline-offset-1 outline-ink" : ""}`}
       aria-hidden="true"
     >
-      {initials(name)}
+      {photoId ? (
+        <span className="relative block h-full w-full overflow-hidden rounded-[inherit]">
+          <span className="absolute inset-0 grid place-items-center">{initials(name)}</span>
+          <MediaImage id={photoId} alt="" className="absolute inset-0 h-full w-full" />
+        </span>
+      ) : (
+        initials(name)
+      )}
     </span>
   );
 }

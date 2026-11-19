@@ -34,6 +34,7 @@ export interface ViewMessage {
   body: string;
   gif?: string;
   deal?: DealOffer;
+  imageId?: string;
   /** suggested profiles (Money Machine matches message) */
   matches?: string[];
   at: string;
@@ -58,6 +59,11 @@ export interface ThreadView {
 }
 
 export const MM_THREAD_ID = "t_mm";
+
+/** URL-safe folder ids: "deal:affiliate" ⇄ "deal-affiliate". */
+export const folderSlug = (id: string) => id.replace(":", "-");
+export const folderIdFromSlug = (slug: string) => decodeURIComponent(slug).replace(/^deal-/, "deal:");
+export const folderHref = (id: string) => `/inbox/f/${folderSlug(id)}`;
 
 /** The folders a user sees, in order. Creators get one folder per means of earning they chose. */
 export function foldersFor(session: Session | null, extraDealTypes: string[] = []): FolderDef[] {
@@ -129,7 +135,7 @@ export function useThreads() {
       .flatMap((t) => {
         const profile = profileByHandle(t.with);
         if (!profile) return [];
-        const mine: ViewMessage[] = messages.filter((m) => m.threadId === t.id).map((m) => ({ id: m.id, fromMe: true, body: m.body, gif: m.gif, deal: m.deal, at: m.createdAt }));
+        const mine: ViewMessage[] = messages.filter((m) => m.threadId === t.id).map((m) => ({ id: m.id, fromMe: true, body: m.body, gif: m.gif, deal: m.deal, imageId: m.imageId, at: m.createdAt }));
         const msgs = [...t.inbound, ...mine].sort((a, b) => a.at.localeCompare(b.at));
         const last = msgs[msgs.length - 1];
         const folder =
@@ -140,7 +146,7 @@ export function useThreads() {
               : t.dealType && (chosen === null || chosen.includes(t.dealType))
                 ? `deal:${t.dealType}`
                 : "general";
-        const preview = last ? `${last.fromMe ? "You: " : ""}${last.deal && !last.body ? `${earningShort(last.deal.type)} offer` : last.gif && !last.body ? "GIF" : last.body}` : "No messages yet. Say hello!";
+        const preview = last ? `${last.fromMe ? "You: " : ""}${last.deal && !last.body ? `${earningShort(last.deal.type)} offer` : last.gif && !last.body ? "GIF" : last.imageId && !last.body ? "Photo" : last.body}` : "No messages yet. Say hello!";
         return [
           {
             id: t.id,
@@ -204,10 +210,10 @@ export function useThreads() {
 
   /** Send one message (optionally a deal) to a thread. */
   const send = useCallback(
-    (threadId: string, msg: { body: string; gif?: string; deal?: DealOffer }) => {
+    (threadId: string, msg: { body: string; gif?: string; deal?: DealOffer; imageId?: string }) => {
       update((s) => ({
         ...s,
-        messages: [...s.messages, { id: uid("msg"), threadId, fromMe: true, body: msg.body, gif: msg.gif, deal: msg.deal, createdAt: new Date().toISOString() }],
+        messages: [...s.messages, { id: uid("msg"), threadId, fromMe: true, body: msg.body, gif: msg.gif, deal: msg.deal, imageId: msg.imageId, createdAt: new Date().toISOString() }],
         trashedThreads: s.trashedThreads.filter((x) => x !== threadId),
       }));
     },

@@ -32,8 +32,15 @@ describe("match scoring", () => {
     expect(r.checks).toHaveLength(4);
   });
 
-  it("gives half credit for same country but another city", () => {
-    expect(scoreProfile(base, { ...EMPTY_FILTERS, cities: ["Mumbai"] }).percent).toBe(50);
+  it("gives half credit for same country but another region", () => {
+    expect(scoreProfile(base, { ...EMPTY_FILTERS, country: "India", cities: ["Mumbai"] }).percent).toBe(50);
+    expect(scoreProfile({ ...base, region: "Maharashtra" }, { ...EMPTY_FILTERS, country: "India", cities: ["Maharashtra"] }).percent).toBe(100);
+  });
+
+  it("doesn't compare prices written in different currencies", () => {
+    const r = scoreProfile({ ...base, currency: "INR" }, { ...EMPTY_FILTERS, currency: "USD", priceMin: 100, priceMax: 200 });
+    expect(r.percent).toBe(50);
+    expect(r.checks[0]!.note).toBe("priced in INR");
   });
 
   it("finds a business by its posts even when its bio never says the word", () => {
@@ -64,7 +71,7 @@ describe("match scoring", () => {
   });
 
   it("applies the minimum match level, counts levels and sorts best first", () => {
-    const f = { ...EMPTY_FILTERS, cities: ["Pune"] };
+    const f = { ...EMPTY_FILTERS, country: "India", cities: ["Pune"] };
     const all = findMatches([brand, base], f);
     expect(all.map((r) => r.percent)).toEqual([100, 50]);
     expect(findMatches([brand, base], f, 90).map((r) => r.profile.handle)).toEqual(["asha.cooks"]);

@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { Inbox, Link2, Plus, Receipt } from "lucide-react";
 import { Avatar } from "@/components/art";
+import { ImageSlot, MediaImage } from "@/components/image-slot";
+import { Photo } from "@/components/photo";
+import { nichePhoto } from "@/lib/photos";
 import { Button, ButtonLink, EmptyState, Field, PageHeader, SampleTag, Sheet, StatusPill, Toast, inputCls } from "@/components/ui";
 import { formatDate, uid } from "@/lib/format";
 import { useMyPrograms, usePrograms } from "@/lib/hooks";
@@ -13,20 +16,34 @@ import { applicationInput, fieldErrors, type FieldErrors } from "@/lib/validatio
 import type { AffiliateProgram, ApplicationStatus, ProgramStatus } from "@/lib/types";
 
 function ProgramRow({ p, right }: { p: AffiliateProgram; right: React.ReactNode }) {
+  const { session, update } = useStore();
+  const owner = profileByHandle(p.ownerHandle);
+  const mine = !p.sample && p.ownerHandle === session?.handle;
   return (
-    <li id={p.id} className="card scroll-mt-24 p-4">
-      <div className="flex items-start gap-3">
-        <Avatar name={p.brand} tone={profileByHandle(p.ownerHandle)?.tone ?? "violet"} size="md" square />
+    <li id={p.id} className="scroll-mt-24 border-b border-line py-5 first:border-t">
+      <div className="flex items-start gap-4">
+        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-[12px] bg-elevated sm:h-28 sm:w-28">
+          <MediaImage id={p.imageId} alt={`${p.name} image`} className="absolute inset-0 h-full w-full" fallback={<Photo photo={nichePhoto(owner?.category ?? session?.niches?.[0])} sizes="112px" decorative />} />
+          <span className="absolute bottom-1.5 left-1.5"><Avatar name={p.brand} tone={owner?.tone ?? "violet"} size="xs" square /></span>
+        </div>
         <div className="min-w-0 flex-1">
-          <p className="flex flex-wrap items-center gap-2 font-semibold">
+          <p className="flex flex-wrap items-center gap-2 text-[17px] font-semibold leading-tight">
             {p.name} {p.sample && <SampleTag />}
           </p>
-          <p className="text-sm font-medium text-brand-700">{p.commissionPercent}% Commission</p>
+          <p className="font-display mt-1 text-[30px] leading-none tabular-nums">{p.commissionPercent}%<span className="font-text ml-1.5 text-[13px] font-medium text-muted">commission</span></p>
           <p className="mt-1 text-sm text-muted">{p.description}</p>
           <details className="mt-2 text-sm">
             <summary className="cursor-pointer text-[13px] font-medium text-ink">Terms</summary>
             <p className="mt-1 whitespace-pre-wrap text-muted">{p.terms}</p>
           </details>
+          {mine && (
+            <details className="mt-2 text-sm">
+              <summary className="cursor-pointer text-[13px] font-medium text-ink">Program image</summary>
+              <div className="mt-2">
+                <ImageSlot label="Image" aspect="aspect-square" id={p.imageId} onChange={(id) => update((s) => ({ ...s, programs: s.programs.map((x) => (x.id === p.id ? { ...x, imageId: id } : x)) }))} />
+              </div>
+            </details>
+          )}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">{right}</div>
       </div>
@@ -96,7 +113,7 @@ function CreatorView() {
             />
           </div>
         ) : (
-          <ul className="space-y-3">
+          <ul>
             {mine.map(({ program, status }) => (
               <ProgramRow
                 key={program.id}
@@ -114,7 +131,7 @@ function CreatorView() {
           </ul>
         ))}
       {tab === "discover" && (
-        <ul className="space-y-3">
+        <ul>
           {programs.map((p) => {
             const a = myApp(p.id);
             return (
@@ -167,7 +184,7 @@ function BusinessView() {
             />
           </div>
         ) : (
-          <ul className="space-y-3">
+          <ul>
             {mine.map((p) => {
               const count = apps.filter((a) => a.programId === p.id && a.status === "approved").length;
               return (
@@ -181,7 +198,7 @@ function BusinessView() {
                       {p.status === "active" ? (
                         <button onClick={() => setStatus(p.id, "paused")} className="text-xs font-medium text-muted hover:text-ink">Pause</button>
                       ) : (
-                        <button onClick={() => setStatus(p.id, "active")} className="text-xs font-medium text-brand-700">Activate</button>
+                        <button onClick={() => setStatus(p.id, "active")} className="text-xs font-semibold text-ink underline decoration-signal decoration-2 underline-offset-2">Activate</button>
                       )}
                     </>
                   }

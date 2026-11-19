@@ -48,9 +48,11 @@ interface StoreState {
   oppApplied: string[];
   /** ISO time of the last bulk DM (one every BULK_DM_COOLDOWN_DAYS) */
   lastBulkDmAt: string | null;
+  /** notification keys the user cleared; a newer event gets a new key and shows again */
+  clearedNotifications: string[];
 }
 
-export type ListKey = "liked" | "saved" | "following" | "readThreads" | "savedProfiles" | "reposts" | "starredThreads" | "trashedThreads" | "deletedThreads" | "dismissedTips" | "starredProfiles" | "hiddenProfiles" | "oppApplied";
+export type ListKey = "liked" | "saved" | "following" | "readThreads" | "savedProfiles" | "reposts" | "starredThreads" | "trashedThreads" | "deletedThreads" | "dismissedTips" | "starredProfiles" | "hiddenProfiles" | "oppApplied" | "clearedNotifications";
 
 const EMPTY: StoreState = {
   session: null,
@@ -77,6 +79,7 @@ const EMPTY: StoreState = {
   opportunities: [],
   oppApplied: [],
   lastBulkDmAt: null,
+  clearedNotifications: [],
 };
 
 const KEY = "mm.preview.v1";

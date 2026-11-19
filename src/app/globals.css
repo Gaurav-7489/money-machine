@@ -310,6 +310,10 @@ dialog[data-closing]::backdrop { animation: fade-out 0.18s ease-in both; }
 .line-draw { stroke-dasharray: 1; animation: line-draw 1.2s var(--ease-out-expo) both 0.15s; }
 @keyframes line-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
+/* Mobile menu: a full-screen sheet that fades in while its links rise in sequence */
+dialog.menu-overlay[open] { animation: fade-in 0.22s ease-out both; }
+dialog.menu-overlay[open] .menu-item { animation: fade-up 0.6s var(--ease-out-expo) both; animation-delay: calc(0.04s + var(--i, 0) * 0.04s); }
+
 /* Theme switch: circular reveal via the View Transitions API */
 ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
 .theme-fade, .theme-fade * { transition: background-color 0.35s ease, border-color 0.35s ease, color 0.25s ease !important; }

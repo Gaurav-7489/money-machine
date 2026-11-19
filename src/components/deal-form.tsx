@@ -2,7 +2,7 @@
 
 import { Minus, Plus, X } from "lucide-react";
 import { DELIVERABLE_TYPES, EARNING_MODELS, deliverablesText, earningLabel, type Deliverable } from "@/lib/catalog";
-import { formatINR } from "@/lib/format";
+import { DEFAULT_CURRENCY, currencySymbol, formatMoney } from "@/lib/format";
 import type { DealOffer } from "@/lib/types";
 import { Field, inputCls, selectCls } from "./ui";
 
@@ -28,7 +28,7 @@ export const emptyDeal = (type = "brand_deal"): DealDraft => ({
 const n = (v: string) => (v.trim() === "" ? undefined : Number(v));
 
 /** Validates a draft. Returns an error message per field, or the offer. */
-export function checkDeal(d: DealDraft, { noteRequired = true } = {}): { errors: Record<string, string>; offer?: DealOffer } {
+export function checkDeal(d: DealDraft, { noteRequired = true, currency = DEFAULT_CURRENCY }: { noteRequired?: boolean; currency?: string } = {}): { errors: Record<string, string>; offer?: DealOffer } {
   const errors: Record<string, string> = {};
   const lo = n(d.budgetMin);
   const hi = n(d.budgetMax);
@@ -37,17 +37,19 @@ export function checkDeal(d: DealDraft, { noteRequired = true } = {}): { errors:
   if (d.note.length > 1000) errors.note = "Keep the message under 1000 characters.";
   const deliverables = d.deliverables.filter((x) => x.count > 0);
   if (Object.keys(errors).length) return { errors };
-  return { errors, offer: { type: d.type, budgetMin: lo, budgetMax: hi, deliverables, note: d.note.trim() } };
+  return { errors, offer: { type: d.type, budgetMin: lo, budgetMax: hi, deliverables, note: d.note.trim(), currency } };
 }
 
-export function budgetText(min?: number, max?: number): string {
+export function budgetText(min?: number, max?: number, currency: string = DEFAULT_CURRENCY): string {
+  const f = (v: number) => formatMoney(v, currency);
   if (min === undefined && max === undefined) return "Budget open";
-  if (min !== undefined && max !== undefined) return min === max ? formatINR(min) : `${formatINR(min)} – ${formatINR(max)}`;
-  return min !== undefined ? `From ${formatINR(min)}` : `Up to ${formatINR(max!)}`;
+  if (min !== undefined && max !== undefined) return min === max ? f(min) : `${f(min)} – ${f(max)}`;
+  return min !== undefined ? `From ${f(min)}` : `Up to ${f(max!)}`;
 }
 
 /** The fields of a deal: type, budget range, deliverables and a note. */
-export function DealFields({ draft, onChange, errors, noteLabel = "Note / message" }: { draft: DealDraft; onChange: (d: DealDraft) => void; errors: Record<string, string>; noteLabel?: string }) {
+export function DealFields({ draft, onChange, errors, noteLabel = "Note / message", currency = DEFAULT_CURRENCY }: { draft: DealDraft; onChange: (d: DealDraft) => void; errors: Record<string, string>; noteLabel?: string; currency?: string }) {
+  const sym = currencySymbol(currency);
   const set = <K extends keyof DealDraft>(k: K, v: DealDraft[K]) => onChange({ ...draft, [k]: v });
   const used = new Set(draft.deliverables.map((d) => d.type));
   const nextType = DELIVERABLE_TYPES.find((t) => !used.has(t));
@@ -61,14 +63,14 @@ export function DealFields({ draft, onChange, errors, noteLabel = "Note / messag
       </Field>
 
       <div>
-        <p className="mb-1.5 text-[13px] font-medium">Budget (₹) — min to max</p>
+        <p className="mb-1.5 text-[13px] font-medium">Budget ({sym}), min to max</p>
         <div className="grid grid-cols-2 gap-2">
           <label>
-            <span className="sr-only">Minimum budget in rupees</span>
+            <span className="sr-only">Minimum budget ({sym})</span>
             <input inputMode="numeric" className={inputCls} placeholder="Min e.g. 5000" value={draft.budgetMin} onChange={(e) => set("budgetMin", e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!errors.budget} />
           </label>
           <label>
-            <span className="sr-only">Maximum budget in rupees</span>
+            <span className="sr-only">Maximum budget ({sym})</span>
             <input inputMode="numeric" className={inputCls} placeholder="Max e.g. 20000" value={draft.budgetMax} onChange={(e) => set("budgetMax", e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!errors.budget} />
           </label>
         </div>
@@ -128,7 +130,7 @@ export function DealSummary({ deal, compact = false }: { deal: DealOffer; compac
       <dl className="grid grid-cols-2 gap-2 px-3.5 py-3 text-[13px]">
         <div>
           <dt className="text-[11px] text-muted">Budget</dt>
-          <dd className="font-semibold">{budgetText(deal.budgetMin, deal.budgetMax)}</dd>
+          <dd className="font-semibold">{budgetText(deal.budgetMin, deal.budgetMax, deal.currency)}</dd>
         </div>
         <div>
           <dt className="text-[11px] text-muted">Deliverables</dt>

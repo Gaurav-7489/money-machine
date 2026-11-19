@@ -15,7 +15,7 @@ import { earningLabel } from "@/lib/catalog";
 import { filtersFromProfile, matchLabel, scoreProfile } from "@/lib/match";
 import { usePostIndex } from "@/lib/search-index";
 import { useFeed } from "@/lib/feed";
-import { formatINR } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { profileByHandle } from "@/lib/sample-data";
 import { useStore } from "@/lib/store";
 import { useThreads } from "@/lib/threads";
@@ -48,7 +48,10 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
   const isFollowing = following.includes(p.handle);
   const isStarred = starredProfiles.includes(p.handle);
   const isHidden = hiddenProfiles.includes(p.handle);
-  const fit = session && !p.system ? scoreProfile(p, { ...filtersFromProfile(session), kind: "all" }, index).percent : null;
+  // Same side (creator↔creator, business↔business) is a peer: no rate card or match score.
+  const peer = !!session && session.role === p.kind;
+  const shared = peer ? p.niches.filter((n) => (session?.niches ?? []).includes(n)) : [];
+  const fit = session && !p.system && !peer ? scoreProfile(p, { ...filtersFromProfile(session), kind: "all" }, index).percent : null;
   const isCreator = p.kind === "creator";
   const socials = Object.entries(p.socials).filter(([, v]) => v) as [string, string][];
   const SOCIAL_NAMES: Record<string, string> = { instagram: "Instagram", youtube: "YouTube", x: "X" };
@@ -59,8 +62,8 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
       <div className="relative -mx-4 aspect-[16/10] overflow-hidden bg-elevated md:mx-0 md:aspect-[21/8] md:rounded-[16px]">
         <Photo photo={nichePhoto(p.category)} sizes="(min-width: 1024px) 1024px, 100vw" priority decorative />
         <span className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/20" aria-hidden="true" />
-        <Link href="/explore" className="press glass absolute left-3 top-3 inline-flex h-9 items-center gap-1 rounded-full pl-2 pr-3.5 text-[13px] font-medium text-ink" aria-label="Back">
-          <ChevronLeft className="h-4 w-4" /> Search
+        <Link href={peer ? "/friends" : "/explore"} className="press glass absolute left-3 top-3 inline-flex h-9 items-center gap-1 rounded-full pl-2 pr-3.5 text-[13px] font-medium text-ink" aria-label="Back">
+          <ChevronLeft className="h-4 w-4" /> {peer ? "Friends" : "Search"}
         </Link>
         <SampleTag className="glass absolute right-3 top-3 border-transparent text-ink" />
       </div>
@@ -79,7 +82,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
           <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px] text-muted">
             <span>@{p.handle}</span>
             <span className="rounded-full border border-line px-2 py-px text-[12px] font-medium text-ink">{isCreator ? "Creator" : "Business"}</span>
-            <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {p.city}, {p.country}</span>
+            <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {[p.city, p.region, p.country].filter(Boolean).join(", ")}</span>
           </p>
           <p className="mt-6 max-w-[34ch] text-[clamp(1.35rem,2.6vw,1.75rem)] font-medium leading-snug tracking-[-0.015em]">{p.bio}</p>
           <p className="mt-5 flex flex-wrap gap-1.5">
@@ -148,7 +151,25 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
           </div>
         </section>
 
-        {/* Working together: the business terms, set like a rate card */}
+        {peer ? (
+          <aside className="md:col-span-5 md:pt-14" aria-labelledby="peer-title">
+            <div className="border-t border-ink pt-3">
+              <h2 id="peer-title" className="font-text text-[14px] font-semibold">{isCreator ? "Fellow creator" : "Fellow business"}</h2>
+              <p className="font-display mt-5 text-[clamp(2rem,4vw,2.75rem)] leading-[0.95]">
+                {shared.length ? `You both work in ${shared.join(" and ")}.` : `A ${isCreator ? "creator" : "business"} in ${p.niche}.`}
+              </p>
+              <p className="mt-4 text-[15px] text-muted">
+                {isCreator
+                  ? "Add them as a friend to see their posts in your Friends feed, trade notes on rates and brands, or plan a collab together."
+                  : "Add them as a friend to follow their launches, compare what works with creators, or plan a co-branded campaign."}
+              </p>
+              <dl className="mt-6 divide-y divide-line border-y border-line text-[14px]">
+                <div className="flex items-baseline justify-between gap-4 py-3.5"><dt className="text-muted">Based in</dt><dd className="text-right font-medium">{[p.city, p.region, p.country].filter(Boolean).join(", ")}</dd></div>
+                <div className="flex items-baseline justify-between gap-4 py-3.5"><dt className="text-muted">Works in</dt><dd className="text-right font-medium">{p.niches.join(", ")}</dd></div>
+              </dl>
+            </div>
+          </aside>
+        ) : (
         <aside className="md:col-span-5 md:pt-14" aria-labelledby="terms-title">
           <div className="border-t border-ink pt-3">
             <h2 id="terms-title" className="font-text text-[14px] font-semibold">Working together</h2>
@@ -165,7 +186,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
               </div>
               <div className="flex items-baseline justify-between gap-4 py-3.5">
                 <dt className="text-muted">{isCreator ? "Asks commission" : "Pays commission"}</dt>
-                <dd className="text-right font-semibold tabular-nums">{p.commissionPercent !== undefined ? `${p.commissionPercent}%` : "—"}{p.perSale !== undefined ? ` · ${formatINR(p.perSale)}/sale` : ""}</dd>
+                <dd className="text-right font-semibold tabular-nums">{p.commissionPercent !== undefined ? `${p.commissionPercent}%` : "—"}{p.perSale !== undefined ? ` · ${formatMoney(p.perSale, p.currency)}/sale` : ""}</dd>
               </div>
               <div className="flex items-baseline justify-between gap-4 py-3.5">
                 <dt className="text-muted">Works in</dt>
@@ -185,6 +206,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
             )}
           </div>
         </aside>
+        )}
       </div>
 
       <section className="mt-16" aria-labelledby="posts-title">

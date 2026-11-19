@@ -45,8 +45,8 @@ test("business: matched creators, match levels, select all and bulk DM once ever
   await page.getByRole("radio", { name: /^All/ }).click();
   await page.getByRole("button", { name: /Select all/ }).click();
   await page.getByRole("button", { name: /Bulk DM/ }).click();
-  await page.getByLabel("Minimum budget in rupees").fill("5000");
-  await page.getByLabel("Maximum budget in rupees").fill("20000");
+  await page.getByLabel("Minimum budget (₹)").fill("5000");
+  await page.getByLabel("Maximum budget (₹)").fill("20000");
   await page.getByLabel("Note / message").fill("We'd love to send you our new serum!");
   await page.getByRole("button", { name: "Review", exact: true }).click();
   await page.getByRole("button", { name: "Change" }).click();
@@ -77,11 +77,16 @@ test("creator DMs: Money Machine, founder and deal folders", async ({ page }) =>
   await onboard(page);
   await page.goto("/inbox");
   const folders = page.getByRole("region", { name: "Folders" });
-  await expect(folders.getByRole("button", { name: /Money Machine/ })).toBeVisible();
-  await expect(folders.getByRole("button", { name: /Zenath Sath/ })).toBeVisible();
-  await folders.getByRole("button", { name: /Brand deals/ }).click();
+  await expect(folders.getByRole("link", { name: /Money Machine/ })).toBeVisible();
+  await expect(folders.getByRole("link", { name: /Zenath Sath/ })).toBeVisible();
+  // Folders open: the conversations live inside them.
+  await folders.getByRole("link", { name: /Brand deals/ }).click();
+  await expect(page).toHaveURL(/\/inbox\/f\/deal-brand_deal$/);
+  await expect(page.getByRole("heading", { name: "Brand deals" })).toBeVisible();
   await expect(page.getByRole("link", { name: /FitLife/ })).toBeVisible();
-  await folders.getByRole("button", { name: /Affiliate/ }).click();
+  await expect(page.getByRole("link", { name: /Glow Habit/ })).toHaveCount(0);
+  await page.getByRole("link", { name: "Folders" }).click();
+  await page.getByRole("region", { name: "Folders" }).getByRole("link", { name: /Affiliate/ }).click();
   await expect(page.getByRole("link", { name: /Glow Habit/ })).toBeVisible();
 
   await page.goto("/inbox/t_fit");
@@ -97,7 +102,8 @@ test("creator DMs: Money Machine, founder and deal folders", async ({ page }) =>
 test("business DMs have no founder folder", async ({ page }) => {
   await onboard(page, "Business");
   await page.goto("/inbox");
-  await expect(page.getByRole("region", { name: "Folders" }).getByRole("button", { name: /Zenath Sath/ })).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Folders" }).getByRole("link", { name: /Money Machine/ })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Folders" }).getByRole("link", { name: /Zenath Sath/ })).toHaveCount(0);
 });
 
 test("feed: post a thought with a GIF, react, comment with a GIF, repost", async ({ page }) => {
@@ -213,4 +219,55 @@ test("first visit follows the device colour scheme", async ({ browser }) => {
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await ctx.close();
+});
+
+test("explore shows only the other side; friends finds your own side", async ({ page }) => {
+  await onboard(page);
+  await page.goto("/explore?mode=custom");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Find brands");
+  await expect(page.getByRole("article", { name: "Glow Habit" })).toBeVisible();
+  await expect(page.getByRole("article", { name: "Kavya Fit" })).toHaveCount(0);
+  await page.goto("/friends");
+  await page.getByLabel("Search creators").fill("fit");
+  await page.getByRole("button", { name: "Add Kavya Fit as a friend" }).click();
+  await expect(page.getByText("Your friends (1)")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Add .* as a friend/ }).filter({ hasText: "Glow Habit" })).toHaveCount(0);
+});
+
+test("peer profiles show no rate card; cross-side profiles do", async ({ page }) => {
+  await onboard(page);
+  await page.goto("/u/kavya.fit");
+  await expect(page.getByRole("heading", { name: "Fellow creator" })).toBeVisible();
+  await expect(page.getByText("Charges per video")).toHaveCount(0);
+  await page.goto("/u/glowhabit");
+  await expect(page.getByRole("heading", { name: "Working together" })).toBeVisible();
+});
+
+test("notifications: dismiss one, then clear all", async ({ page }) => {
+  await onboard(page);
+  await page.goto("/notifications");
+  const rows = page.getByRole("button", { name: /^Dismiss:/ });
+  const before = await rows.count();
+  expect(before).toBeGreaterThan(1);
+  await rows.first().click();
+  await expect(rows).toHaveCount(before - 1);
+  await page.getByRole("button", { name: "Clear all" }).click();
+  await expect(page.getByText("You're all caught up")).toBeVisible();
+  await page.reload();
+  await expect(page.getByText("You're all caught up")).toBeVisible();
+});
+
+test("country sets the account currency", async ({ page }) => {
+  await onboard(page);
+  await page.goto("/profile");
+  await page.getByRole("button", { name: "Edit Profile" }).click();
+  await page.getByRole("combobox", { name: /^Country/ }).selectOption("United Arab Emirates");
+  await page.getByRole("combobox", { name: /^State/ }).selectOption("Dubai");
+  await page.getByRole("button", { name: "Save" }).click();
+  await page.goto("/money");
+  await page.getByRole("button", { name: /add earning/i }).click();
+  await page.getByLabel("Description").fill("Hotel shoot");
+  await page.getByLabel(/^Amount \(AED\)/).fill("1200");
+  await page.getByRole("button", { name: "Save" }).click();
+  await expect(page.getByText(/AED\s?1,200/).first()).toBeVisible();
 });

@@ -1,6 +1,6 @@
 /* Money Machine service worker — app-shell caching + offline fallback.
    Never caches API responses or user data. */
-const VERSION = "mm-v1";
+const VERSION = "mm-v2";
 const SHELL = ["/offline", "/icons/icon-192.png", "/icons/icon.svg"];
 
 self.addEventListener("install", (event) => {

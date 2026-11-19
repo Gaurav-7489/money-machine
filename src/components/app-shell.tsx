@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 import { Bell, ChevronRight, Menu, Plus, Search } from "lucide-react";
 import { Logo, LogoMark } from "./logo";
 import { Avatar } from "./art";
@@ -11,7 +11,6 @@ import { useStore } from "@/lib/store";
 import { useThreads } from "@/lib/threads";
 import { InstallBanner } from "./install-prompt";
 import { ThemeToggle } from "./theme";
-import { Sheet } from "./ui";
 import { motion } from "motion/react";
 
 const mainNav = (role: Parameters<typeof primaryNav>[0]) => primaryNav(role).filter((i) => i.href !== "/profile" && i.href !== "/create");
@@ -91,7 +90,7 @@ function Sidebar() {
       <ThemeToggle withLabel className="mt-4 w-full justify-start" />
       {session && (
         <Link href="/profile" className="mt-2 flex items-center gap-3 rounded-xl border-t border-line p-2.5 pt-4 hover:bg-elevated">
-          <Avatar name={session.displayName} tone={session.role === "business" ? "violet" : "rose"} />
+          <Avatar name={session.displayName} tone={session.role === "business" ? "violet" : "rose"} square={session.role === "business"} photoId={session.avatarId} />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-semibold">{session.displayName}</span>
             <span className="block truncate text-xs text-muted">@{session.handle} · {session.role === "business" ? "Business" : "Creator"}</span>
@@ -144,46 +143,106 @@ function Rail() {
 function ProfileDot() {
   const { session } = useStore();
   if (!session) return null;
-  return <Avatar name={session.displayName} tone={session.role === "business" ? "violet" : "rose"} />;
+  return <Avatar name={session.displayName} tone={session.role === "business" ? "violet" : "rose"} square={session.role === "business"} photoId={session.avatarId} />;
 }
 
-/** Mobile: full list of destinations so nothing is hidden behind gestures. */
-function MenuSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+/** Two bars that fold into an ×. */
+function MenuGlyph({ open }: { open: boolean }) {
+  return (
+    <span className="relative block h-3 w-4" aria-hidden="true">
+      <span className={`absolute left-0 h-[1.75px] w-4 rounded-full bg-current transition-transform duration-300 ease-[var(--ease-out-expo)] ${open ? "top-[5px] rotate-45" : "top-[2px]"}`} />
+      <span className={`absolute left-0 h-[1.75px] rounded-full bg-current transition-all duration-300 ease-[var(--ease-out-expo)] ${open ? "top-[5px] w-4 -rotate-45" : "top-[8px] w-2.5"}`} />
+    </span>
+  );
+}
+
+/**
+ * Mobile: a full-screen menu. Every destination is one tap away, the main ones
+ * set large, the rest in a compact grid. A native <dialog> keeps focus inside
+ * and closes on Escape.
+ */
+function MenuOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
   const pathname = usePathname();
   const { unreadCount } = useThreads();
   const { session } = useStore();
-  const groups = [
-    { title: "Main", items: primaryNav(session?.role) },
-    { title: "DMs", items: MESSAGE_FOLDERS.map(({ href, label, icon }) => ({ href, label: label === "All" ? "All DMs" : label, icon })) },
-    { title: "People", items: SOCIAL_NAV },
-    { title: "Your tools", items: toolsNav(session?.role) },
-  ];
+
+  useEffect(() => {
+    const d = ref.current;
+    if (!d) return;
+    if (open && !d.open) d.showModal();
+    if (!open && d.open) d.close();
+  }, [open]);
+
+  // Navigating closes the menu.
+  useEffect(() => {
+    onClose();
+  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const main = primaryNav(session?.role);
+  const more = [...SOCIAL_NAV, ...toolsNav(session?.role)];
   return (
-    <Sheet open={open} onClose={onClose} title="Menu">
-      <nav aria-label="All pages" className="space-y-5" onClick={(e) => (e.target as HTMLElement).closest("a") && onClose()}>
-        {groups.map((g) => (
-          <section key={g.title}>
-            <h3 className="mb-2 px-1 text-[12px] font-medium text-muted">{g.title}</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {g.items.map(({ href, label, icon: Icon }) => (
-                <Link
-                  key={href + label}
-                  href={href}
-                  className={`press flex min-h-12 items-center gap-2.5 rounded-xl border px-3 py-2.5 text-sm font-medium ${!href.includes("?") && isActive(pathname, href) ? "border-ink bg-surface text-ink" : "border-line hover:bg-elevated"}`}
-                >
-                  <Icon className="h-5 w-5 shrink-0" />
-                  <span className="flex-1">{label}</span>
-                  {href === "/inbox" && <CountBadge n={unreadCount} />}
+    <dialog
+      ref={ref}
+      onCancel={(e) => {
+        e.preventDefault();
+        onClose();
+      }}
+      aria-label="Menu"
+      className="menu-overlay m-0 h-dvh max-h-none w-full max-w-none bg-canvas p-0 text-ink backdrop:bg-transparent"
+    >
+      <div className="flex min-h-full flex-col px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]">
+        <div className="flex items-center justify-between py-2">
+          <span className="flex items-center gap-2 pl-1"><LogoMark className="h-7 w-7" /><span className="font-display text-[20px]">Money Machine</span></span>
+          <button onClick={onClose} className="press inline-flex h-10 items-center gap-2 rounded-full bg-ink pl-4 pr-3.5 text-[14px] font-semibold text-canvas" aria-label="Close menu">
+            Close <MenuGlyph open />
+          </button>
+        </div>
+
+        <nav aria-label="All pages" className="mt-6 flex-1">
+          <ul className="border-b border-line">
+            {main.map(({ href, label }, i) => {
+              const active = isActive(pathname, href);
+              return (
+                <li key={href} className="menu-item border-t border-line" style={{ ["--i" as string]: i }}>
+                  <Link href={href} aria-current={active ? "page" : undefined} className="flex items-center justify-between py-2.5">
+                    <span className={`font-display text-[clamp(2.6rem,13vw,3.6rem)] leading-[1] ${active ? "" : "text-ink/85"}`}>
+                      {label}
+                    </span>
+                    <span className="flex items-center gap-2">
+                      {href === "/inbox" && unreadCount > 0 && <span className="grid h-7 min-w-7 place-items-center rounded-full bg-signal px-2 text-[13px] font-bold tabular-nums text-on-signal" aria-label={`${unreadCount} unread`}>{unreadCount}</span>}
+                      {active && <span className="h-2.5 w-2.5 rounded-full bg-signal" aria-hidden="true" />}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+          <ul className="mt-6 grid grid-cols-2 gap-x-4">
+            {more.map(({ href, label, icon: Icon }, i) => (
+              <li key={href} className="menu-item" style={{ ["--i" as string]: main.length + i * 0.5 }}>
+                <Link href={href} aria-current={isActive(pathname, href) ? "page" : undefined} className="flex items-center gap-2.5 border-b border-line py-3 text-[15px] font-medium aria-[current=page]:text-ink aria-[current=page]:underline aria-[current=page]:decoration-signal aria-[current=page]:decoration-2 aria-[current=page]:underline-offset-4">
+                  <Icon className="h-[18px] w-[18px] text-muted" strokeWidth={1.7} /> {label}
                 </Link>
-              ))}
-            </div>
-          </section>
-        ))}
-        <section className="border-t border-line pt-3">
-          <ThemeToggle withLabel className="w-full justify-start" />
-        </section>
-      </nav>
-    </Sheet>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="mt-8 flex items-center gap-3 border-t border-line pt-4">
+          {session && (
+            <Link href="/profile" className="flex min-w-0 flex-1 items-center gap-3">
+              <ProfileDot />
+              <span className="min-w-0">
+                <span className="block truncate text-sm font-semibold">{session.displayName}</span>
+                <span className="block truncate text-xs text-muted">@{session.handle}</span>
+              </span>
+            </Link>
+          )}
+          <ThemeToggle withLabel className="shrink-0" />
+        </div>
+      </div>
+    </dialog>
   );
 }
 
@@ -198,13 +257,14 @@ function TopBar() {
       </Link>
       <div className="flex-1" />
       <ThemeToggle />
-      <Link href="/notifications" className="grid h-10 w-10 place-items-center rounded-full hover:bg-elevated" aria-label="Notifications" title="Notifications">
-        <Bell className={`h-[22px] w-[22px] ${unreadCount > 0 ? "ring-bell" : ""}`} />
+      <Link href="/notifications" className="relative grid h-10 w-10 place-items-center rounded-full hover:bg-elevated" aria-label="Notifications" title="Notifications">
+        <Bell className={`h-[21px] w-[21px] ${unreadCount > 0 ? "ring-bell" : ""}`} strokeWidth={1.8} />
+        {unreadCount > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-signal ring-2 ring-canvas" aria-hidden="true" />}
       </Link>
-      <button onClick={() => setMenu(true)} className="press grid h-10 w-10 place-items-center rounded-full border border-line hover:border-ink" aria-haspopup="dialog" aria-label="Menu">
-        <Menu className="h-[18px] w-[18px]" />
+      <button onClick={() => setMenu(true)} className="press ml-1 inline-flex h-10 items-center gap-2.5 rounded-full border border-line pl-4 pr-3.5 text-[14px] font-semibold hover:border-ink" aria-haspopup="dialog" aria-expanded={menu} aria-label="Menu">
+        Menu <MenuGlyph open={menu} />
       </button>
-      <MenuSheet open={menu} onClose={() => setMenu(false)} />
+      <MenuOverlay open={menu} onClose={() => setMenu(false)} />
     </header>
   );
 }
@@ -252,11 +312,11 @@ function DesktopHeader() {
     <div className="glass sticky top-0 z-20 hidden items-center gap-3 border-b border-line px-6 py-3 md:flex">
       <form action="/explore" className="relative flex-1" role="search">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-        <label className="sr-only" htmlFor="global-search">Search creators and businesses</label>
+        <label className="sr-only" htmlFor="global-search">{session?.role === "business" ? "Search creators" : "Search brands"}</label>
         <input
           id="global-search"
           name="q"
-          placeholder="Search anything: skincare, @handle, a brand…"
+          placeholder={session?.role === "business" ? "Search creators: skincare, @handle, a city…" : "Search brands: skincare, @handle, a city…"}
           className="h-11 w-full max-w-md rounded-full border border-line bg-surface/70 pl-10 pr-4 text-sm outline-none transition hover:border-muted/60 focus:border-ink focus:bg-surface"
         />
       </form>

@@ -7,8 +7,8 @@ import { BadgeCheck, CreditCard, Handshake, Link2, Megaphone, Package, PlusCircl
 import { useFeedback } from "@/components/feedback";
 import { MonthChart } from "@/components/month-chart";
 import { Button, EmptyState, Field, PageHeader, Sheet, inputCls, selectCls } from "@/components/ui";
-import { formatDate, formatINR, uid } from "@/lib/format";
-import { useGrowth, useMoney } from "@/lib/hooks";
+import { currencySymbol, formatDate, formatMoney, uid } from "@/lib/format";
+import { useCurrency, useGrowth, useMoney } from "@/lib/hooks";
 import { useStore } from "@/lib/store";
 import type { FinancialRecord } from "@/lib/types";
 import { fieldErrors, financialRecordInput, type FieldErrors } from "@/lib/validation";
@@ -30,6 +30,7 @@ const LABEL: Record<Kind, { one: string; add: string; from: string; ph: string }
 function RecordForm({ kind, open, onClose }: { kind: Kind; open: boolean; onClose: () => void }) {
   const { update } = useStore();
   const { toast } = useFeedback();
+  const currency = useCurrency();
   const cats = CATS[kind];
   const empty = { title: "", amount: "", category: cats[0]![0], date: new Date().toISOString().slice(0, 10), counterparty: "" };
   const [form, setForm] = useState(empty);
@@ -42,7 +43,7 @@ function RecordForm({ kind, open, onClose }: { kind: Kind; open: boolean; onClos
     e.preventDefault();
     const parsed = financialRecordInput.safeParse({ ...form, kind, counterparty: form.counterparty || undefined });
     if (!parsed.success) return setErrors(fieldErrors(parsed.error));
-    const rec: FinancialRecord = { id: uid("rec"), ...parsed.data, category: parsed.data.category as FinancialRecord["category"], source: "self_reported", createdAt: new Date().toISOString() };
+    const rec: FinancialRecord = { id: uid("rec"), ...parsed.data, category: parsed.data.category as FinancialRecord["category"], currency, source: "self_reported", createdAt: new Date().toISOString() };
     update((s) => ({ ...s, records: [rec, ...s.records] }));
     setForm(empty);
     setErrors({});
@@ -57,7 +58,7 @@ function RecordForm({ kind, open, onClose }: { kind: Kind; open: boolean; onClos
           <input className={inputCls} value={form.title} onChange={set("title")} aria-invalid={!!errors.title} placeholder={LABEL[kind].ph} />
         </Field>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Amount (₹)" error={errors.amount}>
+          <Field label={`Amount (${currencySymbol(currency)})`} error={errors.amount}>
             <input className={inputCls} inputMode="numeric" value={form.amount} onChange={set("amount")} aria-invalid={!!errors.amount} />
           </Field>
           <Field label="Date" error={errors.date}>
@@ -81,6 +82,7 @@ function RecordForm({ kind, open, onClose }: { kind: Kind; open: boolean; onClos
 function RecordList({ kind }: { kind: Kind }) {
   const { records, update } = useStore();
   const { toast, confirm } = useFeedback();
+  const currency = useCurrency();
   const list = records.filter((r) => r.kind === kind).sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt));
   async function remove(id: string) {
     if (!(await confirm({ title: "Delete this record?", body: "It will be removed from your totals. This can't be undone.", confirmLabel: "Delete", danger: true }))) return;
@@ -109,7 +111,7 @@ function RecordList({ kind }: { kind: Kind }) {
               <span className="block truncate text-sm font-semibold">{r.title}</span>
               <span className="block text-xs text-muted">{formatDate(r.date)}{r.counterparty ? ` · ${r.counterparty}` : ""} · {r.source === "verified" ? "Verified" : "Self-reported"}</span>
             </span>
-            <span className={`font-display text-[22px] leading-none tabular-nums ${kind === "spending" ? "text-ink" : "text-gain"}`}>{sign}{formatINR(r.amount)}</span>
+            <span className={`font-display text-[22px] leading-none tabular-nums ${kind === "spending" ? "text-ink" : "text-gain"}`}>{sign}{formatMoney(r.amount, r.currency ?? currency)}</span>
             <button onClick={() => remove(r.id)} className="grid h-8 w-8 place-items-center rounded-full text-muted hover:bg-elevated hover:text-danger" aria-label={`Delete ${r.title}`}><Trash2 className="h-4 w-4" /></button>
           </li>
         );
@@ -148,6 +150,8 @@ function StripeCard({ purpose }: { purpose: "payouts" | "revenue" }) {
 /** Creators: real earnings. */
 function CreatorEarnings() {
   const { summary, records } = useMoney();
+  const currency = useCurrency();
+  const money = (v: number) => formatMoney(v, currency);
   const [open, setOpen] = useState(false);
   const bySource = CATS.income.map(([id, label]) => ({ id, label, total: records.filter((r) => r.category === id).reduce((s, r) => s + r.amount, 0) })).filter((x) => x.total > 0);
   return (
@@ -156,20 +160,20 @@ function CreatorEarnings() {
       <section className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-12" aria-label="Summary">
         <div>
           <p className="text-[14px] text-muted">Total earned</p>
-          <p className="font-display mt-2 text-[clamp(3.6rem,11vw,6.5rem)] leading-[0.85] tabular-nums">{formatINR(summary.total)}</p>
+          <p className="font-display mt-2 text-[clamp(3.6rem,11vw,6.5rem)] leading-[0.85] tabular-nums">{money(summary.total)}</p>
           <p className="mt-3 text-[14px]">
             {summary.changePercent !== null ? (
               <span className={`font-semibold tabular-nums ${summary.changePercent >= 0 ? "text-gain" : "text-loss"}`}>{summary.changePercent >= 0 ? "▲" : "▼"} {Math.abs(summary.changePercent)}% vs last month</span>
             ) : (
-              <span className="text-muted">This month: <span className="font-medium tabular-nums text-ink">{formatINR(summary.thisMonth)}</span></span>
+              <span className="text-muted">This month: <span className="font-medium tabular-nums text-ink">{money(summary.thisMonth)}</span></span>
             )}
           </p>
           <dl className="mt-6 grid grid-cols-2 border-y border-line text-[13px]">
-            <div className="py-3"><dt className="flex items-center gap-1 text-muted"><BadgeCheck className="h-3.5 w-3.5" /> Verified</dt><dd className="mt-1 text-[17px] font-semibold tabular-nums">{formatINR(summary.verifiedTotal)}</dd></div>
-            <div className="border-l border-line py-3 pl-4"><dt className="text-muted">Self-reported</dt><dd className="mt-1 text-[17px] font-semibold tabular-nums">{formatINR(summary.selfReportedTotal)}</dd></div>
+            <div className="py-3"><dt className="flex items-center gap-1 text-muted"><BadgeCheck className="h-3.5 w-3.5" /> Verified</dt><dd className="mt-1 text-[17px] font-semibold tabular-nums">{money(summary.verifiedTotal)}</dd></div>
+            <div className="border-l border-line py-3 pl-4"><dt className="text-muted">Self-reported</dt><dd className="mt-1 text-[17px] font-semibold tabular-nums">{money(summary.selfReportedTotal)}</dd></div>
           </dl>
         </div>
-        <MonthChart data={summary.monthly} caption="Earnings for the last six months" />
+        <MonthChart currency={currency} data={summary.monthly} caption="Earnings for the last six months" />
       </section>
 
       {bySource.length > 0 && (
@@ -178,7 +182,7 @@ function CreatorEarnings() {
           <ul className="space-y-4">
             {bySource.map((s, i) => (
               <li key={s.id}>
-                <div className="mb-1.5 flex justify-between text-[14px]"><span>{s.label}</span><span className="font-semibold tabular-nums">{formatINR(s.total)}</span></div>
+                <div className="mb-1.5 flex justify-between text-[14px]"><span>{s.label}</span><span className="font-semibold tabular-nums">{money(s.total)}</span></div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-elevated"><div className={`h-full origin-left rounded-full ${i === 0 ? "bg-signal" : "bg-ink"} animate-[grow-x_0.9s_var(--ease-out-expo)_both]`} style={{ width: `${Math.max(4, (s.total / summary.total) * 100)}%` }} /></div>
               </li>
             ))}
@@ -203,6 +207,8 @@ function CreatorEarnings() {
 function BusinessGrowth() {
   const params = useSearchParams();
   const g = useGrowth();
+  const currency = useCurrency();
+  const money = (v: number) => formatMoney(v, currency);
   const [tab, setTab] = useState<"spending" | "revenue">("spending");
   const [open, setOpen] = useState(false);
   useEffect(() => {
@@ -215,16 +221,16 @@ function BusinessGrowth() {
       <section className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-12" aria-label="Summary">
         <div>
           <p className="flex items-center gap-1.5 text-[14px] text-muted"><Rocket className="h-4 w-4" /> Profit</p>
-          <p className={`font-display mt-2 text-[clamp(3.6rem,11vw,6.5rem)] leading-[0.85] tabular-nums ${up ? "" : "text-loss"}`}>{up ? "" : "−"}{formatINR(Math.abs(g.profit))}</p>
+          <p className={`font-display mt-2 text-[clamp(3.6rem,11vw,6.5rem)] leading-[0.85] tabular-nums ${up ? "" : "text-loss"}`}>{up ? "" : "−"}{money(Math.abs(g.profit))}</p>
           <p className="mt-3 text-[14px]">
             {g.roi !== null ? <span className={`font-semibold tabular-nums ${g.roi >= 0 ? "text-gain" : "text-loss"}`}>{g.roi >= 0 ? "▲" : "▼"} {Math.abs(g.roi)}% return on investment</span> : <span className="text-muted">Add investments and revenue to see your return.</span>}
           </p>
           <dl className="mt-6 grid grid-cols-2 border-y border-line text-[13px]">
-            <div className="py-3"><dt className="flex items-center gap-1 text-muted"><TrendingDown className="h-3.5 w-3.5" /> Invested</dt><dd className="mt-1 text-[17px] font-semibold tabular-nums">{formatINR(g.spending.total)}</dd></div>
-            <div className="border-l border-line py-3 pl-4"><dt className="flex items-center gap-1 text-muted"><TrendingUp className="h-3.5 w-3.5" /> Revenue</dt><dd className="mt-1 text-[17px] font-semibold tabular-nums">{formatINR(g.revenue.total)}</dd></div>
+            <div className="py-3"><dt className="flex items-center gap-1 text-muted"><TrendingDown className="h-3.5 w-3.5" /> Invested</dt><dd className="mt-1 text-[17px] font-semibold tabular-nums">{money(g.spending.total)}</dd></div>
+            <div className="border-l border-line py-3 pl-4"><dt className="flex items-center gap-1 text-muted"><TrendingUp className="h-3.5 w-3.5" /> Revenue</dt><dd className="mt-1 text-[17px] font-semibold tabular-nums">{money(g.revenue.total)}</dd></div>
           </dl>
         </div>
-        <MonthChart data={g.monthlyProfit} caption="Profit for the last six months" />
+        <MonthChart currency={currency} data={g.monthlyProfit} caption="Profit for the last six months" />
       </section>
 
       <div role="tablist" aria-label="Show" className="mt-12 grid grid-cols-2 gap-1 rounded-full border border-line p-1">

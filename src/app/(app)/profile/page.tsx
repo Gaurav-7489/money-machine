@@ -4,7 +4,7 @@ import { TabIndicator } from "@/components/motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AtSign, Bookmark, ChevronRight, Grid3x3, Link2, LogOut, Mail, MapPin, Palette, Pencil, Repeat2, Rocket, Settings, Smartphone, Star, Users, Wallet } from "lucide-react";
+import { AtSign, Bookmark, Camera, ChevronRight, Grid3x3, Link2, LogOut, Mail, MapPin, Palette, Pencil, Repeat2, Rocket, Settings, Smartphone, Star, Users, Wallet } from "lucide-react";
 import { Photo } from "@/components/photo";
 import { nichePhoto } from "@/lib/photos";
 import { Avatar, TONES } from "@/components/art";
@@ -13,9 +13,11 @@ import { PostCard } from "@/components/feed/post-card";
 import { InstallGuide } from "@/components/install-prompt";
 import { ThemePicker } from "@/components/theme";
 import { Button, EmptyState, Field, Sheet, inputCls, selectCls } from "@/components/ui";
-import { COUNTRIES, EARNING_MODELS, LOCATIONS, NICHES, earningLabel } from "@/lib/catalog";
+import { EARNING_MODELS, NICHES, earningLabel } from "@/lib/catalog";
+import { LocationPicker } from "@/components/location-picker";
+import { ImageSlot, MediaImage } from "@/components/image-slot";
+import { DEFAULT_CURRENCY, currencySymbol, formatMoney } from "@/lib/format";
 import { useFeed } from "@/lib/feed";
-import { formatINR } from "@/lib/format";
 import { useBadges, useGrowth, useMoney, useMyPrograms } from "@/lib/hooks";
 import { useStore } from "@/lib/store";
 import type { Session } from "@/lib/types";
@@ -29,7 +31,9 @@ type Form = {
   lookingFor: string[];
   commissionPercent: string;
   country: string;
+  region: string;
   city: string;
+  currency: string;
   priceFrom: string;
   priceTo: string;
   perSale: string;
@@ -50,7 +54,9 @@ function toForm(s: Session): Form {
     lookingFor: s.lookingFor ?? [],
     commissionPercent: str(s.commissionPercent),
     country: s.country ?? "",
+    region: s.region ?? "",
     city: s.city ?? "",
+    currency: s.currency ?? DEFAULT_CURRENCY,
     priceFrom: str(s.priceFrom),
     priceTo: str(s.priceTo),
     perSale: str(s.perSale),
@@ -67,7 +73,7 @@ function completeness(s: Session) {
   const steps = [
     { done: !!s.bio, label: "Add a short bio" },
     { done: (s.niches ?? []).length > 0 || !!s.category, label: "Pick your niches" },
-    { done: !!s.city, label: "Add your city" },
+    { done: !!s.country, label: "Add where you're based" },
     { done: s.priceFrom !== undefined || s.priceTo !== undefined, label: "Add your pay per video" },
     { done: (s.earningModels ?? []).length > 0, label: s.role === "business" ? "Choose how you work with creators" : "Choose how you earn" },
     { done: !!(s.instagram || s.youtube || s.x), label: "Add a social media handle" },
@@ -78,7 +84,7 @@ function completeness(s: Session) {
 function ChipField({ label, options, value, onChange }: { label: string; options: { id: string; label: string }[]; value: string[]; onChange: (v: string[]) => void }) {
   return (
     <div>
-      <p className="mb-1.5 text-[13px] font-medium">{label} <span className="ml-1 rounded-full bg-elevated px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span></p>
+      <p className="mb-1.5 text-[13px] font-medium">{label} <span className="font-normal text-muted">(optional)</span></p>
       <div className="flex flex-wrap gap-1.5">
         {options.map((o) => {
           const on = value.includes(o.id);
@@ -99,11 +105,11 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
   const [form, setForm] = useState<Form>(() => toForm(session));
   const [errors, setErrors] = useState<FieldErrors>({});
   const set = (k: keyof Form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setForm((f) => ({ ...f, [k]: e.target.value, ...(k === "country" ? { city: "" } : {}) }));
+    setForm((f) => ({ ...f, [k]: e.target.value }));
     setErrors((x) => ({ ...x, [k]: "" }));
   };
   const isBiz = session.role === "business";
-  const cities = form.country ? LOCATIONS[form.country] ?? [] : [];
+  const sym = currencySymbol(form.currency);
 
   function save(e: React.FormEvent) {
     e.preventDefault();
@@ -113,7 +119,7 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
       toast("Please fix the highlighted fields.", "error");
       return;
     }
-    update((s) => (s.session ? { ...s, session: { ...s.session, ...parsed.data, category: parsed.data.niches[0] ?? parsed.data.category, payPerVideoMin: parsed.data.priceFrom, payPerVideoMax: parsed.data.priceTo } } : s));
+    update((s) => (s.session ? { ...s, session: { ...s.session, ...parsed.data, region: form.region || undefined, currency: form.currency || DEFAULT_CURRENCY, category: parsed.data.niches[0] ?? parsed.data.category, payPerVideoMin: parsed.data.priceFrom, payPerVideoMax: parsed.data.priceTo } } : s));
     toast("Profile saved!");
     onDone();
   }
@@ -121,6 +127,10 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
   return (
     <form onSubmit={save} className="space-y-5" noValidate>
       <section className="space-y-4">
+        <ImageSlot label="Profile photo" round id={session.avatarId} onChange={(id) => update((s) => (s.session ? { ...s, session: { ...s.session, avatarId: id } } : s))} />
+        <ImageSlot label="Cover photo" id={session.coverId} onChange={(id) => update((s) => (s.session ? { ...s, session: { ...s.session, coverId: id } } : s))} />
+      </section>
+      <section className="space-y-4 border-t border-line pt-4">
         <h3 className="text-sm font-bold">About you</h3>
         <Field label={isBiz ? "Brand name" : "Name"} error={errors.displayName}>
           <input className={inputCls} value={form.displayName} onChange={set("displayName")} aria-invalid={!!errors.displayName} />
@@ -130,20 +140,11 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
         </Field>
         <ChipField label={isBiz ? "What your business does" : "Content you create"} options={NICHES.map((n) => ({ id: n, label: n }))} value={form.niches} onChange={(v) => setForm((f) => ({ ...f, niches: v }))} />
         {isBiz && <ChipField label="Creators you're looking for" options={NICHES.map((n) => ({ id: n, label: n }))} value={form.lookingFor} onChange={(v) => setForm((f) => ({ ...f, lookingFor: v }))} />}
-        <div className="grid grid-cols-2 gap-2">
-          <Field label="Country" optional>
-            <select className={selectCls} value={form.country} onChange={set("country")}>
-              <option value="">Choose</option>
-              {COUNTRIES.map((c) => <option key={c}>{c}</option>)}
-            </select>
-          </Field>
-          <Field label="City" optional>
-            <select className={selectCls} value={form.city} onChange={set("city")} disabled={!form.country}>
-              <option value="">{form.country ? "Choose" : "Pick a country first"}</option>
-              {cities.map((c) => <option key={c}>{c}</option>)}
-            </select>
-          </Field>
-        </div>
+        <LocationPicker value={{ country: form.country, region: form.region }} onChange={(v) => setForm((f) => ({ ...f, country: v.country, region: v.region, currency: v.currency || f.currency }))} />
+        <Field label="City" optional>
+          <input className={inputCls} value={form.city} onChange={set("city")} placeholder="e.g. Pune" maxLength={60} />
+        </Field>
+        {form.country && <p className="text-[12px] text-muted">Amounts on your account are shown in {form.currency} ({sym}).</p>}
       </section>
 
       <section className="space-y-4 border-t border-line pt-4">
@@ -151,10 +152,10 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
           Working together
         </h3>
         <div className="grid grid-cols-2 gap-2">
-          <Field label={isBiz ? "Budget per video from ₹" : "Pay per video from ₹"} optional error={errors.priceFrom}>
+          <Field label={`${isBiz ? "Budget per video from" : "Pay per video from"} ${sym}`} optional error={errors.priceFrom}>
             <input inputMode="numeric" className={inputCls} placeholder="e.g. 2000" value={form.priceFrom} onChange={set("priceFrom")} aria-invalid={!!errors.priceFrom} />
           </Field>
-          <Field label="To ₹" optional error={errors.priceTo}>
+          <Field label={`To ${sym}`} optional error={errors.priceTo}>
             <input inputMode="numeric" className={inputCls} placeholder="e.g. 10000" value={form.priceTo} onChange={set("priceTo")} aria-invalid={!!errors.priceTo} />
           </Field>
         </div>
@@ -162,7 +163,7 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
           <Field label={isBiz ? "Commission you pay %" : "Commission you ask %"} optional error={errors.commissionPercent}>
             <input inputMode="numeric" className={inputCls} placeholder="e.g. 15" value={form.commissionPercent} onChange={set("commissionPercent")} aria-invalid={!!errors.commissionPercent} />
           </Field>
-          <Field label={isBiz ? "You pay per sale ₹" : "You ask per sale ₹"} optional error={errors.perSale}>
+          <Field label={`${isBiz ? "You pay per sale" : "You ask per sale"} ${sym}`} optional error={errors.perSale}>
             <input inputMode="numeric" className={inputCls} placeholder="e.g. 100" value={form.perSale} onChange={set("perSale")} aria-invalid={!!errors.perSale} />
           </Field>
         </div>
@@ -245,12 +246,13 @@ export default function Profile() {
     router.replace("/");
   }
 
+  const money = (v: number) => formatMoney(v, session.currency);
   const tools = [
     isBiz
-      ? { href: "/money", label: "Profit", value: `${growth.profit < 0 ? "−" : ""}${formatINR(Math.abs(growth.profit))}`, icon: Rocket, tone: "bg-aurora text-on-accent" }
-      : { href: "/money", label: "Earned", value: formatINR(summary.total), icon: Wallet, tone: "bg-money text-on-accent" },
-    { href: "/affiliates", label: isBiz ? "Programs running" : "Programs joined", value: String(programs.length), icon: Link2, tone: "bg-violet-50 text-violet-600" },
-    { href: "/badges", label: "Badges earned", value: String(earned), icon: Star, tone: "bg-amber-50 text-amber-500" },
+      ? { href: "/money", label: "Profit", value: `${growth.profit < 0 ? "−" : ""}${money(Math.abs(growth.profit))}`, icon: Rocket }
+      : { href: "/money", label: "Earned", value: money(summary.total), icon: Wallet },
+    { href: "/affiliates", label: isBiz ? "Programs running" : "Programs joined", value: String(programs.length), icon: Link2 },
+    { href: "/badges", label: "Badges earned", value: String(earned), icon: Star },
   ];
   const socials = [
     ["Instagram", session.instagram],
@@ -261,23 +263,28 @@ export default function Profile() {
   return (
     <div className="mx-auto max-w-5xl">
       <div className="relative -mx-4 aspect-[16/9] overflow-hidden bg-elevated md:mx-0 md:aspect-[21/7] md:rounded-[16px]">
-        <Photo photo={nichePhoto(session.niches?.[0] ?? session.category)} sizes="(min-width: 1024px) 1024px, 100vw" priority decorative />
+        <MediaImage id={session.coverId} alt="Your cover photo" className="absolute inset-0 h-full w-full" fallback={<Photo photo={nichePhoto(session.niches?.[0] ?? session.category)} sizes="(min-width: 1024px) 1024px, 100vw" priority decorative />} />
         <span className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/15" aria-hidden="true" />
-        <Button variant="ghost" size="sm" onClick={() => setSettings(true)} className="glass absolute right-3 top-3 h-9 px-3.5 text-[13px]">
-          <Settings className="h-4 w-4" /> Settings
-        </Button>
+        <div className="absolute right-3 top-3 flex gap-2">
+          <Button variant="ghost" size="sm" onClick={() => setEditing(true)} className="glass h-9 px-3.5 text-[13px]" aria-label="Change profile and cover photos">
+            <Camera className="h-4 w-4" /> Photos
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => setSettings(true)} className="glass h-9 px-3.5 text-[13px]">
+            <Settings className="h-4 w-4" /> Settings
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-10 md:grid-cols-12 md:gap-12">
         <section className="md:col-span-7" aria-label="About you">
           <span className="relative z-10 -mt-10 inline-block rounded-full bg-canvas p-1.5 md:-mt-12" style={{ borderRadius: isBiz ? "30%" : undefined }}>
-            <Avatar name={session.displayName} tone={isBiz ? "violet" : "rose"} size="xl" square={isBiz} />
+            <Avatar name={session.displayName} tone={isBiz ? "violet" : "rose"} size="xl" square={isBiz} photoId={session.avatarId} />
           </span>
           <h1 className="mt-4 text-[clamp(2.8rem,8vw,5.5rem)] leading-[0.88]">{session.displayName}</h1>
           <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px] text-muted">
             <span>@{session.handle}</span>
             <span className="rounded-full border border-line px-2 py-px text-[12px] font-medium text-ink">{isBiz ? "Business" : "Creator"}</span>
-            {session.city && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {session.city}, {session.country}</span>}
+            {session.country && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {[session.city, session.region, session.country].filter(Boolean).join(", ")}</span>}
           </p>
           {session.bio && <p className="mt-6 max-w-[34ch] text-[clamp(1.35rem,2.6vw,1.75rem)] font-medium leading-snug tracking-[-0.015em]">{session.bio}</p>}
           {(session.niches ?? []).length > 0 && (

@@ -13,7 +13,7 @@
  *
  * Name, social handle and type (creator/business) are hard filters.
  */
-import { LOCATIONS, cleanHandle } from "./catalog";
+import { cleanHandle } from "./catalog";
 
 export interface MatchFilters {
   /** keywords: searched across profile AND posts */
@@ -21,8 +21,11 @@ export interface MatchFilters {
   kind: "all" | "creator" | "business";
   niches: string[];
   country: string;
+  /** states / regions (or cities) within the country */
   cities: string[];
-  /** pay per video in whole ₹ (null = not used) */
+  /** currency the price filters are written in; amounts in other currencies aren't compared */
+  currency?: string;
+  /** pay per video in whole units of `currency` (null = not used) */
   priceMin: number | null;
   priceMax: number | null;
   /** affiliate commission %: brands paying at least this / creators asking at most this */
@@ -58,7 +61,9 @@ export interface Matchable {
   category: string;
   niches?: string[];
   country: string;
+  region?: string;
   city: string;
+  currency?: string;
   priceFrom: number;
   priceTo: number;
   perSale?: number;
@@ -155,13 +160,18 @@ export function scoreProfile(p: Matchable, f: MatchFilters, posts: PostIndex = {
   }
 
   if (f.cities.length) {
-    const countries = new Set(f.country ? [f.country] : f.cities.map((c) => Object.keys(LOCATIONS).find((k) => LOCATIONS[k]!.includes(c))).filter(Boolean) as string[]);
-    checks.push({ label: f.cities.length === 1 ? f.cities[0]! : `${f.cities.length} cities`, score: f.cities.includes(p.city) ? 1 : countries.has(p.country) ? 0.5 : 0, note: !f.cities.includes(p.city) && countries.has(p.country) ? "same country" : undefined });
+    const places = f.cities.map(norm);
+    const here = places.includes(norm(p.city)) || (!!p.region && places.includes(norm(p.region)));
+    const sameCountry = !!f.country && p.country === f.country;
+    checks.push({ label: f.cities.length === 1 ? f.cities[0]! : `${f.cities.length} places`, score: here ? 1 : sameCountry ? 0.5 : 0, note: !here && sameCountry ? "same country" : undefined });
   } else if (f.country) {
     checks.push({ label: f.country, score: p.country === f.country ? 1 : 0 });
   }
 
-  if (f.priceMin !== null || f.priceMax !== null) {
+  const otherCurrency = !!f.currency && !!p.currency && f.currency !== p.currency;
+  if ((f.priceMin !== null || f.priceMax !== null) && otherCurrency) {
+    checks.push({ label: "Pay per video", score: 0.5, note: `priced in ${p.currency}` });
+  } else if (f.priceMin !== null || f.priceMax !== null) {
     const lo = f.priceMin ?? 0;
     const hi = f.priceMax ?? Number.POSITIVE_INFINITY;
     const overlaps = p.priceFrom <= hi && p.priceTo >= lo;
@@ -176,7 +186,9 @@ export function scoreProfile(p: Matchable, f: MatchFilters, posts: PostIndex = {
     checks.push({ label: `Commission ${p.kind === "business" ? "≥" : "≤"} ${f.commission}%`, score: ok ? 1 : close ? 0.5 : 0 });
   }
 
-  if (f.perSale !== null) {
+  if (f.perSale !== null && otherCurrency) {
+    checks.push({ label: "Pay per sale", score: 0.5, note: `priced in ${p.currency}` });
+  } else if (f.perSale !== null) {
     const s = p.perSale;
     const ok = s !== undefined && (p.kind === "business" ? s >= f.perSale : s <= f.perSale);
     const close = s !== undefined && (p.kind === "business" ? s >= f.perSale * 0.8 : s <= f.perSale * 1.25);
@@ -278,7 +290,7 @@ export function filtersToParams(f: MatchFilters, extra: Record<string, string> =
  * onboarding, so a new business immediately sees the creators it needs (and a
  * creator sees the brands that fit).
  */
-export function filtersFromProfile(s: { role: "creator" | "business"; lookingFor?: string[]; niches?: string[]; earningModels?: string[]; country?: string }): MatchFilters {
+export function filtersFromProfile(s: { role: "creator" | "business"; lookingFor?: string[]; niches?: string[]; earningModels?: string[]; country?: string; currency?: string }): MatchFilters {
   const niches = (s.lookingFor?.length ? s.lookingFor : s.niches) ?? [];
   return {
     ...EMPTY_FILTERS,
@@ -286,5 +298,6 @@ export function filtersFromProfile(s: { role: "creator" | "business"; lookingFor
     niches,
     earningModels: s.earningModels ?? [],
     country: s.country ?? "",
+    currency: s.currency,
   };
 }
