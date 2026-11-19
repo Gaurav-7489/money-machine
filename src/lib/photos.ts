@@ -42,8 +42,8 @@ export const STORY = {
 
 /** One photograph per niche, used for covers, opportunity headers and showcases. */
 export const NICHE_PHOTOS: Record<string, Photo> = {
-  Makeup: P("1522335789203-aabd1fc54bc9", "Makeup palettes and brushes on a marble surface"),
-  Skincare: P("1612817288484-6f916006741a", "Unlabelled skincare bottles arranged with stones and leaves"),
+  Makeup: P("1596462502278-27bfdc403348", "Brushes, lipstick and powder laid out on a sand-coloured surface"),
+  Skincare: P("1608571423902-eed4a5ad8108", "An unlabelled amber dropper bottle in soft window light"),
   Haircare: P("1522337360788-8b13dee7a37e", "Long wavy hair against a pink wall"),
   Fashion: P("1515886657613-9f3515b0c78f", "A model in a yellow tracksuit on a beach court"),
   Fitness: P("1599058917765-a780eda07a3e", "An athlete training with battle ropes in an open concrete gym"),

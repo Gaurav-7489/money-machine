@@ -86,24 +86,29 @@ function DealStack({ photos, side, label }: { photos: readonly PhotoT[]; side: "
   );
 }
 
-/** Illustrative match dial between the two stacks; counts up once. */
+/** Illustrative match dial between the two stacks; counts up once. Writes to the DOM directly, so no React render per frame. */
 function MatchDial() {
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return setN(94);
-    const c = animate(0, 94, { duration: 1.6, delay: 0.9, ease: [0.16, 1, 0.3, 1], onUpdate: (v) => setN(Math.round(v)) });
-    return () => c.stop();
-  }, []);
+  const num = useRef<HTMLSpanElement>(null);
+  const arc = useRef<SVGCircleElement>(null);
   const r = 46;
   const c = 2 * Math.PI * r;
+  useEffect(() => {
+    const paint = (v: number) => {
+      if (num.current) num.current.textContent = `${Math.round(v)}%`;
+      arc.current?.setAttribute("stroke-dashoffset", String(c * (1 - v / 100)));
+    };
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return paint(94);
+    const ctl = animate(0, 94, { duration: 1.6, delay: 0.9, ease: [0.16, 1, 0.3, 1], onUpdate: paint });
+    return () => ctl.stop();
+  }, [c]);
   return (
     <div data-dial className="fade-late relative z-20 -mx-6 grid h-[104px] w-[104px] shrink-0 place-items-center rounded-full bg-ink text-canvas shadow-2xl md:-mx-10 md:h-[136px] md:w-[136px]" aria-label="Example: a 94% match between a creator and a business">
       <svg viewBox="0 0 100 100" className="absolute inset-0 -rotate-90" aria-hidden="true">
         <circle cx="50" cy="50" r={r} fill="none" strokeWidth="3" className="stroke-canvas/15" />
-        <circle cx="50" cy="50" r={r} fill="none" strokeWidth="3" strokeLinecap="round" className="stroke-signal" strokeDasharray={c} strokeDashoffset={c * (1 - n / 100)} />
+        <circle ref={arc} cx="50" cy="50" r={r} fill="none" strokeWidth="3" strokeLinecap="round" className="stroke-signal" strokeDasharray={c} strokeDashoffset={c} />
       </svg>
       <span className="text-center" aria-hidden="true">
-        <span className="font-display block text-[34px] leading-none tabular-nums md:text-[46px]">{n}%</span>
+        <span ref={num} className="font-display block text-[34px] leading-none tabular-nums md:text-[46px]">0%</span>
         <span className="mt-1 block text-[10px] font-medium text-canvas/70 md:text-[11px]">example match</span>
       </span>
     </div>
