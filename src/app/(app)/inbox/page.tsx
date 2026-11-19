@@ -60,13 +60,16 @@ function FolderTile({ f, threads }: { f: FolderDef; threads: ThreadView[] }) {
       <Link href={folderHref(f.id)} className="group relative block overflow-hidden rounded-[16px] bg-ink text-white" aria-label={`${f.label}: ${threads.length} ${threads.length === 1 ? "chat" : "chats"}${unread ? `, ${unread} unread` : ""}`}>
         <span className="relative block aspect-[16/9] sm:aspect-[5/4]">
           <Photo photo={folderPhoto(f)} sizes="(min-width: 1024px) 300px, 50vw" className="photo-zoom" decorative />
-          <span className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/75" aria-hidden="true" />
-          {/* folder tab */}
-          <span className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold ${strong ? (f.kind === "owner" ? "bg-signal text-on-signal" : "bg-white text-black") : "bg-black/45 backdrop-blur-sm"}`}>
-            <Icon className="h-3.5 w-3.5" /> {f.kind === "mm" ? "Official" : f.kind === "owner" ? "Founder" : f.kind === "deal" ? "Deals" : "Chats"}
+          <span className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-black/80" aria-hidden="true" />
+          {/* folder tab: always a solid chip so it reads on any photo, in either theme */}
+          <span className={`absolute left-3 top-3 inline-flex h-7 items-center gap-1.5 rounded-full pl-2.5 text-[12px] font-semibold shadow-[0_2px_10px_rgb(0_0_0/0.25)] ${unread > 0 ? "pr-1" : "pr-2.5"} ${f.kind === "owner" ? "bg-signal text-on-signal" : "bg-white text-[#0f1a14]"}`}>
+            <Icon className="h-3.5 w-3.5" strokeWidth={2.2} />
+            {f.kind === "mm" ? "Official" : f.kind === "owner" ? "Founder" : f.kind === "deal" ? "Deals" : "Chats"}
             {f.kind === "mm" && <Pin className="h-3 w-3" />}
+            {unread > 0 && (
+              <span className={`ml-0.5 grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[11px] font-bold tabular-nums ${f.kind === "owner" ? "bg-[#0f1a14] text-signal" : "bg-signal text-on-signal"}`} aria-hidden="true">{unread}</span>
+            )}
           </span>
-          {unread > 0 && <span className="absolute right-3 top-3 grid h-6 min-w-6 place-items-center rounded-full bg-signal px-1.5 text-[12px] font-bold tabular-nums text-on-signal">{unread}</span>}
           <span className="absolute inset-x-3 bottom-3">
             <span className="font-display block text-[clamp(1.6rem,3vw,2.2rem)] leading-[0.95]">{f.label}</span>
             <span className="mt-1.5 flex items-center gap-2">
@@ -75,9 +78,9 @@ function FolderTile({ f, threads }: { f: FolderDef; threads: ThreadView[] }) {
                   <span key={t.id} className="rounded-full ring-2 ring-black/40"><Avatar name={t.profile.name} tone={t.profile.tone} size="xs" square={t.profile.kind === "business"} /></span>
                 ))}
               </span>
-              <span className="text-[12px] tabular-nums opacity-80">{threads.length} {threads.length === 1 ? "chat" : "chats"}</span>
+              <span className="text-[12px] tabular-nums text-white/85">{threads.length} {threads.length === 1 ? "chat" : "chats"}</span>
             </span>
-            {latest && <span className="mt-1 block truncate text-[12px] opacity-75">{latest.profile.name}: {latest.preview}</span>}
+            {latest && <span className="mt-1.5 block truncate text-[12px] text-white/80">{latest.profile.name}: {latest.preview}</span>}
           </span>
         </span>
       </Link>

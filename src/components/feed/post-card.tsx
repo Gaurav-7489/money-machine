@@ -221,8 +221,8 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
             <p className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 text-[14px] leading-tight">
               <Link href={authorHref} className="truncate font-semibold hover:underline">{post.authorName}</Link>
               {post.verified && <VerifiedMark />}
-              <span className="truncate text-muted">@{post.authorHandle}</span>
-              <span className="text-muted">· {timeAgo(post.createdAt)}</span>
+              <span className="truncate text-muted max-sm:hidden">@{post.authorHandle}</span>
+              <span className="whitespace-nowrap text-muted">· {timeAgo(post.createdAt)}</span>
               {post.authorKind === "business" && <span className="rounded-full border border-line px-1.5 py-px text-[11px] font-medium text-muted">Business</span>}
             </p>
             {post.sample && <SampleTag />}

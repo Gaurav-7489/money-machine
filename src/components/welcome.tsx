@@ -294,9 +294,13 @@ function Ledger() {
         onPointerLeave={() => setHover(null)}
       >
         {LEDGER.map((row, i) => (
-          <li key={row.title} onPointerEnter={(e) => e.pointerType === "mouse" && setHover(i)} className="grid gap-2 border-t border-line py-6 transition-colors md:grid-cols-12 md:items-baseline md:gap-6 md:py-9 md:hover:bg-surface/60">
-            <h3 className="font-display text-[clamp(2rem,3.6vw,3.4rem)] leading-none md:col-span-7">{row.title}</h3>
-            <p className="max-w-[44ch] text-[16px] leading-relaxed text-muted md:col-span-5">{row.body}</p>
+          <li key={row.title} onPointerEnter={(e) => e.pointerType === "mouse" && setHover(i)} className="grid grid-cols-[92px_minmax(0,1fr)] gap-x-4 gap-y-2 border-t border-line py-6 transition-colors md:grid-cols-12 md:items-baseline md:gap-6 md:py-9 md:hover:bg-surface/60">
+            {/* phones can't hover, so the photo sits in the row */}
+            <div className="relative row-span-2 aspect-[4/5] overflow-hidden rounded-[10px] bg-elevated md:hidden" aria-hidden="true">
+              <Photo photo={row.photo} sizes="92px" decorative />
+            </div>
+            <h3 className="font-display self-end text-[clamp(1.9rem,3.6vw,3.4rem)] leading-[0.95] md:col-span-7 md:self-auto">{row.title}</h3>
+            <p className="max-w-[44ch] text-[15px] leading-relaxed text-muted md:col-span-5 md:text-[16px]">{row.body}</p>
           </li>
         ))}
       </ul>

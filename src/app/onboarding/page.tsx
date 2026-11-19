@@ -116,7 +116,19 @@ export default function Onboarding() {
           <p className="mt-4 text-[14px] tabular-nums opacity-80">Step {step + 1} of {STEPS}</p>
         </div>
       </aside>
-      <form onSubmit={next} className="mx-auto w-full max-w-md px-5 pb-28 pt-6 md:self-center md:px-8 md:py-14" noValidate>
+      {/* Phones: the same story as a photo band above the form */}
+      <div className="relative h-[34svh] min-h-[220px] overflow-hidden bg-ink text-white md:hidden" aria-hidden="true">
+        <div key={`m-${step}-${isBiz}`} className="absolute inset-0 animate-[fade-in_0.7s_ease-out_both]">
+          <Photo photo={panel.photo} sizes="100vw" priority={step === 0} decorative />
+        </div>
+        <span className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/5 to-black/65" />
+        <span className="absolute left-5 top-[max(1rem,env(safe-area-inset-top))] [&_*]:!text-white"><Logo /></span>
+        <div key={`ml-${step}-${isBiz}`} className="absolute inset-x-5 bottom-9 animate-[fade-up_0.7s_var(--ease-out-expo)_both]">
+          <p className="font-display text-[clamp(1.9rem,8.5vw,2.6rem)] leading-[0.92]">{panel.line}</p>
+          <p className="mt-2 text-[13px] tabular-nums opacity-80">Step {step + 1} of {STEPS}</p>
+        </div>
+      </div>
+      <form onSubmit={next} className="relative mx-auto w-full max-w-md bg-canvas px-5 pb-28 pt-5 max-md:-mt-5 max-md:rounded-t-[22px] md:self-center md:bg-transparent md:px-8 md:py-14" noValidate>
         <div className="mb-5 flex items-center gap-3">
           {step === 0 ? (
             <Link href="/" aria-label="Back" className="press -ml-2 grid h-9 w-9 place-items-center rounded-full text-ink hover:bg-elevated"><ChevronLeft className="h-5 w-5" /></Link>

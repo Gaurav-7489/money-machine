@@ -3,12 +3,14 @@
 import { TabIndicator } from "@/components/motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { CheckSquare, RotateCcw, Search, SearchX, Send, SlidersHorizontal, Sparkles, Square, Star, Undo2, X } from "lucide-react";
+import { Check, CheckSquare, RotateCcw, Search, SearchX, Send, SlidersHorizontal, Sparkles, Square, Star, Undo2, X } from "lucide-react";
 import { useFeedback } from "@/components/feedback";
 import { BulkDm } from "@/components/search/bulk-dm";
 import { MatchCard, MatchCardSkeleton } from "@/components/search/match-card";
 import { Button, EmptyState, Sheet, inputCls } from "@/components/ui";
-import { EARNING_MODELS } from "@/lib/catalog";
+import { EARNING_MODELS, NICHES } from "@/lib/catalog";
+import { Photo } from "@/components/photo";
+import { nichePhoto } from "@/lib/photos";
 import { DEFAULT_CURRENCY } from "@/lib/format";
 import { FilterBuilder, fromDraft, toDraft, type Draft } from "@/components/search/filter-builder";
 import { EMPTY_FILTERS, MATCH_LEVELS, activeFilterCount, countAtLeast, filtersFromParams, filtersFromProfile, filtersToParams, findMatches, type MatchFilters } from "@/lib/match";
@@ -123,7 +125,7 @@ function ExploreInner() {
           id="explore-q"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder={`Try “skincare”: we search bios and posts`}
+          placeholder={`Search ${who} or #tags`}
           className="h-14 w-full rounded-full border border-line bg-surface pl-13 pr-24 text-[17px] outline-none transition-colors placeholder:text-muted/80 hover:border-muted/60 focus:border-ink"
         />
         {q && (
@@ -149,6 +151,31 @@ function ExploreInner() {
           <SlidersHorizontal className="h-4 w-4" /> Custom search{custom && count ? ` · ${count}` : ""}
         </button>
       </div>
+
+      {/* Phones & tablets: the niches as swipeable photo tiles (desktop has them in the sidebar) */}
+      <ul className="no-scrollbar -mx-4 mt-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 lg:hidden" aria-label="Pick a niche">
+        {NICHES.map((n) => {
+          const on = custom && applied.niches.includes(n);
+          return (
+            <li key={n} className="snap-start">
+              <button
+                type="button"
+                aria-pressed={on}
+                onClick={() => {
+                  const base = custom ? applied : { ...EMPTY_FILTERS, kind, currency };
+                  go({ ...base, q, kind, niches: on ? base.niches.filter((x) => x !== n) : [...base.niches.filter((x) => custom || x !== n), n] });
+                }}
+                className={`press relative block h-[88px] w-[88px] overflow-hidden rounded-[12px] bg-elevated text-left ${on ? "ring-2 ring-signal ring-offset-2 ring-offset-canvas" : ""}`}
+              >
+                <Photo photo={nichePhoto(n)} sizes="88px" className={on ? "scale-105" : "grayscale-[30%]"} decorative />
+                <span className={`absolute inset-0 ${on ? "bg-black/25" : "bg-black/45"}`} aria-hidden="true" />
+                <span className="absolute inset-x-2 bottom-1.5 text-[12px] font-semibold leading-tight text-white">{n}</span>
+                {on && <span className="absolute right-1.5 top-1.5 grid h-5 w-5 place-items-center rounded-full bg-signal text-on-signal"><Check className="h-3 w-3" strokeWidth={3} /></span>}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
 
       {!custom && (
         <p className="mt-4 border-l-2 border-signal pl-3 text-[14px] text-muted">
