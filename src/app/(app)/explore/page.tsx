@@ -20,7 +20,7 @@ const numOrNull = (v: string) => (v.trim() === "" ? null : Number(digits(v)) || 
 
 function Chip({ on, onClick, children, title }: { on: boolean; onClick: () => void; children: React.ReactNode; title?: string }) {
   return (
-    <button type="button" aria-pressed={on} title={title} onClick={onClick} className={`press h-9 shrink-0 rounded-full px-3.5 text-[13px] font-semibold transition-colors ${on ? "bg-aurora text-on-accent shadow-sm" : "border border-line bg-surface text-ink hover:border-brand-300"}`}>
+    <button type="button" aria-pressed={on} title={title} onClick={onClick} className={`press h-9 shrink-0 rounded-full px-3.5 text-[13px] font-semibold transition-colors ${on ? "bg-action text-on-accent shadow-sm" : "border border-line bg-surface text-ink hover:border-brand-300"}`}>
       {children}
     </button>
   );
@@ -67,7 +67,7 @@ function FilterForm({ draft, setDraft, role, error, onSubmit, onClear }: { draft
           <label><span className="sr-only">Minimum per video</span><input inputMode="numeric" className={inputCls} placeholder="Min e.g. 3000" value={draft.priceMin} onChange={(e) => setDraft((d) => ({ ...d, priceMin: digits(e.target.value) }))} aria-invalid={!!error} /></label>
           <label><span className="sr-only">Maximum per video</span><input inputMode="numeric" className={inputCls} placeholder="Max e.g. 25000" value={draft.priceMax} onChange={(e) => setDraft((d) => ({ ...d, priceMax: digits(e.target.value) }))} aria-invalid={!!error} /></label>
         </div>
-        {error && <p role="alert" className="text-[12px] text-rose-600">{error}</p>}
+        {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
         <div className="grid grid-cols-2 gap-2">
           <label className="block">
             <span className="mb-1 block text-[12px] font-medium text-muted">{lookingForCreators ? "Commission up to %" : "Commission at least %"}</span>
@@ -203,7 +203,7 @@ function ExploreInner() {
     <div className="mx-auto max-w-6xl pb-24">
       <header className="mb-4">
         <h1 className="text-[26px] font-extrabold tracking-tight">
-          Find <span className="text-aurora">{who}</span>
+          Find <span className="text-brand-700">{who}</span>
         </h1>
       </header>
 
@@ -222,7 +222,7 @@ function ExploreInner() {
             <X className="h-4 w-4" />
           </button>
         )}
-        <button type="button" onClick={() => setSheet(true)} className="press absolute right-1.5 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-aurora text-on-accent lg:hidden" aria-label={`Filters${count ? `, ${count} on` : ""}`}>
+        <button type="button" onClick={() => setSheet(true)} className="press absolute right-1.5 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-action text-on-accent lg:hidden" aria-label={`Filters${count ? `, ${count} on` : ""}`}>
           <SlidersHorizontal className="h-[18px] w-[18px]" />
           {count > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-ink px-1 text-[10px] font-bold text-surface">{count}</span>}
         </button>
@@ -232,7 +232,7 @@ function ExploreInner() {
         <button
           onClick={() => router.replace(`/explore${kind !== defaultKind ? `?type=${kind}` : ""}`, { scroll: false })}
           aria-pressed={!custom}
-          className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold ${!custom ? "bg-aurora text-on-accent" : "border border-line bg-surface"}`}
+          className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold ${!custom ? "bg-action text-on-accent" : "border border-line bg-surface"}`}
         >
           <Sparkles className="h-4 w-4" /> Matched to you
         </button>
@@ -248,7 +248,7 @@ function ExploreInner() {
       </div>
 
       {!custom && (
-        <p className="bg-aurora-soft mt-3 rounded-2xl px-4 py-3 text-[13px]">
+        <p className="bg-brand-50 mt-3 rounded-2xl px-4 py-3 text-[13px]">
           <Sparkles className="mr-1 inline h-4 w-4 text-brand-600" />
           {applied.niches.length || applied.earningModels.length ? (
             <>Showing {who} for your setup: <strong>{[...applied.niches, ...EARNING_MODELS.filter((m) => applied.earningModels.includes(m.id)).map((m) => m.short)].slice(0, 5).join(", ")}</strong>. Tap <strong>Custom search</strong> to change it.</>
@@ -344,13 +344,13 @@ function ExploreInner() {
       {selected.length > 0 && (
         <div className="animate-fade-up fixed inset-x-3 bottom-20 z-40 mx-auto flex max-w-xl items-center gap-2 rounded-full bg-ink p-1.5 pl-4 text-surface shadow-2xl md:bottom-6">
           <span className="mr-auto text-sm font-bold">{selected.length} selected</span>
-          <button onClick={() => { setMany("starredProfiles", selected, true); toast(`${selected.length} starred ⭐`); }} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-white/10" aria-label="Star selected" title="Star selected">
+          <button onClick={() => { setMany("starredProfiles", selected, true); toast(`${selected.length} starred ⭐`); }} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-on-accent/10" aria-label="Star selected" title="Star selected">
             <Star className="h-5 w-5" />
           </button>
-          <button onClick={() => setSelected([])} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-white/10" aria-label="Clear selection" title="Clear selection">
+          <button onClick={() => setSelected([])} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-on-accent/10" aria-label="Clear selection" title="Clear selection">
             <X className="h-5 w-5" />
           </button>
-          <button onClick={() => setBulkOpen(true)} className="press btn-glow inline-flex h-10 items-center gap-1.5 rounded-full bg-aurora px-4 text-sm font-bold text-on-accent">
+          <button onClick={() => setBulkOpen(true)} className="press inline-flex h-10 items-center gap-1.5 rounded-full bg-action px-4 text-sm font-bold text-on-accent">
             <Send className="h-4 w-4" /> Bulk DM{bulkDaysLeft > 0 ? ` · ${bulkDaysLeft}d` : ""}
           </button>
         </div>

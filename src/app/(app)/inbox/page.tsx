@@ -50,8 +50,8 @@ function NewMessage({ open, onClose }: { open: boolean; onClose: () => void }) {
 }
 
 const FOLDER_STYLE: Record<FolderDef["kind"], { icon: typeof FolderIcon; cls: string }> = {
-  mm: { icon: BadgeCheck, cls: "bg-aurora text-on-accent" },
-  owner: { icon: Crown, cls: "bg-gradient-to-br from-accent-4 via-accent-3 to-accent-2 text-on-accent" },
+  mm: { icon: BadgeCheck, cls: "bg-action text-on-accent" },
+  owner: { icon: Crown, cls: "bg-accent-soft text-accent" },
   general: { icon: MessageSquareText, cls: "bg-elevated text-ink ring-1 ring-line" },
   deal: { icon: Handshake, cls: "bg-brand-50 text-brand-700 ring-1 ring-brand-200" },
 };
@@ -60,8 +60,8 @@ function FolderCard({ f, count, unread, active, onClick }: { f: FolderDef; count
   const { icon: Icon, cls } = FOLDER_STYLE[f.kind];
   const DealIcon = f.dealType === "affiliate" ? Link2 : Icon;
   return (
-    <button onClick={onClick} aria-pressed={active} className={`press relative flex w-[132px] shrink-0 flex-col items-start gap-2 rounded-2xl p-3 text-left transition-shadow ${active ? "ring-aurora" : ""} ${f.kind === "mm" || f.kind === "owner" ? cls : "card"}`}>
-      <span className={`grid h-9 w-9 place-items-center rounded-xl ${f.kind === "mm" || f.kind === "owner" ? "bg-white/20" : cls}`}>
+    <button onClick={onClick} aria-pressed={active} className={`press relative flex w-[132px] shrink-0 flex-col items-start gap-2 rounded-2xl p-3 text-left transition-shadow ${active ? "ring-2 ring-brand-500 ring-offset-2 ring-offset-surface" : ""} ${f.kind === "mm" || f.kind === "owner" ? cls : "card"}`}>
+      <span className={`grid h-9 w-9 place-items-center rounded-xl ${f.kind === "mm" || f.kind === "owner" ? "bg-on-accent/20" : cls}`}>
         <DealIcon className="h-[18px] w-[18px]" />
       </span>
       <span className="w-full">
@@ -178,7 +178,7 @@ function InboxInner() {
       {box === "trash" && list.length > 0 && (
         <div className="mb-3 flex items-center justify-between rounded-xl bg-elevated px-3 py-2 text-[13px] text-muted ring-1 ring-line">
           <span>Conversations in Trash can be restored.</span>
-          <button onClick={emptyTrash} className="press rounded-full px-3 py-1.5 font-semibold text-rose-600 hover:bg-rose-50">Empty Trash</button>
+          <button onClick={emptyTrash} className="press rounded-full px-3 py-1.5 font-semibold text-danger hover:bg-danger-soft">Empty Trash</button>
         </div>
       )}
 
@@ -196,7 +196,7 @@ function InboxInner() {
           {list.map((t) => {
             const f = folders.find((x) => x.id === t.folder);
             return (
-              <li key={t.id} className={`flex items-center ${t.pinned ? "bg-aurora-soft" : ""}`}>
+              <li key={t.id} className={`flex items-center ${t.pinned ? "bg-brand-50" : ""}`}>
                 <Link href={`/inbox/${t.id}`} className="flex min-w-0 flex-1 items-center gap-3 py-3.5 pl-4 pr-2 transition-colors hover:bg-canvas/60">
                   <span className="relative">
                     <Avatar name={t.profile.name} tone={t.profile.tone} size="md" square={t.profile.kind === "business"} ring={t.pinned} />
@@ -207,12 +207,12 @@ function InboxInner() {
                       <span className={`truncate text-[15px] ${t.unread ? "font-bold" : "font-semibold"}`}>{t.profile.name}</span>
                       {t.profile.verified && <VerifiedMark />}
                       {t.pinned && <Pin className="h-3.5 w-3.5 shrink-0 text-brand-600" aria-label="Pinned" />}
-                      {t.starred && <Star className="h-3.5 w-3.5 shrink-0 fill-amber-400 text-amber-400" aria-label="Starred" />}
+                      {t.starred && <Star className="h-3.5 w-3.5 shrink-0 fill-accent text-accent" aria-label="Starred" />}
                     </span>
                     <span className={`block truncate text-sm ${t.unread ? "font-medium text-ink" : "text-muted"}`}>{t.preview}</span>
                     <span className="mt-1 flex flex-wrap items-center gap-1">
                       {f && !activeFolder && <span className="rounded-full bg-elevated px-1.5 py-px text-[10px] font-semibold text-muted ring-1 ring-line">{f.label}</span>}
-                      {t.dealType && <span className="bg-aurora rounded-full px-1.5 py-px text-[10px] font-bold text-on-accent">{earningShort(t.dealType)}</span>}
+                      {t.dealType && <span className="bg-action rounded-full px-1.5 py-px text-[10px] font-bold text-on-accent">{earningShort(t.dealType)}</span>}
                       {t.sample && <SampleTag />}
                     </span>
                   </span>
@@ -223,17 +223,17 @@ function InboxInner() {
                     <button onClick={() => { toggle("trashedThreads", t.id); toast("Conversation restored"); }} className="press grid h-10 w-10 place-items-center rounded-full text-brand-700 hover:bg-brand-50" aria-label={`Restore conversation with ${t.profile.name}`} title="Restore">
                       <ArchiveRestore className="h-5 w-5" />
                     </button>
-                    <button onClick={() => deleteForever(t.id, t.profile.name)} className="press grid h-10 w-10 place-items-center rounded-full text-rose-600 hover:bg-rose-50" aria-label={`Delete conversation with ${t.profile.name} forever`} title="Delete forever">
+                    <button onClick={() => deleteForever(t.id, t.profile.name)} className="press grid h-10 w-10 place-items-center rounded-full text-danger hover:bg-danger-soft" aria-label={`Delete conversation with ${t.profile.name} forever`} title="Delete forever">
                       <Trash2 className="h-5 w-5" />
                     </button>
                   </div>
                 ) : (
                   !t.pinned && (
                     <div className="flex shrink-0 flex-col pr-2">
-                      <button onClick={() => { toggle("starredThreads", t.id); toast(t.starred ? "Unstarred" : "Starred ⭐", t.starred ? "info" : "success"); }} className="press grid h-9 w-9 place-items-center rounded-full text-muted hover:text-amber-500" aria-label={t.starred ? `Unstar ${t.profile.name}` : `Star ${t.profile.name}`}>
-                        <Star className={`h-4 w-4 ${t.starred ? "fill-amber-400 text-amber-400" : ""}`} />
+                      <button onClick={() => { toggle("starredThreads", t.id); toast(t.starred ? "Unstarred" : "Starred ⭐", t.starred ? "info" : "success"); }} className="press grid h-9 w-9 place-items-center rounded-full text-muted hover:text-accent" aria-label={t.starred ? `Unstar ${t.profile.name}` : `Star ${t.profile.name}`}>
+                        <Star className={`h-4 w-4 ${t.starred ? "fill-accent text-accent" : ""}`} />
                       </button>
-                      <button onClick={() => { toggle("trashedThreads", t.id); toast("Moved to Trash", "info"); }} className="press grid h-9 w-9 place-items-center rounded-full text-muted hover:text-rose-600" aria-label={`Move ${t.profile.name} to Trash`}>
+                      <button onClick={() => { toggle("trashedThreads", t.id); toast("Moved to Trash", "info"); }} className="press grid h-9 w-9 place-items-center rounded-full text-muted hover:text-danger" aria-label={`Move ${t.profile.name} to Trash`}>
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>

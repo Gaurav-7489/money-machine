@@ -106,23 +106,23 @@ function ConfirmDialog({ opts, onDone }: { opts: ConfirmOptions | null; onDone: 
         onDone(false);
       }}
       aria-labelledby="confirm-title"
-      className="m-auto w-[min(26rem,calc(100%-2rem))] rounded-3xl bg-surface p-0 text-ink shadow-2xl backdrop:bg-ink/40 backdrop:backdrop-blur-sm"
+      className="m-auto w-[min(26rem,calc(100%-2rem))] rounded-panel border border-line bg-surface p-0 text-ink shadow-panel backdrop:bg-scrim/55"
     >
       {opts && (
         <div className="p-6 text-center">
-          <span className={`mx-auto grid h-12 w-12 place-items-center rounded-2xl ${opts.danger ? "bg-rose-50 text-rose-600" : "bg-brand-50 text-brand-700"}`}>
+          <span className={`mx-auto grid h-12 w-12 place-items-center rounded-2xl ${opts.danger ? "bg-danger-soft text-danger" : "bg-brand-50 text-brand-700"}`}>
             {opts.danger ? <AlertTriangle className="h-6 w-6" /> : <Info className="h-6 w-6" />}
           </span>
           <h2 id="confirm-title" className="mt-3 text-lg font-bold">{opts.title}</h2>
           {opts.body && <p className="mt-1 text-sm text-muted">{opts.body}</p>}
           <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row">
-            <button onClick={() => onDone(false)} className="press h-11 flex-1 rounded-full border border-line bg-surface text-sm font-semibold hover:bg-elevated">
+            <button onClick={() => onDone(false)} className="press h-11 flex-1 rounded-control border border-line bg-surface text-sm font-semibold hover:bg-elevated">
               {opts.cancelLabel ?? "Cancel"}
             </button>
             <button
               autoFocus
               onClick={() => onDone(true)}
-              className={`press h-11 flex-1 rounded-full text-sm font-semibold ${opts.danger ? "bg-danger text-on-danger hover:brightness-110" : "bg-aurora text-on-accent btn-glow"}`}
+              className={`press h-11 flex-1 rounded-control text-sm font-semibold ${opts.danger ? "bg-danger text-on-danger hover:brightness-110" : "bg-action text-on-accent"}`}
             >
               {opts.confirmLabel ?? "Yes, continue"}
             </button>

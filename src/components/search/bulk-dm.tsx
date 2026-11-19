@@ -55,7 +55,7 @@ export function BulkDm({ open, onClose, recipients, onSent }: { open: boolean; o
     <Sheet open={open} onClose={close} title={review ? "Review bulk DM" : "Bulk DM"}>
       {bulkDaysLeft > 0 ? (
         <div className="py-6 text-center">
-          <span className="bg-aurora-soft mx-auto grid h-14 w-14 place-items-center rounded-2xl text-brand-600"><CalendarClock className="h-7 w-7" /></span>
+          <span className="bg-brand-50 mx-auto grid h-14 w-14 place-items-center rounded-2xl text-brand-600"><CalendarClock className="h-7 w-7" /></span>
           <p className="mt-3 font-bold">Your next bulk DM unlocks in {bulkDaysLeft} {bulkDaysLeft === 1 ? "day" : "days"}</p>
           <Button variant="secondary" className="mt-4" onClick={close}>Got it</Button>
         </div>
@@ -85,7 +85,7 @@ export function BulkDm({ open, onClose, recipients, onSent }: { open: boolean; o
           ) : (
             <form onSubmit={next} noValidate className="space-y-5">
               <DealFields draft={draft} onChange={setDraft} errors={errors} />
-              <p className="rounded-xl bg-amber-50 px-3 py-2 text-[12px] text-amber-700 ring-1 ring-amber-200">You can send one bulk DM every {BULK_DM_COOLDOWN_DAYS} days, so make it count.</p>
+              <p className="rounded-xl bg-accent-soft px-3 py-2 text-[12px] text-accent ring-1 ring-accent/30">You can send one bulk DM every {BULK_DM_COOLDOWN_DAYS} days, so make it count.</p>
               <div className="sticky bottom-0 -mx-5 grid grid-cols-2 gap-2 border-t border-line bg-surface px-5 py-3">
                 <Button type="button" variant="secondary" onClick={close}>Cancel</Button>
                 <Button type="submit">Review</Button>

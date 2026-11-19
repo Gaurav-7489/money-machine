@@ -17,7 +17,7 @@ export default function Notifications() {
 
   const items = [
     ...unread.map((t) => ({ key: t.id, icon: <MessageCircle className="h-4 w-4 text-brand-600" />, text: `New message from ${t.profile.name} · ${timeAgo(t.at)}`, href: `/inbox/${t.id}` })),
-    ...badges.map((b) => ({ key: b.badge.id, icon: <Star className="h-4 w-4 text-amber-500" />, text: `You earned the ${b.badge.name} badge`, href: "/badges" })),
+    ...badges.map((b) => ({ key: b.badge.id, icon: <Star className="h-4 w-4 text-accent" />, text: `You earned the ${b.badge.name} badge`, href: "/badges" })),
     ...(session?.role === "creator"
       ? applications
           .filter((a) => a.creatorHandle === session.handle && (a.status === "approved" || a.status === "rejected"))

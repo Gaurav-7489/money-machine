@@ -121,7 +121,7 @@ export function Composer({ autoFocus = false, onDone }: { autoFocus?: boolean; o
             aria-invalid={!!error}
             aria-describedby={error ? "composer-err" : undefined}
           />
-          {error && <p id="composer-err" role="alert" className="mt-1 text-[12px] text-rose-600">{error}</p>}
+          {error && <p id="composer-err" role="alert" className="mt-1 text-[12px] text-danger">{error}</p>}
 
           {images.length > 0 && (
             <div className={`mt-2 grid gap-1.5 ${images.length > 1 ? "grid-cols-2" : ""}`}>
@@ -129,7 +129,7 @@ export function Composer({ autoFocus = false, onDone }: { autoFocus?: boolean; o
                 <div key={i} className="relative overflow-hidden rounded-2xl ring-1 ring-line">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={src} alt={`Photo ${i + 1} you're about to post`} className={`w-full object-cover ${images.length > 1 ? "aspect-square" : "max-h-72"}`} />
-                  <button type="button" onClick={() => setImages((x) => x.filter((_, j) => j !== i))} className="absolute right-1.5 top-1.5 grid h-8 w-8 place-items-center rounded-full bg-black/70 text-white" aria-label={`Remove photo ${i + 1}`}>
+                  <button type="button" onClick={() => setImages((x) => x.filter((_, j) => j !== i))} className="absolute right-1.5 top-1.5 grid h-8 w-8 place-items-center rounded-full bg-scrim/70 text-on-scrim" aria-label={`Remove photo ${i + 1}`}>
                     <X className="h-4 w-4" />
                   </button>
                 </div>
@@ -139,7 +139,7 @@ export function Composer({ autoFocus = false, onDone }: { autoFocus?: boolean; o
           {videoId && (
             <div className="relative mt-2">
               <VideoView id={videoId} />
-              <button type="button" onClick={() => setVideoId(undefined)} className="absolute right-2 top-2 inline-flex h-8 items-center gap-1 rounded-full bg-black/70 px-3 text-xs font-semibold text-white" aria-label="Remove video">
+              <button type="button" onClick={() => setVideoId(undefined)} className="absolute right-2 top-2 inline-flex h-8 items-center gap-1 rounded-full bg-scrim/70 px-3 text-xs font-semibold text-on-scrim" aria-label="Remove video">
                 <X className="h-4 w-4" /> Remove
               </button>
             </div>
@@ -147,7 +147,7 @@ export function Composer({ autoFocus = false, onDone }: { autoFocus?: boolean; o
           {gif && (
             <div className="relative mt-2 inline-block">
               <GifView id={gif} />
-              <button type="button" onClick={() => setGif(undefined)} className="absolute right-1.5 top-1.5 grid h-8 w-8 place-items-center rounded-full bg-black/70 text-white" aria-label="Remove GIF">
+              <button type="button" onClick={() => setGif(undefined)} className="absolute right-1.5 top-1.5 grid h-8 w-8 place-items-center rounded-full bg-scrim/70 text-on-scrim" aria-label="Remove GIF">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -178,7 +178,7 @@ export function Composer({ autoFocus = false, onDone }: { autoFocus?: boolean; o
         <button type="button" className={tool} onClick={() => setEmojiOpen((o) => !o)} aria-pressed={emojiOpen} aria-label="Add emoji" title="Emoji">
           <Smile className="h-5 w-5" />
         </button>
-        <span className={`ml-auto mr-2 text-xs tabular-nums ${caption.length > LIMIT - 100 ? "text-amber-700" : "text-muted"}`} aria-live="polite">
+        <span className={`ml-auto mr-2 text-xs tabular-nums ${caption.length > LIMIT - 100 ? "text-accent" : "text-muted"}`} aria-live="polite">
           {caption.length > 0 ? `${caption.length}/${LIMIT}` : ""}
         </span>
         <Button type="submit" disabled={(!caption.trim() && !hasMedia) || busy}>Post</Button>

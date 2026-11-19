@@ -105,7 +105,7 @@ function CreatorView() {
                   <>
                     <StatusPill status={status} />
                     {status === "pending" && (
-                      <button onClick={() => withdraw(program.id)} className="text-xs font-medium text-muted hover:text-rose-600">Withdraw</button>
+                      <button onClick={() => withdraw(program.id)} className="text-xs font-medium text-muted hover:text-danger">Withdraw</button>
                     )}
                   </>
                 }
@@ -234,7 +234,7 @@ function Tabs({ tabs, value, onChange }: { tabs: [string, string][]; value: stri
           role="tab"
           aria-selected={value === id}
           onClick={() => onChange(id)}
-          className={`h-8 rounded-full px-4 text-[13px] font-semibold transition ${value === id ? "bg-aurora text-on-accent" : "text-muted hover:text-ink"}`}
+          className={`h-8 rounded-full px-4 text-[13px] font-semibold transition ${value === id ? "bg-action text-on-accent" : "text-muted hover:text-ink"}`}
         >
           {label}
         </button>

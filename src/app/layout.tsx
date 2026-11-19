@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Inter } from "next/font/google";
 import "./globals.css";
-import { Ambient } from "@/components/ambient";
 import { MotionProvider } from "@/components/motion";
 import { StoreProvider } from "@/lib/store";
 import { ServiceWorkerRegister } from "@/components/sw-register";
@@ -45,10 +44,6 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#FAFAFD" },
-    { media: "(prefers-color-scheme: dark)", color: "#0D0B12" },
-  ],
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -58,10 +53,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en-IN" suppressHydrationWarning className={`${body.variable} ${head.variable}`}>
       <head>
+        <meta name="theme-color" />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body>
-        <Ambient />
         <StoreProvider>
           <MotionProvider>
             <FeedbackProvider>{children}</FeedbackProvider>

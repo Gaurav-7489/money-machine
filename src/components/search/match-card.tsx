@@ -57,11 +57,11 @@ export function MatchCard({ result, selected, onSelect, starred, onStar, onRemov
   const { profile: p, percent, checks, foundIn, snippet } = result;
   const isCreator = p.kind === "creator";
   return (
-    <article className={`card relative flex flex-col p-4 transition-shadow ${selected ? "ring-aurora" : ""}`} aria-label={p.name}>
+    <article className={`card relative flex flex-col p-4 transition-shadow ${selected ? "ring-2 ring-brand-500 ring-offset-2 ring-offset-surface" : ""}`} aria-label={p.name}>
       <div className="flex items-start gap-3">
         <label className="press -m-1 mt-0.5 flex cursor-pointer items-center rounded-lg p-1">
           <input type="checkbox" checked={selected} onChange={onSelect} className="peer sr-only" />
-          <span className={`grid h-6 w-6 place-items-center rounded-lg border-2 transition-colors peer-focus-visible:ring-4 peer-focus-visible:ring-brand-100 ${selected ? "border-transparent bg-aurora text-on-accent" : "border-line bg-surface"}`} aria-hidden="true">
+          <span className={`grid h-6 w-6 place-items-center rounded-lg border-2 transition-colors peer-focus-visible:ring-4 peer-focus-visible:ring-brand-100 ${selected ? "border-transparent bg-action text-on-accent" : "border-line bg-surface"}`} aria-hidden="true">
             {selected && <Check className="animate-pop h-4 w-4" strokeWidth={3} />}
           </span>
           <span className="sr-only">Select {p.name}</span>
@@ -89,7 +89,7 @@ export function MatchCard({ result, selected, onSelect, starred, onStar, onRemov
 
       <p className="mt-3 flex flex-wrap gap-1">
         {p.niches.map((n) => (
-          <span key={n} className="bg-aurora-soft rounded-full px-2 py-0.5 text-[11px] font-semibold text-brand-700">{n}</span>
+          <span key={n} className="bg-brand-50 rounded-full px-2 py-0.5 text-[11px] font-semibold text-brand-700">{n}</span>
         ))}
         {p.earningModels.slice(0, 3).map((m) => (
           <span key={m} className="rounded-full bg-elevated px-2 py-0.5 text-[11px] font-medium text-muted ring-1 ring-line">{earningShort(m)}</span>
@@ -114,7 +114,7 @@ export function MatchCard({ result, selected, onSelect, starred, onStar, onRemov
           <ul className="mt-1.5 space-y-1">
             {checks.map((c) => (
               <li key={c.label} className="flex items-center gap-1.5">
-                {c.score === 1 ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : c.score > 0 ? <Minus className="h-3.5 w-3.5 text-amber-600" /> : <X className="h-3.5 w-3.5 text-rose-600" />}
+                {c.score === 1 ? <Check className="h-3.5 w-3.5 text-brand-700" /> : c.score > 0 ? <Minus className="h-3.5 w-3.5 text-accent" /> : <X className="h-3.5 w-3.5 text-danger" />}
                 <span>{c.label}</span>
                 <span className="text-muted">— {c.score === 1 ? "yes" : c.score > 0 ? c.note ?? "partly" : "no"}</span>
               </li>
@@ -124,7 +124,7 @@ export function MatchCard({ result, selected, onSelect, starred, onStar, onRemov
       )}
 
       <div className="mt-3 flex gap-2">
-        <button onClick={onMessage} className="press btn-glow inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-aurora text-[13px] font-semibold text-on-accent">
+        <button onClick={onMessage} className="press inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-action text-[13px] font-semibold text-on-accent">
           <MessageCircle className="h-4 w-4" /> DM
         </button>
         <button
@@ -132,11 +132,11 @@ export function MatchCard({ result, selected, onSelect, starred, onStar, onRemov
           aria-pressed={starred}
           aria-label={starred ? `Unstar ${p.name}` : `Star ${p.name}`}
           title={starred ? "Unstar" : "Star"}
-          className={`press grid h-10 w-10 place-items-center rounded-full ${starred ? "bg-amber-50 text-amber-500 ring-1 ring-amber-200" : "border border-line text-muted hover:text-ink"}`}
+          className={`press grid h-10 w-10 place-items-center rounded-full ${starred ? "bg-accent-soft text-accent ring-1 ring-accent/30" : "border border-line text-muted hover:text-ink"}`}
         >
           <Star className={`h-[18px] w-[18px] ${starred ? "animate-pop fill-current" : ""}`} />
         </button>
-        <button onClick={onRemove} aria-label={`Remove ${p.name} from results`} title="Remove from results" className="press grid h-10 w-10 place-items-center rounded-full border border-line text-muted hover:bg-rose-50 hover:text-rose-600">
+        <button onClick={onRemove} aria-label={`Remove ${p.name} from results`} title="Remove from results" className="press grid h-10 w-10 place-items-center rounded-full border border-line text-muted hover:bg-danger-soft hover:text-danger">
           <Trash2 className="h-[18px] w-[18px]" />
         </button>
       </div>

@@ -56,7 +56,7 @@ export default function Saved() {
                   <SampleTag />
                 </Link>
                 <div className="mt-3 grid grid-cols-2 gap-2">
-                  <button onClick={() => router.push(`/inbox/${startThread(p.handle)}`)} className="press btn-glow inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-aurora text-[13px] font-semibold text-on-accent">
+                  <button onClick={() => router.push(`/inbox/${startThread(p.handle)}`)} className="press inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-action text-[13px] font-semibold text-on-accent">
                     <MessageCircle className="h-4 w-4" /> DM
                   </button>
                   <button

@@ -55,7 +55,7 @@ function PostOpportunity({ open, onClose }: { open: boolean; onClose: () => void
             {NICHES.map((n) => {
               const on = niches.includes(n);
               return (
-                <button key={n} type="button" aria-pressed={on} onClick={() => setNiches((x) => (on ? x.filter((y) => y !== n) : [...x, n]))} className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-aurora text-on-accent" : "border border-line"}`}>
+                <button key={n} type="button" aria-pressed={on} onClick={() => setNiches((x) => (on ? x.filter((y) => y !== n) : [...x, n]))} className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-action text-on-accent" : "border border-line"}`}>
                   {n}
                 </button>
               );
@@ -114,14 +114,14 @@ export function OpportunityCard({ o }: { o: Opportunity }) {
     <article className="card overflow-hidden" aria-label={o.title}>
       {o.sample ? (
         <div
-          className="relative h-36 overflow-hidden bg-gradient-to-br from-brand-100 to-rose-100 bg-cover bg-center sm:h-40"
+          className="relative h-36 overflow-hidden bg-brand-50 bg-cover bg-center sm:h-40"
           style={{ backgroundImage: `linear-gradient(0deg, rgba(13,11,20,.20), transparent 70%), url("${o.niches.map((n) => OPPORTUNITY_PHOTOS[n]).find(Boolean) ?? SAMPLE_OPPORTUNITY_FALLBACK}")` }}
           role="img"
           aria-label={`Sample campaign photograph for ${o.title}`}
         >
-          <span className="absolute bottom-3 left-3 rounded-full border border-white/50 bg-white/85 px-3 py-1 text-xs font-semibold text-gray-900 backdrop-blur">Campaign preview</span>
+          <span className="absolute bottom-3 left-3 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold text-ink">Campaign preview</span>
         </div>
-      ) : <div className="bg-aurora h-1.5" />}
+      ) : <div className="bg-action h-1.5" />}
       <div className="p-4">
         <div className="flex items-start gap-3">
           <Link href={mine ? "/profile" : `/u/${o.ownerHandle}`}><Avatar name={name} tone={owner?.tone ?? "violet"} square /></Link>
@@ -132,12 +132,12 @@ export function OpportunityCard({ o }: { o: Opportunity }) {
             <h3 className="mt-0.5 text-[17px] font-bold leading-snug">{o.title}</h3>
           </div>
           {o.sample && <SampleTag />}
-          {mine && <button onClick={remove} className="grid h-9 w-9 place-items-center rounded-full text-muted hover:bg-rose-50 hover:text-rose-600" aria-label="Delete opportunity"><Trash2 className="h-4 w-4" /></button>}
+          {mine && <button onClick={remove} className="grid h-9 w-9 place-items-center rounded-full text-muted hover:bg-danger-soft hover:text-danger" aria-label="Delete opportunity"><Trash2 className="h-4 w-4" /></button>}
         </div>
         <p className="mt-2 text-[14px]">{o.details}</p>
         <div className="mt-3 flex flex-wrap gap-1.5 text-[12px]">
-          <span className="bg-aurora rounded-full px-2.5 py-1 font-bold text-on-accent">{earningLabel(o.type)}</span>
-          <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-semibold text-emerald-700">{budgetText(o.budgetMin, o.budgetMax)}</span>
+          <span className="bg-action rounded-full px-2.5 py-1 font-bold text-on-accent">{earningLabel(o.type)}</span>
+          <span className="rounded-full bg-brand-50 px-2.5 py-1 font-semibold text-brand-700">{budgetText(o.budgetMin, o.budgetMax)}</span>
           {o.deliverables.length > 0 && <span className="rounded-full bg-elevated px-2.5 py-1 font-semibold ring-1 ring-line">{deliverablesText(o.deliverables)}</span>}
           {o.niches.map((n) => <span key={n} className="rounded-full bg-brand-50 px-2.5 py-1 font-semibold text-brand-700">{n}</span>)}
         </div>
@@ -161,15 +161,15 @@ export function OpportunityList() {
   return (
     <div>
       {isBiz ? (
-        <button onClick={() => setPosting(true)} className="press bg-aurora btn-glow mb-4 flex w-full items-center gap-3 rounded-[var(--radius-card)] p-4 text-left text-on-accent">
-          <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/20"><Plus className="h-6 w-6" /></span>
+        <button onClick={() => setPosting(true)} className="press bg-action mb-4 flex w-full items-center gap-3 rounded-[var(--radius-card)] p-4 text-left text-on-accent">
+          <span className="grid h-11 w-11 place-items-center rounded-xl bg-on-accent/20"><Plus className="h-6 w-6" /></span>
           <span>
             <span className="block font-bold">Post an opportunity</span>
             <span className="block text-[13px] text-on-accent/75">Tell creators what you need. Applications land in your Messages.</span>
           </span>
         </button>
       ) : (
-        <p className="bg-aurora-soft mb-4 flex items-center gap-2 rounded-2xl px-4 py-3 text-[13px]"><Briefcase className="h-4 w-4 text-brand-600" /> Brands post paid work here. Tap <strong>Apply now</strong> and we send your application to their Messages.</p>
+        <p className="bg-brand-50 mb-4 flex items-center gap-2 rounded-2xl px-4 py-3 text-[13px]"><Briefcase className="h-4 w-4 text-brand-600" /> Brands post paid work here. Tap <strong>Apply now</strong> and we send your application to their Messages.</p>
       )}
       {mineFirst.length ? (
         <ul className="stagger space-y-4">

@@ -65,9 +65,9 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
               {p.name} {p.verified && <VerifiedMark />}
             </h2>
             <p className="text-sm text-muted">@{p.handle}</p>
-            <span className={`mt-1.5 inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${isCreator ? "bg-rose-50 text-rose-700" : "bg-violet-50 text-violet-700"}`}>{isCreator ? "Creator" : "Business"}</span>
+            <span className={`mt-1.5 inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${isCreator ? "bg-elevated text-ink" : "bg-brand-50 text-brand-700"}`}>{isCreator ? "Creator" : "Business"}</span>
             <p className="mt-2 flex flex-wrap justify-center gap-1 sm:justify-start">
-              {p.niches.map((n) => <span key={n} className="bg-aurora-soft rounded-full px-2.5 py-0.5 text-xs font-semibold text-brand-700">{n}</span>)}
+              {p.niches.map((n) => <span key={n} className="bg-brand-50 rounded-full px-2.5 py-0.5 text-xs font-semibold text-brand-700">{n}</span>)}
             </p>
             <p className="mt-3 text-[15px]">{p.bio}</p>
             <ul className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-muted sm:justify-start">
@@ -118,7 +118,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
               toast(isStarred ? `${p.name} unstarred` : `${p.name} starred ⭐`, isStarred ? "info" : "success");
             }}
           >
-            <Star className={`h-4 w-4 ${isStarred ? "fill-amber-400 text-amber-400" : ""}`} />
+            <Star className={`h-4 w-4 ${isStarred ? "fill-accent text-accent" : ""}`} />
           </Button>
           <Button
             variant="secondary"

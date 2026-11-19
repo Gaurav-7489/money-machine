@@ -227,7 +227,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
             </p>
             {post.sample && <SampleTag />}
             {post.mine && (
-              <button onClick={removePost} className="press -mr-1 -mt-1 grid h-8 w-8 place-items-center rounded-full text-muted hover:bg-rose-50 hover:text-rose-600" aria-label="Delete post" title="Delete post">
+              <button onClick={removePost} className="press -mr-1 -mt-1 grid h-8 w-8 place-items-center rounded-full text-muted hover:bg-danger-soft hover:text-danger" aria-label="Delete post" title="Delete post">
                 <Trash2 className="h-4 w-4" />
               </button>
             )}
@@ -270,7 +270,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
             />
             <Stat onClick={() => setShowComments((v) => !v)} pressed={showComments} label="Comment" count={commentCount} activeCls="text-brand-600" icon={<MessageCircle className="h-[19px] w-[19px]" />} />
             <div className="relative">
-              <Stat onClick={() => (post.mine ? setQuoting(true) : setRepostMenu((v) => !v))} pressed={isReposted} label={isReposted ? "Reposted" : "Repost"} count={repostCount} activeCls="text-emerald-600" icon={<Repeat2 className={`h-[19px] w-[19px] ${isReposted ? "animate-pop" : ""}`} />} />
+              <Stat onClick={() => (post.mine ? setQuoting(true) : setRepostMenu((v) => !v))} pressed={isReposted} label={isReposted ? "Reposted" : "Repost"} count={repostCount} activeCls="text-brand-700" icon={<Repeat2 className={`h-[19px] w-[19px] ${isReposted ? "animate-pop" : ""}`} />} />
               {repostMenu && (
                 <div className="animate-scale-in absolute bottom-full left-0 z-20 mb-1 w-44 overflow-hidden rounded-2xl bg-surface shadow-xl ring-1 ring-line" role="menu">
                   <button role="menuitem" onClick={repost} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm font-medium hover:bg-elevated"><Repeat2 className="h-4 w-4" /> {isReposted ? "Undo repost" : "Repost"}</button>
@@ -279,7 +279,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
               )}
             </div>
             <div>
-              <Stat onClick={() => setReactOpen((v) => !v)} pressed={!!myReaction} label="React with an emoji" activeCls="text-amber-600" icon={myReaction ? <span className="text-[17px] leading-none">{myReaction}</span> : <SmilePlus className="h-[19px] w-[19px]" />} />
+              <Stat onClick={() => setReactOpen((v) => !v)} pressed={!!myReaction} label="React with an emoji" activeCls="text-accent" icon={myReaction ? <span className="text-[17px] leading-none">{myReaction}</span> : <SmilePlus className="h-[19px] w-[19px]" />} />
               {reactOpen && (
                 <div className="animate-scale-in absolute bottom-full left-0 right-0 z-20 mx-auto mb-1 flex w-fit max-w-full flex-wrap justify-center gap-0.5 rounded-full bg-surface p-1 shadow-xl ring-1 ring-line" role="menu" aria-label="Reactions">
                   {REACTIONS.map((e) => (
@@ -292,7 +292,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
             </div>
             <Stat onClick={share} label="Share" icon={<Send className="h-[18px] w-[18px]" />} />
             <span className="flex-1 max-sm:hidden" />
-            <Stat onClick={saveToggle} pressed={isSaved} label={isSaved ? "Saved" : "Save"} activeCls="text-amber-600" icon={<Bookmark className={`h-[19px] w-[19px] ${isSaved ? "animate-pop fill-current" : ""}`} />} />
+            <Stat onClick={saveToggle} pressed={isSaved} label={isSaved ? "Saved" : "Save"} activeCls="text-accent" icon={<Bookmark className={`h-[19px] w-[19px] ${isSaved ? "animate-pop fill-current" : ""}`} />} />
           </div>
         </div>
       </div>
@@ -319,7 +319,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
                       {"gif" in c && c.gif && <div className="mt-1"><GifView id={c.gif} size="sm" /></div>}
                     </div>
                     {isMe && (
-                      <button onClick={() => removeComment(c.id)} className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-muted hover:bg-rose-50 hover:text-rose-600" aria-label="Delete comment">
+                      <button onClick={() => removeComment(c.id)} className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-muted hover:bg-danger-soft hover:text-danger" aria-label="Delete comment">
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     )}
@@ -333,7 +333,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
               {draftGif && (
                 <div className="relative mb-2 ml-12 inline-block">
                   <GifView id={draftGif} size="sm" />
-                  <button type="button" onClick={() => setDraftGif(undefined)} className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-black/70 text-white" aria-label="Remove GIF from comment">
+                  <button type="button" onClick={() => setDraftGif(undefined)} className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-scrim/70 text-on-scrim" aria-label="Remove GIF from comment">
                     <X className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -361,7 +361,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
                   placeholder={`Reply to ${post.authorName}…`}
                   className="h-10 min-w-0 flex-1 rounded-full border border-line bg-elevated px-4 text-sm outline-none focus:border-brand-400 focus:bg-surface focus:ring-4 focus:ring-brand-100"
                 />
-                <button type="submit" disabled={!draft.trim() && !draftGif} className="press grid h-10 w-10 shrink-0 place-items-center rounded-full bg-aurora text-on-accent disabled:opacity-40" aria-label="Post comment">
+                <button type="submit" disabled={!draft.trim() && !draftGif} className="press grid h-10 w-10 shrink-0 place-items-center rounded-full bg-action text-on-accent disabled:opacity-40" aria-label="Post comment">
                   <SendHorizontal className="h-4 w-4" />
                 </button>
               </div>
@@ -378,7 +378,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
           <QuotedPost post={post} />
           <div className="flex gap-2">
             <button type="button" onClick={() => setQuoting(false)} className="press h-11 flex-1 rounded-full border border-line font-semibold">Cancel</button>
-            <button type="submit" className="press btn-glow h-11 flex-1 rounded-full bg-aurora font-semibold text-on-accent">Post quote</button>
+            <button type="submit" className="press h-11 flex-1 rounded-full bg-action font-semibold text-on-accent">Post quote</button>
           </div>
         </form>
       </Sheet>

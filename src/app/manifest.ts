@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
+import { siteColors } from "@/lib/site-colors";
 
 export default function manifest(): MetadataRoute.Manifest {
+  const { canvas, action } = siteColors();
   return {
     id: "/",
     name: "Money Machine",
@@ -10,8 +12,8 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#FAFAFD",
-    theme_color: "#965BFF",
+    background_color: canvas,
+    theme_color: action,
     categories: ["social", "business", "finance"],
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },

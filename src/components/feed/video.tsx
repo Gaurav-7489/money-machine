@@ -12,5 +12,5 @@ export function VideoView({ id }: { id: string }) {
       </div>
     );
   if (!url) return <div className="skeleton aspect-video w-full rounded-2xl" />;
-  return <video src={url} controls playsInline preload="metadata" className="max-h-[520px] w-full rounded-2xl bg-black" />;
+  return <video src={url} controls playsInline preload="metadata" className="max-h-[520px] w-full rounded-2xl bg-scrim" />;
 }

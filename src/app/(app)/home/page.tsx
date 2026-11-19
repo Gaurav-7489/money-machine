@@ -39,13 +39,13 @@ function MatchedRow() {
         <Link href="/create" className="flex w-16 shrink-0 flex-col items-center gap-1">
           <span className="relative">
             <Avatar name={session.displayName} tone={session.role === "business" ? "violet" : "rose"} size="lg" />
-            <span className="absolute bottom-0 right-0 grid h-5 w-5 place-items-center rounded-full bg-aurora text-on-accent ring-2 ring-canvas"><Plus className="h-3 w-3" strokeWidth={3} /></span>
+            <span className="absolute bottom-0 right-0 grid h-5 w-5 place-items-center rounded-full bg-action text-on-accent ring-2 ring-canvas"><Plus className="h-3 w-3" strokeWidth={3} /></span>
           </span>
           <span className="text-[11px]">New post</span>
         </Link>
         {list.map(({ profile: p, percent }) => (
           <Link key={p.handle} href={`/u/${p.handle}`} className="flex w-16 shrink-0 flex-col items-center gap-1">
-            <span className="relative rounded-full bg-aurora p-[2.5px]">
+            <span className="relative rounded-full bg-action p-[2.5px]">
               <span className="block rounded-full bg-elevated p-[2px]"><Avatar name={p.name} tone={p.tone} size="lg" /></span>
               {percent !== null && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-ink px-1.5 text-[10px] font-bold text-surface">{percent}%</span>}
             </span>
@@ -80,7 +80,7 @@ export default function Home() {
       <div className="mx-auto w-full max-w-xl">
         <h1 className="sr-only">Feed</h1>
         <MatchedRow />
-        <div role="tablist" aria-label="Feed" className="sticky top-[57px] z-20 -mx-4 mb-4 grid grid-cols-3 glass border-b border-line px-4 md:top-[65px] md:mx-0 md:px-0">
+        <div role="tablist" aria-label="Feed" className="sticky top-[57px] z-20 -mx-4 mb-4 grid grid-cols-3 bg-surface border-b border-line px-4 md:top-[65px] md:mx-0 md:px-0">
           {TABS.map((t) => (
             <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={`relative py-3 text-[15px] transition ${tab === t.id ? "font-bold text-ink" : "text-muted hover:text-ink"}`}>
               {t.label}

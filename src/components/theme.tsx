@@ -3,44 +3,18 @@
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
-/** Two themes: White ("Creative Pastel") and Dark ("Editorial Neon"). */
 export type ThemeChoice = "light" | "dark";
 const KEY = "mm.theme";
 const EVENT = "mm-theme";
-const COLORS = { light: "#FAFAFD", dark: "#0D0B12" };
 
 /** Runs before first paint (inlined in <head>) so there is no flash. First visit follows the device. */
-export const THEME_INIT_SCRIPT = `(function(){try{var c=localStorage.getItem("${KEY}");var d=c?c==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=d?"dark":"light";}catch(e){}})();`;
+export const THEME_INIT_SCRIPT = `(function(){try{var c=localStorage.getItem("${KEY}");var d=c?c==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=d?"dark":"light";}catch(e){}document.addEventListener("DOMContentLoaded",function(){var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=getComputedStyle(document.documentElement).getPropertyValue("--color-canvas").trim();},{once:true});})();`;
 
 function apply(choice: ThemeChoice) {
   document.documentElement.dataset.theme = choice;
-  document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute("content", COLORS[choice]));
+  const tint = getComputedStyle(document.documentElement).getPropertyValue("--color-canvas").trim();
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", tint);
   window.dispatchEvent(new CustomEvent(EVENT, { detail: choice }));
-}
-
-const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-/** Switch theme with a circular reveal from the pointer (View Transitions), or a soft cross-fade. */
-function transition(next: ThemeChoice, origin?: { x: number; y: number }) {
-  const doc = document as Document & { startViewTransition?: (cb: () => void) => { ready: Promise<void> } };
-  if (reduced()) return apply(next);
-  if (doc.startViewTransition && origin) {
-    const r = Math.hypot(Math.max(origin.x, innerWidth - origin.x), Math.max(origin.y, innerHeight - origin.y));
-    const vt = doc.startViewTransition(() => apply(next));
-    vt.ready
-      .then(() => {
-        document.documentElement.animate(
-          { clipPath: [`circle(0px at ${origin.x}px ${origin.y}px)`, `circle(${r}px at ${origin.x}px ${origin.y}px)`] },
-          { duration: 520, easing: "cubic-bezier(0.16, 1, 0.3, 1)", pseudoElement: "::view-transition-new(root)" },
-        );
-      })
-      .catch(() => {});
-    return;
-  }
-  const root = document.documentElement;
-  root.classList.add("theme-fade");
-  apply(next);
-  setTimeout(() => root.classList.remove("theme-fade"), 400);
 }
 
 export function useTheme() {
@@ -67,13 +41,13 @@ export function useTheme() {
     };
   }, []);
 
-  function set(next: ThemeChoice, e?: { clientX: number; clientY: number }) {
+  function set(next: ThemeChoice) {
     try {
       localStorage.setItem(KEY, next);
     } catch {
       /* storage blocked: applies for this visit only */
     }
-    transition(next, e && e.clientX + e.clientY > 0 ? { x: e.clientX, y: e.clientY } : undefined);
+    apply(next);
   }
 
   return { choice, dark: choice === "dark", set };
@@ -85,17 +59,17 @@ export function ThemeToggle({ withLabel = false, className = "" }: { withLabel?:
   const label = dark ? "Switch to white theme" : "Switch to dark theme";
   if (!withLabel) {
     return (
-      <button type="button" onClick={(e) => set(dark ? "light" : "dark", e)} aria-label={label} title={label} className={`press grid h-10 w-10 place-items-center rounded-full text-ink hover:bg-elevated ${className}`}>
+      <button type="button" onClick={() => set(dark ? "light" : "dark")} aria-label={label} title={label} className={`press grid h-10 w-10 place-items-center rounded-control text-ink hover:bg-elevated ${className}`}>
         <span key={String(dark)} className="animate-[scale-in_0.4s_var(--ease-spring)]">{dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}</span>
       </button>
     );
   }
   return (
-    <button type="button" role="switch" aria-checked={dark} aria-label="Dark theme" onClick={(e) => set(dark ? "light" : "dark", e)} className={`press flex h-11 items-center gap-3 rounded-full px-3 text-[15px] text-ink hover:bg-elevated ${className}`}>
+    <button type="button" role="switch" aria-checked={dark} aria-label="Dark theme" onClick={() => set(dark ? "light" : "dark")} className={`press flex h-11 items-center gap-3 rounded-control px-3 text-[15px] text-ink hover:bg-elevated ${className}`}>
       {dark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
       <span className="flex-1 text-left">{dark ? "Dark theme" : "White theme"}</span>
-      <span className={`relative h-6 w-11 rounded-full transition-colors ${dark ? "bg-aurora" : "bg-line"}`} aria-hidden="true">
-        <span className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-[left] duration-300" style={{ left: dark ? 22 : 2 }} />
+      <span className={`relative h-6 w-11 rounded-full transition-colors ${dark ? "bg-action" : "bg-line"}`} aria-hidden="true">
+        <span className="absolute top-0.5 h-5 w-5 rounded-full left-0.5 bg-on-accent shadow transition-transform duration-200" style={{ transform: dark ? "translateX(1.25rem)" : undefined }} />
       </span>
     </button>
   );
@@ -105,22 +79,22 @@ export function ThemeToggle({ withLabel = false, className = "" }: { withLabel?:
 export function ThemePicker() {
   const { choice, set } = useTheme();
   const opts = [
-    { id: "light", label: "White", sub: "Creative pastel", swatch: "bg-[#FAFAFD] ring-1 ring-black/10", dot: "linear-gradient(110deg,#8edbff,#b9a0ff,#ffb4d5,#ffd1ae)" },
-    { id: "dark", label: "Dark", sub: "Editorial neon", swatch: "bg-[#0D0B12] ring-1 ring-white/15", dot: "linear-gradient(110deg,#ff8748,#f452a1,#965bff,#35c8f5)" },
+    { id: "light", label: "White", sub: "Warm white" },
+    { id: "dark", label: "Dark", sub: "Warm charcoal" },
   ] as const;
   return (
     <div role="radiogroup" aria-label="Theme" className="grid grid-cols-2 gap-2">
-      {opts.map(({ id, label, sub, swatch, dot }) => (
+      {opts.map(({ id, label, sub }) => (
         <button
           key={id}
           type="button"
           role="radio"
           aria-checked={choice === id}
-          onClick={(e) => set(id, e)}
-          className={`press flex items-center gap-3 rounded-2xl border p-3 text-left ${choice === id ? "border-brand-400 bg-brand-50 ring-4 ring-brand-100" : "border-line hover:bg-elevated"}`}
+          onClick={() => set(id)}
+          className={`press flex items-center gap-3 rounded-control border p-3 text-left ${choice === id ? "border-brand-400 bg-brand-50 ring-4 ring-brand-100" : "border-line hover:bg-elevated"}`}
         >
-          <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${swatch}`}>
-            <span className="h-4 w-4 rounded-full" style={{ backgroundImage: dot }} />
+          <span aria-hidden="true" className="theme-swatch" data-swatch={id}>
+            <span />
           </span>
           <span>
             <span className="block text-[14px] font-semibold">{label}</span>

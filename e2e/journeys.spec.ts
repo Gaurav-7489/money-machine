@@ -179,7 +179,7 @@ test("theme switch: white and dark, remembered, no flash", async ({ page }) => {
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(13, 11, 18)");
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(23, 25, 21)");
 });
 
 test("no horizontal overflow or console errors on main pages", async ({ page }) => {
@@ -213,4 +213,26 @@ test("first visit follows the device colour scheme", async ({ browser }) => {
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await ctx.close();
+});
+
+test("landing previews work at 360px in both themes with reduced motion", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  await page.goto("/");
+  await page.getByRole("button", { name: "For businesses" }).click();
+  await expect(page.getByText("Compare and reach out")).toBeVisible();
+  await page.getByRole("button", { name: "For creators" }).click();
+  await expect(page.getByText("Find brands that fit")).toBeVisible();
+  await page.getByRole("button", { name: "Affiliates", exact: true }).click();
+  await expect(page.getByText("Field Supply")).toBeVisible();
+  await page.getByText("What is Money Machine?", { exact: true }).click();
+  await expect(page.getByText(/^Money Machine is a social platform/)).toBeVisible();
+
+  for (const theme of ["light", "dark"]) {
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(360);
+    if (theme === "light") await page.getByRole("button", { name: "Switch to dark theme" }).click();
+  }
+  await page.locator(".landing-stage").hover();
+  expect(await page.locator(".landing-stack").evaluate((element) => element.style.transform)).toBe("");
 });

@@ -44,7 +44,7 @@ function PersonRow({ p, followingNow }: { p: Profile; followingNow: boolean }) {
         {followingNow && (
           <button
             onClick={() => router.push(`/inbox/${startThread(p.handle)}`)}
-            className="press btn-glow inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-aurora px-4 text-[13px] font-semibold text-on-accent sm:flex-none"
+            className="press inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-action px-4 text-[13px] font-semibold text-on-accent sm:flex-none"
           >
             <MessageCircle className="h-4 w-4" /> DM
           </button>

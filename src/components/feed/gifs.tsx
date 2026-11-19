@@ -12,18 +12,18 @@ import { MAX_GIF_BYTES, saveMedia, useMediaUrl } from "@/lib/media";
  * own .gif files (stored on the device in the preview build).
  */
 export const GIFS = [
-  { id: "lets-go", text: "LET'S GO", emoji: "🚀", anim: "gif-bounce", bg: "from-violet-600 via-fuchsia-600 to-amber-500" },
-  { id: "deal", text: "DEAL!", emoji: "🤝", anim: "gif-pulse", bg: "from-emerald-500 via-teal-500 to-sky-500" },
-  { id: "paid", text: "GOT PAID", emoji: "💸", anim: "gif-rise", bg: "from-emerald-600 via-lime-500 to-amber-400" },
-  { id: "fire", text: "FIRE", emoji: "🔥", anim: "gif-wiggle", bg: "from-orange-500 via-rose-500 to-fuchsia-600" },
-  { id: "slay", text: "SLAY", emoji: "💅", anim: "gif-wiggle", bg: "from-pink-500 via-fuchsia-500 to-violet-600" },
-  { id: "yay", text: "YAY!", emoji: "🎉", anim: "gif-bounce", bg: "from-amber-400 via-orange-500 to-rose-500" },
-  { id: "omg", text: "OMG", emoji: "😱", anim: "gif-pulse", bg: "from-sky-500 via-indigo-500 to-violet-600" },
-  { id: "lol", text: "LOL", emoji: "😂", anim: "gif-bounce", bg: "from-yellow-400 via-amber-500 to-orange-500" },
-  { id: "love", text: "LOVE IT", emoji: "😍", anim: "gif-pulse", bg: "from-rose-500 via-pink-500 to-fuchsia-500" },
-  { id: "clap", text: "BRAVO", emoji: "👏", anim: "gif-wiggle", bg: "from-teal-500 via-emerald-500 to-lime-500" },
-  { id: "mindblown", text: "MIND BLOWN", emoji: "🤯", anim: "gif-pulse", bg: "from-fuchsia-600 via-purple-600 to-indigo-700" },
-  { id: "money", text: "MONEY MOVES", emoji: "🤑", anim: "gif-spin", bg: "from-amber-400 via-yellow-500 to-emerald-500" },
+  { id: "lets-go", text: "LET'S GO", emoji: "🚀", anim: "gif-bounce", bg: "bg-brand-100" },
+  { id: "deal", text: "DEAL!", emoji: "🤝", anim: "gif-pulse", bg: "bg-brand-100" },
+  { id: "paid", text: "GOT PAID", emoji: "💸", anim: "gif-rise", bg: "bg-brand-100" },
+  { id: "fire", text: "FIRE", emoji: "🔥", anim: "gif-wiggle", bg: "bg-accent-soft" },
+  { id: "slay", text: "SLAY", emoji: "💅", anim: "gif-wiggle", bg: "bg-elevated" },
+  { id: "yay", text: "YAY!", emoji: "🎉", anim: "gif-bounce", bg: "bg-accent-soft" },
+  { id: "omg", text: "OMG", emoji: "😱", anim: "gif-pulse", bg: "bg-elevated" },
+  { id: "lol", text: "LOL", emoji: "😂", anim: "gif-bounce", bg: "bg-accent-soft" },
+  { id: "love", text: "LOVE IT", emoji: "😍", anim: "gif-pulse", bg: "bg-brand-50" },
+  { id: "clap", text: "BRAVO", emoji: "👏", anim: "gif-wiggle", bg: "bg-brand-100" },
+  { id: "mindblown", text: "MIND BLOWN", emoji: "🤯", anim: "gif-pulse", bg: "bg-elevated" },
+  { id: "money", text: "MONEY MOVES", emoji: "🤑", anim: "gif-spin", bg: "bg-brand-100" },
 ] as const;
 
 export function GifView({ id, size = "md" }: { id: string; size?: "sm" | "md" | "lg" }) {
@@ -33,12 +33,10 @@ export function GifView({ id, size = "md" }: { id: string; size?: "sm" | "md" | 
   const box = size === "sm" ? "h-24 w-36 text-[11px]" : size === "lg" ? "aspect-[16/10] w-full text-2xl" : "h-36 w-56 text-sm";
   const emoji = size === "sm" ? "text-3xl" : size === "lg" ? "text-7xl" : "text-5xl";
   return (
-    <div role="img" aria-label={`GIF: ${g.text}`} className={`gif-hue relative grid place-items-center overflow-hidden rounded-2xl bg-gradient-to-br ${g.bg} ${box}`} style={{ animationDuration: "9s" }}>
-      <span className="absolute -left-6 -top-6 h-24 w-24 rounded-full bg-white/25 blur-xl" />
-      <span className="absolute -bottom-8 -right-4 h-28 w-28 rounded-full bg-black/10 blur-xl" />
+    <div role="img" aria-label={`GIF: ${g.text}`} className={`relative grid place-items-center overflow-hidden rounded-2xl ${g.bg} ${box}`}>
       <span className={`relative ${g.anim} ${emoji}`}>{g.emoji}</span>
-      <span className="absolute bottom-2 left-0 right-0 text-center font-black tracking-wider text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.35)]">{g.text}</span>
-      <span className="absolute left-2 top-2 rounded bg-black/40 px-1.5 text-[9px] font-bold text-white">GIF</span>
+      <span className="absolute bottom-2 left-0 right-0 text-center font-bold tracking-wide text-ink">{g.text}</span>
+      <span className="absolute left-2 top-2 rounded bg-surface px-1.5 text-[9px] font-bold text-muted">GIF</span>
     </div>
   );
 }

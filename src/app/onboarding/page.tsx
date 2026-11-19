@@ -21,7 +21,7 @@ function Chips({ options, value, onChange }: { options: readonly { id: string; l
       {options.map((o) => {
         const on = value.includes(o.id);
         return (
-          <button key={o.id} type="button" aria-pressed={on} title={o.hint} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`press inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold transition-colors ${on ? "bg-aurora text-on-accent shadow-sm" : "border border-line bg-surface hover:border-brand-300"}`}>
+          <button key={o.id} type="button" aria-pressed={on} title={o.hint} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`press inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold transition-colors ${on ? "bg-action text-on-accent shadow-sm" : "border border-line bg-surface hover:border-brand-300"}`}>
             {on && <Check className="h-4 w-4" strokeWidth={3} />} {o.label}
           </button>
         );
@@ -99,7 +99,7 @@ export default function Onboarding() {
             <button type="button" onClick={() => { setErrors({}); setStep((s) => s - 1); }} aria-label="Back" className="press -ml-2 grid h-9 w-9 place-items-center rounded-full text-ink hover:bg-elevated"><ChevronLeft className="h-5 w-5" /></button>
           )}
           <div className="flex flex-1 gap-1.5" aria-label={`Step ${step + 1} of ${STEPS}`}>
-            {Array.from({ length: STEPS }, (_, i) => <span key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i <= step ? "bg-aurora" : "bg-line"}`} />)}
+            {Array.from({ length: STEPS }, (_, i) => <span key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i <= step ? "bg-action" : "bg-line"}`} />)}
           </div>
         </div>
 
@@ -112,9 +112,9 @@ export default function Onboarding() {
                 {ROLES.map(({ id, title, body, icon: Icon }) => {
                   const selected = role === id;
                   return (
-                    <label key={id} className={`press relative flex cursor-pointer flex-col items-center gap-2 rounded-3xl border p-4 text-center transition ${selected ? "border-transparent ring-aurora bg-aurora-soft" : "border-line hover:bg-elevated"}`}>
+                    <label key={id} className={`press relative flex cursor-pointer flex-col items-center gap-2 rounded-3xl border p-4 text-center transition ${selected ? "border-transparent ring-2 ring-brand-500 ring-offset-2 ring-offset-surface bg-brand-50" : "border-line hover:bg-elevated"}`}>
                       <input type="radio" name="role" value={id} checked={selected} onChange={() => setRole(id)} className="sr-only" />
-                      <span className={`grid h-12 w-12 place-items-center rounded-2xl ${selected ? "bg-aurora text-on-accent" : "bg-elevated text-brand-600"}`}><Icon className="h-6 w-6" /></span>
+                      <span className={`grid h-12 w-12 place-items-center rounded-2xl ${selected ? "bg-action text-on-accent" : "bg-elevated text-brand-600"}`}><Icon className="h-6 w-6" /></span>
                       <span className="font-bold">{title}</span>
                       <span className="text-[12px] leading-snug text-muted">{body}</span>
                     </label>
@@ -139,7 +139,7 @@ export default function Onboarding() {
             <>
               <h1 className="text-[28px] font-extrabold tracking-tight">{isBiz ? "What does your business do?" : "What content do you create?"}</h1>
               <Chips options={nicheOpts} value={niches} onChange={setNiches} />
-              {errors.niches && <p role="alert" className="mt-3 text-[13px] text-rose-600">{errors.niches}</p>}
+              {errors.niches && <p role="alert" className="mt-3 text-[13px] text-danger">{errors.niches}</p>}
             </>
           )}
 
@@ -158,7 +158,7 @@ export default function Onboarding() {
                   <Chips options={earnOpts} value={earning} onChange={setEarning} />
                 </>
               )}
-              {errors.step2 && <p role="alert" className="mt-3 text-[13px] text-rose-600">{errors.step2}</p>}
+              {errors.step2 && <p role="alert" className="mt-3 text-[13px] text-danger">{errors.step2}</p>}
             </>
           )}
 
@@ -186,7 +186,7 @@ export default function Onboarding() {
                     <label><span className="sr-only">Minimum</span><input inputMode="numeric" className={inputCls} placeholder="Min" value={payMin} onChange={(e) => setPayMin(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!errors.pay} /></label>
                     <label><span className="sr-only">Maximum</span><input inputMode="numeric" className={inputCls} placeholder="Max" value={payMax} onChange={(e) => setPayMax(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!errors.pay} /></label>
                   </div>
-                  {errors.pay && <p role="alert" className="mt-1 text-[12px] text-rose-600">{errors.pay}</p>}
+                  {errors.pay && <p role="alert" className="mt-1 text-[12px] text-danger">{errors.pay}</p>}
                 </div>
               </div>
             </>

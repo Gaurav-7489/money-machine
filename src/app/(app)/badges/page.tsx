@@ -13,12 +13,12 @@ export default function Badges() {
     <div className="mx-auto max-w-2xl">
       <PageHeader title="Badges" back="/profile" />
       {featured && (
-        <section className="card animate-scale-in flex flex-col items-center bg-gradient-to-br from-cream via-surface to-violet-50 p-6 text-center">
+        <section className="card animate-scale-in flex flex-col items-center bg-surface p-6 text-center">
           <BadgeMedal icon={featured.badge.icon} earned={featured.earned} size="lg" />
           <p className="mt-3 text-lg font-bold">{featured.badge.name}</p>
           {!featured.earned && (
             <div className="mt-3 h-2 w-48 overflow-hidden rounded-full bg-surface ring-1 ring-line">
-              <div className="h-full rounded-full bg-aurora transition-[width] duration-700" style={{ width: `${(featured.current / featured.target) * 100}%` }} />
+              <div className="h-full rounded-full bg-action transition-[width] duration-700" style={{ width: `${(featured.current / featured.target) * 100}%` }} />
             </div>
           )}
         </section>
@@ -35,7 +35,7 @@ export default function Badges() {
             <p className="mt-0.5 text-[11px] leading-snug text-muted">{badge.description}</p>
             {!isEarned &&
               (badge.requiresVerification ? (
-                <p className="mt-2 text-[10px] font-medium text-slate-500">Needs verified records</p>
+                <p className="mt-2 text-[10px] font-medium text-muted">Needs verified records</p>
               ) : (
                 <p className="mt-2 text-[11px] font-semibold text-brand-700">
                   {target >= 1000 ? `${Math.round((current / target) * 100)}%` : `${current}/${target}`}

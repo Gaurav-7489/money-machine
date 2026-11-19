@@ -45,7 +45,7 @@ function MatchesCard({ handles }: { handles: string[] }) {
                 send(id, { body: `Hi ${p.name}! Money Machine matched us, I'd love to work together. ${session?.role === "creator" ? "Here's my profile." : "Are you open to a collab?"} 👋` });
                 router.push(`/inbox/${id}`);
               }}
-              className="press inline-flex h-9 shrink-0 items-center gap-1 rounded-full bg-aurora px-3 text-[12px] font-bold text-on-accent disabled:bg-none disabled:bg-elevated disabled:text-muted"
+              className="press inline-flex h-9 shrink-0 items-center gap-1 rounded-full bg-action px-3 text-[12px] font-bold text-on-accent disabled:bg-none disabled:bg-elevated disabled:text-muted"
             >
               {already ? <><Check className="h-3.5 w-3.5" /> Sent</> : "Say hi 👋"}
             </button>
@@ -62,7 +62,7 @@ function Bubble({ m, name, tone, square, onReply }: { m: ViewMessage; name: stri
       <div className="animate-fade-up flex flex-col items-end">
         {m.deal && <div className="mb-1 w-[85%] max-w-sm"><DealSummary deal={{ ...m.deal, note: "" }} compact /></div>}
         {m.gif && <div className="mb-1"><GifView id={m.gif} size="md" /></div>}
-        {m.body && <p className="bg-aurora max-w-[80%] whitespace-pre-wrap break-words rounded-3xl rounded-br-md px-4 py-2.5 text-[15px] text-on-accent">{m.body}</p>}
+        {m.body && <p className="bg-action max-w-[80%] whitespace-pre-wrap break-words rounded-3xl rounded-br-md px-4 py-2.5 text-[15px] text-on-accent">{m.body}</p>}
         <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted"><CheckCheck className="h-3.5 w-3.5 text-brand-500" /> Sent · {timeAgo(m.at)}</span>
       </div>
     );
@@ -76,9 +76,9 @@ function Bubble({ m, name, tone, square, onReply }: { m: ViewMessage; name: stri
           <div className="mt-1.5 w-[min(22rem,80vw)]">
             <DealSummary deal={m.deal} />
             <div className="mt-1.5 grid grid-cols-3 gap-1.5">
-              <button onClick={() => onReply("accept", m.deal!)} className="press h-9 rounded-full bg-emerald-600 text-[12px] font-bold text-white">Accept</button>
+              <button onClick={() => onReply("accept", m.deal!)} className="press h-9 rounded-full bg-action text-[12px] font-bold text-on-accent">Accept</button>
               <button onClick={() => onReply("counter", m.deal!)} className="press h-9 rounded-full border border-line bg-surface text-[12px] font-bold">Counter</button>
-              <button onClick={() => onReply("decline", m.deal!)} className="press h-9 rounded-full border border-line bg-surface text-[12px] font-bold text-rose-600">Decline</button>
+              <button onClick={() => onReply("decline", m.deal!)} className="press h-9 rounded-full border border-line bg-surface text-[12px] font-bold text-danger">Decline</button>
             </div>
           </div>
         )}
@@ -190,7 +190,7 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
           <div className="flex items-center gap-1">
             {thread.sample && <SampleTag className="mr-1" />}
             <button onClick={star} aria-pressed={thread.starred} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-surface" aria-label={thread.starred ? "Remove star" : "Star this conversation"} title={thread.starred ? "Remove star" : "Star"}>
-              <Star className={`h-5 w-5 ${thread.starred ? "animate-pop fill-amber-400 text-amber-400" : ""}`} />
+              <Star className={`h-5 w-5 ${thread.starred ? "animate-pop fill-accent text-accent" : ""}`} />
             </button>
             {!thread.pinned && (
               <button onClick={trash} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-surface" aria-label={thread.trashed ? "Restore from Trash" : "Move to Trash"} title={thread.trashed ? "Restore" : "Move to Trash"}>
@@ -200,7 +200,7 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
           </div>
         }
       />
-      {thread.trashed && <p className="mb-3 rounded-xl bg-amber-50 px-4 py-2.5 text-sm text-amber-700 ring-1 ring-amber-200">This conversation is in Trash. Tap the restore button above to move it back.</p>}
+      {thread.trashed && <p className="mb-3 rounded-xl bg-accent-soft px-4 py-2.5 text-sm text-accent ring-1 ring-accent/30">This conversation is in Trash. Tap the restore button above to move it back.</p>}
       <div className="card flex min-h-[64dvh] flex-col p-4">
         <Link href={p.system ? "#" : `/u/${p.handle}`} className="group mb-4 flex flex-col items-center text-center">
           <Avatar name={p.name} tone={p.tone} size="lg" square={p.kind === "business"} ring={thread.pinned} />
@@ -218,7 +218,7 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
           {gif && (
             <div className="relative mb-2 inline-block">
               <GifView id={gif} size="sm" />
-              <button type="button" onClick={() => setGif(undefined)} className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-black/70 text-white" aria-label="Remove GIF"><X className="h-3.5 w-3.5" /></button>
+              <button type="button" onClick={() => setGif(undefined)} className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-scrim/70 text-on-scrim" aria-label="Remove GIF"><X className="h-3.5 w-3.5" /></button>
             </div>
           )}
           <div className="flex items-end gap-1.5 rounded-[28px] bg-surface p-1 ring-1 ring-line focus-within:ring-2 focus-within:ring-brand-300">
@@ -243,11 +243,11 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
               aria-describedby={error ? "msg-err" : undefined}
               className="max-h-40 min-h-11 flex-1 resize-none bg-transparent px-1 py-2.5 text-[15px] outline-none [field-sizing:content]"
             />
-            <button type="submit" className="press btn-glow grid h-11 w-11 shrink-0 place-items-center rounded-full bg-aurora text-on-accent" aria-label="Send">
+            <button type="submit" className="press grid h-11 w-11 shrink-0 place-items-center rounded-full bg-action text-on-accent" aria-label="Send">
               <SendHorizontal className="h-5 w-5" />
             </button>
           </div>
-          {error && <p id="msg-err" role="alert" className="mt-1 px-3 text-[12px] text-rose-600">{error}</p>}
+          {error && <p id="msg-err" role="alert" className="mt-1 px-3 text-[12px] text-danger">{error}</p>}
         </form>
       </div>
 

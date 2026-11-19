@@ -56,12 +56,12 @@ export default function Create() {
           <div className="relative mb-4 overflow-hidden rounded-2xl ring-1 ring-line">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={image} alt="Photo preview" className="aspect-[4/3] w-full object-cover" />
-            <button type="button" onClick={() => setImage(undefined)} className="absolute right-2 top-2 inline-flex h-9 items-center gap-1 rounded-full bg-ink/80 px-3 text-xs font-semibold text-white hover:bg-ink">
+            <button type="button" onClick={() => setImage(undefined)} className="absolute right-2 top-2 inline-flex h-9 items-center gap-1 rounded-full bg-scrim/80 px-3 text-xs font-semibold text-on-scrim hover:bg-scrim">
               <X className="h-4 w-4" /> Remove photo
             </button>
           </div>
         ) : (
-          <div className={`mb-4 grid aspect-[4/3] place-items-center rounded-2xl bg-gradient-to-br px-6 text-center ${TONES[tone].bg}`}>
+          <div className={`mb-4 grid aspect-[4/3] place-items-center rounded-2xl px-6 text-center ${TONES[tone].bg}`}>
             <p className="text-lg font-semibold text-ink/80">{caption || "Your post preview"}</p>
           </div>
         )}
@@ -79,7 +79,7 @@ export default function Create() {
               aria-checked={tone === t}
               aria-label={t}
               onClick={() => setTone(t)}
-              className={`h-8 w-8 rounded-full bg-gradient-to-br ${TONES[t].bg} ${tone === t ? "ring-2 ring-brand-500 ring-offset-2" : ""}`}
+              className={`h-8 w-8 rounded-full ${TONES[t].bg} ${tone === t ? "ring-2 ring-brand-500 ring-offset-2" : ""}`}
             />
           ))}
         </div>
@@ -98,13 +98,13 @@ export default function Create() {
         <p className="text-sm font-semibold text-muted">Other things you can create</p>
         {session?.role === "business" && (
           <Link href="/affiliates/new" className="card lift flex items-center gap-3 p-4 hover:border-brand-200">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-violet-50 text-violet-600"><Link2 className="h-5 w-5" /></span>
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-brand-700"><Link2 className="h-5 w-5" /></span>
             <span className="flex-1 text-sm font-semibold">Affiliate program</span>
             <ChevronRight className="h-4 w-4 text-muted" />
           </Link>
         )}
         <Link href="/money?add=1" className="card lift flex items-center gap-3 p-4 hover:border-brand-200">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-600"><Wallet className="h-5 w-5" /></span>
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-brand-700"><Wallet className="h-5 w-5" /></span>
           <span className="flex-1 text-sm font-semibold">{session?.role === "business" ? "Spending record" : "Income record"}</span>
           <ChevronRight className="h-4 w-4 text-muted" />
         </Link>

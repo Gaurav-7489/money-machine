@@ -11,8 +11,7 @@ import { useStore } from "@/lib/store";
 import { useThreads } from "@/lib/threads";
 import { InstallBanner } from "./install-prompt";
 import { ThemeToggle } from "./theme";
-import { Sheet } from "./ui";
-import { Magnetic } from "./motion";
+import { ButtonLink, Sheet, inputCls } from "./ui";
 import { motion } from "motion/react";
 
 const mainNav = (role: Parameters<typeof primaryNav>[0]) => primaryNav(role).filter((i) => i.href !== "/profile" && i.href !== "/create");
@@ -31,7 +30,7 @@ function NavLink({ href, label, icon: Icon, active, badge, small }: { href: stri
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`press flex items-center gap-3 rounded-xl px-3 transition-colors ${small ? "py-1.5 text-[14px]" : "py-2.5 text-[15px]"} ${active ? "bg-aurora-soft font-semibold text-brand-700" : "text-ink hover:bg-elevated"}`}
+      className={`press flex items-center gap-3 rounded-xl px-3 transition-colors ${small ? "py-1.5 text-[14px]" : "py-2.5 text-[15px]"} ${active ? "bg-brand-50 font-semibold text-brand-700" : "text-ink hover:bg-elevated"}`}
     >
       <Icon className={small ? "h-4 w-4" : "h-5 w-5"} strokeWidth={active ? 2.4 : 1.9} />
       <span className="flex-1">{label}</span>
@@ -60,7 +59,7 @@ function Sidebar() {
   const MAIN = mainNav(session?.role);
   const TOOLS_NAV = toolsNav(session?.role);
   return (
-    <aside className="glass sticky top-0 hidden h-dvh w-64 shrink-0 flex-col overflow-y-auto border-r border-line/70 px-4 py-6 lg:flex">
+    <aside className="bg-surface sticky top-0 hidden h-dvh w-64 shrink-0 flex-col overflow-y-auto border-r border-line px-4 py-6 lg:flex">
       <Link href="/home" className="mb-6 px-3" aria-label="Money Machine home">
         <Logo />
       </Link>
@@ -82,15 +81,13 @@ function Sidebar() {
         {TOOLS_NAV.map((i) => (
           <NavLink key={i.href} {...i} active={isActive(pathname, i.href)} />
         ))}
-        <Magnetic className="mt-5 w-full" strength={0.18}>
-          <Link href="/create" className="press btn-glow bg-aurora-flow inline-flex h-12 w-full shrink-0 items-center justify-center gap-2 rounded-full text-[15px] font-bold text-on-accent">
-            <Plus className="h-5 w-5" /> New post
-          </Link>
-        </Magnetic>
+        <ButtonLink href="/create" className="mt-5 w-full shrink-0">
+          <Plus className="h-5 w-5" /> New post
+        </ButtonLink>
       </nav>
       <ThemeToggle withLabel className="mt-4 w-full justify-start" />
       {session && (
-        <Link href="/profile" className="mt-2 flex items-center gap-3 rounded-2xl border border-line p-2.5 hover:bg-elevated">
+        <Link href="/profile" className="mt-2 flex items-center gap-3 rounded-card border border-line p-2.5 hover:bg-elevated">
           <Avatar name={session.displayName} tone={session.role === "business" ? "violet" : "rose"} />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-semibold">{session.displayName}</span>
@@ -110,7 +107,7 @@ function Rail() {
   const { session } = useStore();
   const items = [...mainNav(session?.role), { href: "/create", label: "Create", icon: Plus }, ...SOCIAL_NAV.filter((i) => i.href !== "/notifications"), ...toolsNav(session?.role)];
   return (
-    <aside className="glass sticky top-0 hidden h-dvh w-[88px] shrink-0 flex-col items-center gap-1 overflow-y-auto border-r border-line/70 py-5 md:flex lg:hidden">
+    <aside className="bg-surface sticky top-0 hidden h-dvh w-[88px] shrink-0 flex-col items-center gap-1 overflow-y-auto border-r border-line py-5 md:flex lg:hidden">
       <Link href="/home" className="mb-4" aria-label="Money Machine home">
         <LogoMark className="h-8 w-8" />
       </Link>
@@ -122,7 +119,7 @@ function Rail() {
               key={href}
               href={href}
               aria-current={active ? "page" : undefined}
-              className={`press relative flex w-[72px] flex-col items-center gap-0.5 rounded-2xl py-2 text-center text-[11px] font-medium leading-tight transition-colors ${active ? "bg-aurora-soft text-brand-700" : "text-ink hover:bg-elevated"}`}
+              className={`press relative flex w-[72px] flex-col items-center gap-0.5 rounded-card py-2 text-center text-[11px] font-medium leading-tight transition-colors ${active ? "bg-brand-50 text-brand-700" : "text-ink hover:bg-elevated"}`}
             >
               <Icon className="h-[22px] w-[22px]" strokeWidth={active ? 2.4 : 1.9} />
               {label}
@@ -167,7 +164,7 @@ function MenuSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
                 <Link
                   key={href + label}
                   href={href}
-                  className={`press flex min-h-12 items-center gap-2.5 rounded-2xl border px-3 py-2.5 text-sm font-medium ${!href.includes("?") && isActive(pathname, href) ? "border-brand-300 bg-aurora-soft text-brand-700" : "border-line hover:bg-elevated"}`}
+                  className={`press flex min-h-12 items-center gap-2.5 rounded-card border px-3 py-2.5 text-sm font-medium ${!href.includes("?") && isActive(pathname, href) ? "border-brand-300 bg-brand-50 text-brand-700" : "border-line hover:bg-elevated"}`}
                 >
                   <Icon className="h-5 w-5 shrink-0" />
                   <span className="flex-1">{label}</span>
@@ -189,10 +186,10 @@ function TopBar() {
   const [menu, setMenu] = useState(false);
   const { unreadCount } = useThreads();
   return (
-    <header className="glass sticky top-0 z-30 flex items-center gap-1 border-b border-line/60 px-3 py-2 pt-safe md:hidden">
+    <header className="bg-surface sticky top-0 z-30 flex items-center gap-1 border-b border-line px-3 py-2 pt-safe md:hidden">
       <Link href="/home" aria-label="Money Machine home" className="flex items-center gap-2 pl-1">
         <LogoMark className="h-8 w-8" />
-        <span className="font-display whitespace-nowrap text-[17px] font-extrabold tracking-tight max-[360px]:text-[15px]">Money <span className="text-aurora">Machine</span></span>
+        <span className="font-display whitespace-nowrap text-[17px] font-bold tracking-tight max-[360px]:text-[15px]">Money Machine</span>
       </Link>
       <div className="flex-1" />
       <ThemeToggle />
@@ -213,7 +210,7 @@ function BottomNav() {
   const { session } = useStore();
   return (
     <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.6rem,env(safe-area-inset-bottom))] md:hidden">
-      <ul className="glass mx-auto grid max-w-md grid-cols-5 rounded-[26px] border border-line/70 px-1 shadow-[0_12px_40px_-12px_rgb(0_0_0/0.35)]">
+      <ul className="bg-surface mx-auto grid max-w-md grid-cols-5 rounded-panel border border-line px-1 shadow-panel">
         {primaryNav(session?.role).map(({ href, label, icon: Icon }) => {
           const active =
             isActive(pathname, href) ||
@@ -227,8 +224,8 @@ function BottomNav() {
                 aria-current={active ? "page" : undefined}
                 className={`press relative flex h-[62px] flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors ${active ? "text-ink" : "text-muted"}`}
               >
-                <span className={`relative grid h-8 w-12 place-items-center rounded-full ${create ? "bg-aurora-flow text-on-accent shadow-md" : ""}`}>
-                  {active && !create && <motion.span layoutId="bottom-nav" className="bg-aurora-soft absolute inset-0 rounded-full ring-1 ring-line" aria-hidden="true" />}
+                <span className={`relative grid h-8 w-12 place-items-center rounded-control ${create ? "bg-action text-on-accent" : ""}`}>
+                  {active && !create && <motion.span layoutId="bottom-nav" className="bg-brand-50 absolute inset-0 rounded-control" aria-hidden="true" />}
                   <Icon className="relative h-[22px] w-[22px]" strokeWidth={active || create ? 2.4 : 1.9} />
                 </span>
                 {label}
@@ -247,15 +244,15 @@ function BottomNav() {
 function DesktopHeader() {
   const { session } = useStore();
   return (
-    <div className="glass sticky top-0 z-20 hidden items-center gap-3 border-b border-line/60 px-6 py-3 md:flex">
-      <form action="/explore" className="relative flex-1" role="search">
+    <div className="bg-surface sticky top-0 z-20 hidden items-center justify-between gap-3 border-b border-line px-6 py-3 md:flex">
+      <form action="/explore" className="relative min-w-0 max-w-md flex-1" role="search">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
         <label className="sr-only" htmlFor="global-search">Search creators and businesses</label>
         <input
           id="global-search"
           name="q"
           placeholder="Search anything: skincare, @handle, a brand…"
-          className="h-11 w-full max-w-md rounded-full border border-line bg-surface/80 pl-10 pr-4 text-sm outline-none transition focus:border-brand-400 focus:bg-surface focus:ring-4 focus:ring-brand-100"
+          className={`${inputCls} h-11 max-w-md bg-canvas pl-10 pr-4`}
         />
       </form>
       <ThemeToggle className="lg:hidden" />
@@ -295,7 +292,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-dvh">
-      <a href="#main" className="sr-only z-50 rounded-full bg-aurora px-4 py-2 text-on-accent focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
+      <a href="#main" className="sr-only z-50 rounded-full bg-action px-4 py-2 text-on-accent focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
         Skip to content
       </a>
       <Sidebar />
@@ -305,11 +302,11 @@ export function AppShell({ children }: { children: ReactNode }) {
         <DesktopHeader />
         <InstallBanner />
         {!saveOk && (
-          <p role="alert" className="mx-4 mt-3 rounded-xl bg-rose-50 px-4 py-2.5 text-sm text-rose-700 md:mx-6">
+          <p role="alert" className="mx-4 mt-3 rounded-xl bg-danger-soft px-4 py-2.5 text-sm text-danger md:mx-6">
             This device&apos;s storage is full, so your latest changes can&apos;t be saved. Try removing a photo post.
           </p>
         )}
-        <main id="main" className="mx-auto w-full max-w-6xl px-4 pb-32 pt-4 md:px-6 md:pb-10 md:pt-6">{children}</main>
+        <main id="main" tabIndex={-1} className="mx-auto w-full max-w-6xl px-4 pb-32 pt-4 md:px-6 md:pb-10 md:pt-6">{children}</main>
       </div>
       <BottomNav />
     </div>

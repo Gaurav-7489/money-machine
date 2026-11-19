@@ -30,7 +30,7 @@ export function GrowthCard() {
           <p className="flex items-center gap-2 text-xs text-muted">
             {label}
             {summary.changePercent !== null && (
-              <span className={`rounded-full px-1.5 py-0.5 font-semibold ${summary.changePercent >= 0 ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
+              <span className={`rounded-full px-1.5 py-0.5 font-semibold ${summary.changePercent >= 0 ? "bg-brand-50 text-brand-700" : "bg-danger-soft text-danger"}`}>
                 {summary.changePercent >= 0 ? "+" : ""}
                 {summary.changePercent}%
               </span>
@@ -38,7 +38,7 @@ export function GrowthCard() {
           </p>
         </div>
         <div className="border-l border-line pl-4 text-center">
-          <Star className="mx-auto h-7 w-7 fill-amber-300 text-amber-400" />
+          <Star className="mx-auto h-7 w-7 fill-accent text-accent" />
           <p className="mt-1 text-lg font-bold">{earned}</p>
           <p className="text-xs text-muted">Badges</p>
         </div>
@@ -88,10 +88,10 @@ export function TabletQuickCards() {
   const { session } = useStore();
   const items = [
     kind === "income"
-      ? { href: "/money", label: "Earnings", value: formatINR(summary.total), sub: "Earned", icon: Wallet, tone: "bg-emerald-50 text-emerald-600" }
-      : { href: "/money", label: "Grow & Scale", value: `Profit ${formatINR(growth.profit)}`, sub: "Profit", icon: Rocket, tone: "bg-violet-50 text-violet-600" },
-    { href: "/affiliates", label: "Affiliates", value: `${mine.length} Program${mine.length === 1 ? "" : "s"}`, sub: "", icon: Link2, tone: "bg-violet-50 text-violet-600" },
-    { href: "/badges", label: "Badges", value: `${earned} Earned`, sub: "", icon: Star, tone: "bg-amber-50 text-amber-500" },
+      ? { href: "/money", label: "Earnings", value: formatINR(summary.total), sub: "Earned", icon: Wallet, tone: "bg-brand-50 text-brand-700" }
+      : { href: "/money", label: "Grow & Scale", value: `Profit ${formatINR(growth.profit)}`, sub: "Profit", icon: Rocket, tone: "bg-brand-50 text-brand-700" },
+    { href: "/affiliates", label: "Affiliates", value: `${mine.length} Program${mine.length === 1 ? "" : "s"}`, sub: "", icon: Link2, tone: "bg-brand-50 text-brand-700" },
+    { href: "/badges", label: "Badges", value: `${earned} Earned`, sub: "", icon: Star, tone: "bg-accent-soft text-accent" },
   ];
   return (
     <div className="space-y-3">
@@ -109,11 +109,11 @@ export function TabletQuickCards() {
       ))}
       <Link
         href={session?.role === "business" ? "/affiliates/new" : "/create"}
-        className="block rounded-[var(--radius-card)] bg-gradient-to-br from-brand-50 via-aqua/20 to-violet-100 p-4 transition hover:brightness-[1.02]"
+        className="block rounded-[var(--radius-card)] bg-brand-50 p-4 transition hover:brightness-[1.02]"
       >
         <div className="flex items-start justify-between">
           <p className="font-semibold">{session?.role === "business" ? "Create a Program" : "Share a Post"}</p>
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-aurora text-on-accent">
+          <span className="grid h-8 w-8 place-items-center rounded-full bg-action text-on-accent">
             <ArrowRight className="h-4 w-4" />
           </span>
         </div>

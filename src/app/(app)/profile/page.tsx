@@ -81,7 +81,7 @@ function ChipField({ label, options, value, onChange }: { label: string; options
         {options.map((o) => {
           const on = value.includes(o.id);
           return (
-            <button key={o.id} type="button" aria-pressed={on} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-aurora text-on-accent" : "border border-line bg-surface hover:bg-elevated"}`}>
+            <button key={o.id} type="button" aria-pressed={on} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-action text-on-accent" : "border border-line bg-surface hover:bg-elevated"}`}>
               {o.label}
             </button>
           );
@@ -176,7 +176,7 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
                   aria-pressed={on}
                   title={m.hint}
                   onClick={() => setForm((f) => ({ ...f, earningModels: on ? f.earningModels.filter((x) => x !== m.id) : [...f.earningModels, m.id] }))}
-                  className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-aurora text-on-accent" : "border border-line bg-surface hover:bg-elevated"}`}
+                  className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-action text-on-accent" : "border border-line bg-surface hover:bg-elevated"}`}
                 >
                   {m.label}
                 </button>
@@ -245,10 +245,10 @@ export default function Profile() {
 
   const tools = [
     isBiz
-      ? { href: "/money", label: "Profit", value: `${growth.profit < 0 ? "−" : ""}${formatINR(Math.abs(growth.profit))}`, icon: Rocket, tone: "bg-aurora text-on-accent" }
-      : { href: "/money", label: "Earned", value: formatINR(summary.total), icon: Wallet, tone: "bg-money text-on-accent" },
-    { href: "/affiliates", label: isBiz ? "Programs running" : "Programs joined", value: String(programs.length), icon: Link2, tone: "bg-violet-50 text-violet-600" },
-    { href: "/badges", label: "Badges earned", value: String(earned), icon: Star, tone: "bg-amber-50 text-amber-500" },
+      ? { href: "/money", label: "Profit", value: `${growth.profit < 0 ? "−" : ""}${formatINR(Math.abs(growth.profit))}`, icon: Rocket, tone: "bg-action text-on-accent" }
+      : { href: "/money", label: "Earned", value: formatINR(summary.total), icon: Wallet, tone: "bg-action text-on-accent" },
+    { href: "/affiliates", label: isBiz ? "Programs running" : "Programs joined", value: String(programs.length), icon: Link2, tone: "bg-brand-50 text-brand-700" },
+    { href: "/badges", label: "Badges earned", value: String(earned), icon: Star, tone: "bg-accent-soft text-accent" },
   ];
   const socials = [
     ["Instagram", session.instagram],
@@ -273,7 +273,7 @@ export default function Profile() {
         )}
         {(session.niches ?? []).length > 0 && (
           <p className="mt-2 flex flex-wrap justify-center gap-1.5">
-            {session.niches!.map((n) => <span key={n} className="bg-aurora-soft rounded-full px-2.5 py-0.5 text-xs font-semibold text-brand-700">{n}</span>)}
+            {session.niches!.map((n) => <span key={n} className="bg-brand-50 rounded-full px-2.5 py-0.5 text-xs font-semibold text-brand-700">{n}</span>)}
           </p>
         )}
         {isBiz && (session.lookingFor ?? []).length > 0 && <p className="mt-2 text-xs text-muted">Looking for: <span className="font-semibold text-ink">{session.lookingFor!.join(", ")}</span> creators</p>}
@@ -310,7 +310,7 @@ export default function Profile() {
             <button onClick={() => setEditing(true)} className="font-semibold text-brand-700 hover:underline">Finish it</button>
           </div>
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-elevated ring-1 ring-line" role="progressbar" aria-valuenow={done.percent} aria-valuemin={0} aria-valuemax={100} aria-label="Profile completeness">
-            <div className="h-full rounded-full bg-aurora transition-[width] duration-700" style={{ width: `${done.percent}%` }} />
+            <div className="h-full rounded-full bg-action transition-[width] duration-700" style={{ width: `${done.percent}%` }} />
           </div>
           {done.next && <p className="mt-2 text-xs text-muted">Next step: {done.next.label}</p>}
         </section>
@@ -328,11 +328,11 @@ export default function Profile() {
 
       <section className="mt-4 grid grid-cols-2 gap-3">
         <Link href="/friends" className="card lift flex items-center gap-3 p-3.5 hover:border-brand-200">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-sky-50 text-sky-600"><Users className="h-5 w-5" /></span>
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-elevated text-muted"><Users className="h-5 w-5" /></span>
           <span><span className="block text-sm font-semibold">Friends</span><span className="block text-xs text-muted">{following.length} {following.length === 1 ? "friend" : "friends"}</span></span>
         </Link>
         <Link href="/saved" className="card lift flex items-center gap-3 p-3.5 hover:border-brand-200">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-600"><Bookmark className="h-5 w-5" /></span>
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-accent-soft text-accent"><Bookmark className="h-5 w-5" /></span>
           <span><span className="block text-sm font-semibold">Saved</span><span className="block text-xs text-muted">{savedProfiles.length + saved.length} items</span></span>
         </Link>
       </section>
@@ -361,7 +361,7 @@ export default function Profile() {
             <ul className="grid grid-cols-3 gap-1.5">
               {myPosts.map((p) => (
                 <li key={p.id}>
-                  <Link href={`/home#${p.id}`} className={`lift relative grid aspect-square place-items-center overflow-hidden rounded-xl bg-gradient-to-br p-2 text-center text-[11px] font-medium text-ink/80 ${TONES[p.tone ?? "mint"].bg}`} aria-label={p.caption}>
+                  <Link href={`/home#${p.id}`} className={`lift relative grid aspect-square place-items-center overflow-hidden rounded-xl p-2 text-center text-[11px] font-medium text-ink/80 ${TONES[p.tone ?? "mint"].bg}`} aria-label={p.caption}>
                     {p.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={p.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
@@ -398,7 +398,7 @@ export default function Profile() {
             <InstallGuide />
           </section>
           <section className="space-y-3 border-t border-line pt-4">
-            <Button variant="secondary" className="w-full text-rose-600" onClick={signOut}>
+            <Button variant="secondary" className="w-full text-danger" onClick={signOut}>
               <LogOut className="h-4 w-4" /> Sign out & clear preview data
             </Button>
           </section>
