@@ -40,15 +40,15 @@ export function MatchRing({ percent, size = 56 }: { percent: number; size?: numb
       <svg viewBox="0 0 52 52" className="absolute inset-0 -rotate-90">
         <defs>
           <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" style={{ stopColor: percent >= 50 ? "var(--color-brand-500)" : "var(--color-muted)" }} />
-            <stop offset="0.55" style={{ stopColor: percent >= 50 ? "var(--color-accent-2)" : "var(--color-muted)" }} />
-            <stop offset="1" style={{ stopColor: percent >= 50 ? "var(--color-accent-1)" : "var(--color-line)" }} />
+            <stop offset="0" style={{ stopColor: percent >= 50 ? "var(--color-brand-400)" : "var(--color-muted)" }} />
+            <stop offset="0.55" style={{ stopColor: percent >= 50 ? "var(--color-brand-600)" : "var(--color-muted)" }} />
+            <stop offset="1" style={{ stopColor: percent >= 50 ? "var(--color-brand-600)" : "var(--color-line)" }} />
           </linearGradient>
         </defs>
-        <circle cx="26" cy="26" r={r} fill="none" stroke="var(--color-line)" strokeWidth="5" />
-        <circle cx="26" cy="26" r={r} fill="none" stroke={`url(#${id})`} strokeWidth="5" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - Math.max(shown, 2) / 100)} className="transition-[stroke-dashoffset] duration-700" />
+        <circle cx="26" cy="26" r={r} fill="none" stroke="var(--color-line)" strokeWidth="4" />
+        <circle cx="26" cy="26" r={r} fill="none" stroke={`url(#${id})`} strokeWidth="4" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - Math.max(shown, 2) / 100)} className="transition-[stroke-dashoffset] duration-700" />
       </svg>
-      <span className="relative text-[13px] font-extrabold tabular-nums">{percent}%</span>
+      <span className="relative text-[13px] font-semibold tabular-nums">{percent}%</span>
     </span>
   );
 }

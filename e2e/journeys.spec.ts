@@ -171,7 +171,7 @@ test("public profile: DM, add friend, star", async ({ page }) => {
   await expect(page.getByText("Your friends (1)")).toBeVisible();
 });
 
-test("theme switch: white and dark, remembered, no flash", async ({ page }) => {
+test("theme switch: light and dark, remembered, no flash", async ({ page }) => {
   await onboard(page);
   const sw = page.getByRole("switch", { name: "Dark theme" });
   if (await sw.isVisible()) await sw.click();
@@ -179,7 +179,7 @@ test("theme switch: white and dark, remembered, no flash", async ({ page }) => {
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(13, 11, 18)");
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(11, 11, 10)");
 });
 
 test("no horizontal overflow or console errors on main pages", async ({ page }) => {
@@ -196,12 +196,12 @@ test("no horizontal overflow or console errors on main pages", async ({ page }) 
   expect(errors).toEqual([]);
 });
 
-test("landing: editorial hero, theme toggle and CTA", async ({ page }) => {
+test("landing: hero, theme toggle and CTA", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Cash out.");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Brand deals that find you.");
   await expect(page.getByRole("link", { name: /get started/i }).first()).toBeVisible();
   const before = await page.locator("html").getAttribute("data-theme");
-  await page.getByRole("button", { name: /switch to (dark|white) theme/i }).first().click();
+  await page.getByRole("button", { name: /switch to (dark|light) theme/i }).first().click();
   await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "");
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(0);

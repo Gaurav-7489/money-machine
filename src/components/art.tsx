@@ -3,12 +3,12 @@ import type { Tone } from "@/lib/sample-data";
 import { initials } from "@/lib/format";
 
 export const TONES: Record<Tone, { bg: string; fg: string; soft: string }> = {
-  rose: { bg: "from-rose-200 via-pink-100 to-orange-100", fg: "text-rose-500", soft: "bg-rose-50 text-rose-600" },
-  mint: { bg: "from-emerald-200 via-teal-100 to-lime-100", fg: "text-emerald-600", soft: "bg-emerald-50 text-emerald-700" },
-  violet: { bg: "from-violet-200 via-fuchsia-100 to-pink-100", fg: "text-violet-500", soft: "bg-violet-50 text-violet-600" },
-  amber: { bg: "from-amber-200 via-yellow-100 to-orange-50", fg: "text-amber-500", soft: "bg-amber-50 text-amber-700" },
-  sky: { bg: "from-sky-200 via-cyan-100 to-teal-50", fg: "text-sky-600", soft: "bg-sky-50 text-sky-700" },
-  lime: { bg: "from-lime-200 via-emerald-100 to-teal-50", fg: "text-lime-600", soft: "bg-lime-50 text-lime-700" },
+  rose: { bg: "from-rose-100 to-rose-50", fg: "text-rose-700", soft: "bg-rose-50 text-rose-600" },
+  mint: { bg: "from-emerald-50 to-teal-50", fg: "text-emerald-700", soft: "bg-emerald-50 text-emerald-700" },
+  violet: { bg: "from-violet-100 to-violet-50", fg: "text-violet-700", soft: "bg-violet-50 text-violet-600" },
+  amber: { bg: "from-amber-50 to-orange-50", fg: "text-amber-700", soft: "bg-amber-50 text-amber-700" },
+  sky: { bg: "from-sky-50 to-cyan-100", fg: "text-sky-700", soft: "bg-sky-50 text-sky-700" },
+  lime: { bg: "from-lime-100 to-lime-50", fg: "text-lime-700", soft: "bg-lime-50 text-lime-700" },
 };
 
 const SIZES = { xs: "h-7 w-7 text-[10px]", sm: "h-9 w-9 text-xs", md: "h-11 w-11 text-sm", lg: "h-16 w-16 text-lg", xl: "h-24 w-24 text-2xl" };
@@ -28,7 +28,7 @@ export function Avatar({
 }) {
   return (
     <span
-      className={`inline-grid shrink-0 place-items-center bg-gradient-to-br font-semibold ${TONES[tone].bg} ${TONES[tone].fg} ${SIZES[size]} ${square ? "rounded-xl" : "rounded-full"} ${ring ? "ring-2 ring-surface outline-2 outline-offset-1 outline-brand-400" : ""}`}
+      className={`inline-grid shrink-0 place-items-center bg-gradient-to-br font-medium ring-1 ring-inset ring-ink/5 ${TONES[tone].bg} ${TONES[tone].fg} ${SIZES[size]} ${square ? "rounded-xl" : "rounded-full"} ${ring ? "ring-2 ring-surface outline-2 outline-offset-1 outline-brand-400" : ""}`}
       aria-hidden="true"
     >
       {initials(name)}
@@ -37,7 +37,7 @@ export function Avatar({
 }
 
 export function VerifiedMark() {
-  return <BadgeCheck className="h-4 w-4 shrink-0 fill-brand-500 text-white" aria-label="Verified" />;
+  return <BadgeCheck className="h-4 w-4 shrink-0 fill-brand-600 text-canvas" aria-label="Verified" />;
 }
 
 const MEDIA = { bottle: Sparkles, mountain: Mountain, dumbbell: Dumbbell, bag: ShoppingBag, lamp: Lamp, headphones: Headphones, bowl: Soup };

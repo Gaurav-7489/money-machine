@@ -202,7 +202,7 @@ function ExploreInner() {
   return (
     <div className="mx-auto max-w-6xl pb-24">
       <header className="mb-4">
-        <h1 className="text-[26px] font-extrabold tracking-tight">
+        <h1 className="text-[26px] font-semibold tracking-tight">
           Find <span className="text-aurora">{who}</span>
         </h1>
       </header>

@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Inter } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
-import { Ambient } from "@/components/ambient";
 import { MotionProvider } from "@/components/motion";
 import { StoreProvider } from "@/lib/store";
 import { ServiceWorkerRegister } from "@/components/sw-register";
@@ -9,8 +8,9 @@ import { FeedbackProvider } from "@/components/feedback";
 import { THEME_INIT_SCRIPT } from "@/components/theme";
 import { SITE } from "@/lib/site";
 
-const body = Inter({ subsets: ["latin"], variable: "--font-body", display: "swap" });
-const head = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-head", display: "swap", weight: ["500", "700", "800"] });
+const body = Geist({ subsets: ["latin"], variable: "--font-body", display: "swap" });
+const code = Geist_Mono({ subsets: ["latin"], variable: "--font-code", display: "swap", weight: ["400", "500"] });
+const accent = Instrument_Serif({ subsets: ["latin"], variable: "--font-accent", display: "swap", weight: "400", style: ["normal", "italic"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -46,8 +46,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#FAFAFD" },
-    { media: "(prefers-color-scheme: dark)", color: "#0D0B12" },
+    { media: "(prefers-color-scheme: light)", color: "#F7F6F2" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B0B0A" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -56,12 +56,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-IN" suppressHydrationWarning className={`${body.variable} ${head.variable}`}>
+    <html lang="en-IN" suppressHydrationWarning className={`${body.variable} ${code.variable} ${accent.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body>
-        <Ambient />
         <StoreProvider>
           <MotionProvider>
             <FeedbackProvider>{children}</FeedbackProvider>

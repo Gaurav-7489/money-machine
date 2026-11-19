@@ -51,7 +51,7 @@ function NewMessage({ open, onClose }: { open: boolean; onClose: () => void }) {
 
 const FOLDER_STYLE: Record<FolderDef["kind"], { icon: typeof FolderIcon; cls: string }> = {
   mm: { icon: BadgeCheck, cls: "bg-aurora text-on-accent" },
-  owner: { icon: Crown, cls: "bg-gradient-to-br from-accent-4 via-accent-3 to-accent-2 text-on-accent" },
+  owner: { icon: Crown, cls: "bg-signal" },
   general: { icon: MessageSquareText, cls: "bg-elevated text-ink ring-1 ring-line" },
   deal: { icon: Handshake, cls: "bg-brand-50 text-brand-700 ring-1 ring-brand-200" },
 };
@@ -61,7 +61,7 @@ function FolderCard({ f, count, unread, active, onClick }: { f: FolderDef; count
   const DealIcon = f.dealType === "affiliate" ? Link2 : Icon;
   return (
     <button onClick={onClick} aria-pressed={active} className={`press relative flex w-[132px] shrink-0 flex-col items-start gap-2 rounded-2xl p-3 text-left transition-shadow ${active ? "ring-aurora" : ""} ${f.kind === "mm" || f.kind === "owner" ? cls : "card"}`}>
-      <span className={`grid h-9 w-9 place-items-center rounded-xl ${f.kind === "mm" || f.kind === "owner" ? "bg-white/20" : cls}`}>
+      <span className={`grid h-9 w-9 place-items-center rounded-xl ${f.kind === "mm" ? "bg-white/15" : f.kind === "owner" ? "bg-black/10" : cls}`}>
         <DealIcon className="h-[18px] w-[18px]" />
       </span>
       <span className="w-full">
@@ -69,7 +69,7 @@ function FolderCard({ f, count, unread, active, onClick }: { f: FolderDef; count
           {f.label}
           {f.kind === "mm" && <Pin className="h-3 w-3 shrink-0" />}
         </span>
-        <span className={`block text-[11px] ${f.kind === "mm" || f.kind === "owner" ? "text-on-accent/75" : "text-muted"}`}>
+        <span className={`block text-[11px] ${f.kind === "mm" ? "text-on-accent/70" : f.kind === "owner" ? "text-on-signal/70" : "text-muted"}`}>
           {f.kind === "mm" ? "Official · matches" : f.kind === "owner" ? "Founder outreach" : `${count} ${count === 1 ? "chat" : "chats"}`}
         </span>
       </span>
@@ -136,7 +136,7 @@ function InboxInner() {
     <div className="mx-auto max-w-2xl">
       <div className="mb-4 flex items-center gap-3">
         <div className="flex-1">
-          <h1 className="text-[26px] font-extrabold tracking-tight">Messages</h1>
+          <h1 className="text-[26px] font-semibold tracking-tight">Messages</h1>
         </div>
         <Button onClick={() => setComposing(true)} aria-label="New message"><PenSquare className="h-4 w-4" /> <span className="max-sm:hidden">New</span></Button>
       </div>

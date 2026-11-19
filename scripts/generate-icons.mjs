@@ -7,9 +7,9 @@ const svg = await readFile(new URL("../public/icons/icon.svg", import.meta.url),
 const targets = [
   { file: "icon-192.png", size: 192, pad: 0, bg: "transparent" },
   { file: "icon-512.png", size: 512, pad: 0, bg: "transparent" },
-  { file: "apple-touch-icon.png", size: 180, pad: 0, bg: "#0D0B12" },
+  { file: "apple-touch-icon.png", size: 180, pad: 0, bg: "#121211" },
   // maskable: keep the mark inside the 80% safe zone on a solid background
-  { file: "maskable-512.png", size: 512, pad: 0.14, bg: "#0D0B12" },
+  { file: "maskable-512.png", size: 512, pad: 0.14, bg: "#121211" },
 ];
 
 const browser = await chromium.launch();

@@ -109,7 +109,7 @@ export function TabletQuickCards() {
       ))}
       <Link
         href={session?.role === "business" ? "/affiliates/new" : "/create"}
-        className="block rounded-[var(--radius-card)] bg-gradient-to-br from-brand-50 via-aqua/20 to-violet-100 p-4 transition hover:brightness-[1.02]"
+        className="lift block rounded-[var(--radius-card)] border border-line bg-surface p-4"
       >
         <div className="flex items-start justify-between">
           <p className="font-semibold">{session?.role === "business" ? "Create a Program" : "Share a Post"}</p>

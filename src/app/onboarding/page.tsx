@@ -106,7 +106,7 @@ export default function Onboarding() {
         <div key={step} className="animate-fade-up">
           {step === 0 && (
             <>
-              <h1 className="text-[28px] font-extrabold tracking-tight">Who are you?</h1>
+              <h1 className="text-[28px] font-semibold tracking-tight">Who are you?</h1>
               <fieldset className="mt-6 grid grid-cols-2 gap-3">
                 <legend className="sr-only">Account type</legend>
                 {ROLES.map(({ id, title, body, icon: Icon }) => {
@@ -137,7 +137,7 @@ export default function Onboarding() {
 
           {step === 1 && (
             <>
-              <h1 className="text-[28px] font-extrabold tracking-tight">{isBiz ? "What does your business do?" : "What content do you create?"}</h1>
+              <h1 className="text-[28px] font-semibold tracking-tight">{isBiz ? "What does your business do?" : "What content do you create?"}</h1>
               <Chips options={nicheOpts} value={niches} onChange={setNiches} />
               {errors.niches && <p role="alert" className="mt-3 text-[13px] text-rose-600">{errors.niches}</p>}
             </>
@@ -147,14 +147,14 @@ export default function Onboarding() {
             <>
               {isBiz ? (
                 <>
-                  <h1 className="text-[28px] font-extrabold tracking-tight">What creators are you looking for?</h1>
+                  <h1 className="text-[28px] font-semibold tracking-tight">What creators are you looking for?</h1>
                   <Chips options={nicheOpts} value={lookingFor} onChange={setLookingFor} />
                   <h2 className="mb-2 mt-6 font-bold">How do you want to work with them?</h2>
                   <Chips options={earnOpts} value={earning} onChange={setEarning} />
                 </>
               ) : (
                 <>
-                  <h1 className="text-[28px] font-extrabold tracking-tight">How do you want to earn?</h1>
+                  <h1 className="text-[28px] font-semibold tracking-tight">How do you want to earn?</h1>
                   <Chips options={earnOpts} value={earning} onChange={setEarning} />
                 </>
               )}
@@ -164,7 +164,7 @@ export default function Onboarding() {
 
           {step === 3 && (
             <>
-              <h1 className="text-[28px] font-extrabold tracking-tight">Almost there</h1>
+              <h1 className="text-[28px] font-semibold tracking-tight">Almost there</h1>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-2">
                   <Field label="Country" optional>

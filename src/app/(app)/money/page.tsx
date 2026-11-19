@@ -168,7 +168,7 @@ function CreatorEarnings() {
         <div className="relative flex items-end justify-between gap-4">
           <div>
             <p className="text-sm text-on-accent/75">Total earned</p>
-            <p className="mt-1 text-4xl font-extrabold tracking-tight">{formatINR(summary.total)}</p>
+            <p className="mt-1 text-4xl font-semibold tracking-tight">{formatINR(summary.total)}</p>
             <p className="mt-1.5 text-xs">
               {summary.changePercent !== null ? (
                 <span className="rounded-full bg-white/20 px-2 py-0.5 font-bold">{summary.changePercent >= 0 ? "▲" : "▼"} {Math.abs(summary.changePercent)}% vs last month</span>
@@ -227,7 +227,7 @@ function BusinessGrowth() {
         <div className="relative flex items-end justify-between gap-4">
           <div>
             <p className="flex items-center gap-1.5 text-sm text-on-accent/75"><Rocket className="h-4 w-4" /> Profit</p>
-            <p className="mt-1 text-4xl font-extrabold tracking-tight">{up ? "" : "−"}{formatINR(Math.abs(g.profit))}</p>
+            <p className="mt-1 text-4xl font-semibold tracking-tight">{up ? "" : "−"}{formatINR(Math.abs(g.profit))}</p>
             <p className="mt-1.5 text-xs">
               {g.roi !== null ? <span className="rounded-full bg-white/20 px-2 py-0.5 font-bold">{g.roi >= 0 ? "▲" : "▼"} {Math.abs(g.roi)}% return on investment</span> : <span className="text-on-accent/75">Add investments and revenue to see your return.</span>}
             </p>

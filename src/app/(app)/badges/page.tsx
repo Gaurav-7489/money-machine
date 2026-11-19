@@ -13,7 +13,7 @@ export default function Badges() {
     <div className="mx-auto max-w-2xl">
       <PageHeader title="Badges" back="/profile" />
       {featured && (
-        <section className="card animate-scale-in flex flex-col items-center bg-gradient-to-br from-cream via-surface to-violet-50 p-6 text-center">
+        <section className="card animate-scale-in flex flex-col items-center p-6 text-center">
           <BadgeMedal icon={featured.badge.icon} earned={featured.earned} size="lg" />
           <p className="mt-3 text-lg font-bold">{featured.badge.name}</p>
           {!featured.earned && (

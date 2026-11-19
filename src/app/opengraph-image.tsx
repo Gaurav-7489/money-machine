@@ -8,22 +8,17 @@ export const contentType = "image/png";
 export default function OgImage() {
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", padding: 80, background: "linear-gradient(135deg, #ffffff 0%, #ecfbf5 55%, #d2f5e7 100%)", fontFamily: "sans-serif" }}>
-        <svg width="120" height="120" viewBox="0 0 48 48">
-          <defs>
-            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#FF8748" />
-              <stop offset="1" stopColor="#965BFF" />
-            </linearGradient>
-          </defs>
-          <path d="M6 38V14.5c0-2.6 3.2-3.9 5-2l13 13.6L37 12.5c1.8-1.9 5-.6 5 2V38" fill="none" stroke="url(#g)" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx="24" cy="38" r="3.5" fill="#EC4899" />
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", padding: 80, background: "#F7F6F2", fontFamily: "sans-serif" }}>
+        <svg width="96" height="96" viewBox="0 0 32 32">
+          <rect width="32" height="32" rx="9" fill="#121211" />
+          <path d="M9 22V11.6c0-.9 1.1-1.3 1.7-.7L16 16.4l5.3-5.5c.6-.6 1.7-.2 1.7.7V22" fill="none" stroke="#F7F6F2" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="16" cy="23" r="2" fill="#C8F05A" />
         </svg>
-        <div style={{ marginTop: 40, fontSize: 84, fontWeight: 800, color: "#0F1A17", letterSpacing: -2 }}>{SITE.name}</div>
-        <div style={{ marginTop: 12, fontSize: 44, color: "#5F6F69", display: "flex" }}>
-          Collaborate. Create.&nbsp;<span style={{ color: "#965BFF", fontWeight: 700 }}>Earn.</span>
+        <div style={{ marginTop: 44, fontSize: 88, fontWeight: 600, color: "#121211", letterSpacing: -3 }}>{SITE.name}</div>
+        <div style={{ marginTop: 12, fontSize: 44, color: "#6B6A63", display: "flex" }}>
+          Collaborate. Create.&nbsp;<span style={{ color: "#1C7149" }}>Earn.</span>
         </div>
-        <div style={{ marginTop: 36, fontSize: 28, color: "#0B503E" }}>Creators × Brands · Affiliate programs · Income tracking</div>
+        <div style={{ marginTop: 36, fontSize: 26, color: "#121211", opacity: 0.7 }}>Creators × Brands · Affiliate programs · Income tracking</div>
       </div>
     ),
     size,

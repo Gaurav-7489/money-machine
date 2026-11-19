@@ -1,88 +1,117 @@
 "use client";
 
-import { BadgeCheck, Handshake, Heart, Link2, Sparkles } from "lucide-react";
-import { useRef } from "react";
+import { ArrowUpRight, Check, FolderOpen, Search } from "lucide-react";
 
 /**
- * Original editorial collage for the landing hero: two photographic portrait
- * panels, geometric shapes and floating UI chips, layered at different depths.
- * Every colour comes from the theme tokens, so the same artwork reads as
- * pastel in White and neon in Dark. Pointer parallax on desktop only.
+ * Landing hero visual: three real-looking product cards (a match, an incoming
+ * offer, earnings) stacked in CSS 3D. On desktop the stack tilts toward the
+ * pointer; on touch screens it stays still. No canvas, no WebGL: transforms
+ * only, so it composites on the GPU and costs almost nothing.
+ * Names and numbers are illustrative.
  */
-function Portrait({ variant }: { variant: "creator" | "brand" }) {
-  const creator = variant === "creator";
-  // Independent editorial photographs instead of using the reference brand's imagery.
-  const photo = creator
-    ? "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=720&q=85&auto=format&fit=crop"
-    : "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=720&q=85&auto=format&fit=crop";
+function Card({ className = "", children }: { className?: string; children: React.ReactNode }) {
+  return <div className={`rounded-2xl border border-line bg-surface p-4 shadow-[0_1px_2px_rgb(0_0_0/0.04),0_24px_48px_-24px_rgb(0_0_0/0.28)] ${className}`}>{children}</div>;
+}
+
+function MatchCard() {
+  const pct = 94;
+  const c = 2 * Math.PI * 18;
   return (
-    <div
-      className="relative h-full w-full overflow-hidden bg-gradient-to-br from-brand-200 via-rose-100 to-amber-100"
-      style={{ backgroundImage: `linear-gradient(180deg, transparent 65%, rgba(13,11,20,.28)), url("${photo}")`, backgroundPosition: "center", backgroundSize: "cover" }}
-      role="img"
-      aria-label={creator ? "Editorial creator portrait" : "Editorial business collaboration photograph"}
-    >
-      <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/15" />
-    </div>
+    <Card>
+      <div className="flex items-center justify-between">
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">New match</span>
+        <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2 py-0.5 text-[10.5px] font-medium text-brand-700">
+          <Search className="h-3 w-3" /> found in posts
+        </span>
+      </div>
+      <div className="mt-3 flex items-center gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sky-50 text-[13px] font-semibold text-sky-700">DL</span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[14px] font-semibold tracking-[-0.01em]">Dewdrop Labs</p>
+          <p className="truncate text-[12px] text-muted">“…our new <span className="mark text-ink">skincare</span> drop…”</p>
+        </div>
+        <svg viewBox="0 0 44 44" className="h-12 w-12 shrink-0 -rotate-90" aria-label={`${pct}% match`} role="img">
+          <circle cx="22" cy="22" r="18" fill="none" stroke="var(--color-elevated)" strokeWidth="4" />
+          <circle cx="22" cy="22" r="18" fill="none" stroke="var(--color-brand-600)" strokeWidth="4" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - pct / 100)} className="deck-ring" style={{ ["--c" as string]: c }} />
+          <text x="22" y="22" textAnchor="middle" dominantBaseline="central" transform="rotate(90 22 22)" className="fill-ink text-[11px] font-semibold">{pct}%</text>
+        </svg>
+      </div>
+    </Card>
   );
 }
 
-function Chip({ icon, children, className = "" }: { icon: React.ReactNode; children: React.ReactNode; className?: string }) {
+function OfferCard() {
   return (
-    <span className={`glass absolute inline-flex items-center gap-1.5 rounded-full border border-line/70 px-3 py-2 text-[12px] font-bold text-ink shadow-lg ${className}`}>
-      {icon}
-      {children}
-    </span>
+    <Card>
+      <div className="flex items-center gap-2 text-[11.5px] text-muted">
+        <FolderOpen className="h-3.5 w-3.5" /> Brand deals
+        <span className="ml-auto h-1.5 w-1.5 rounded-full bg-accent-2" aria-label="Unread" />
+      </div>
+      <p className="mt-2 text-[14px] font-semibold tracking-[-0.01em]">Summer serum launch</p>
+      <p className="mt-0.5 text-[12px] text-muted">1 Reel · 2 Stories · usage 30 days</p>
+      <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
+        <p className="text-[22px] font-semibold tracking-[-0.03em] tabular-nums">₹25,000</p>
+        <div className="flex gap-1.5">
+          <span className="inline-flex h-8 items-center rounded-full border border-line px-3 text-[12px] font-medium">Counter</span>
+          <span className="inline-flex h-8 items-center gap-1 rounded-full bg-ink px-3 text-[12px] font-medium text-canvas">
+            <Check className="h-3.5 w-3.5" /> Accept
+          </span>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+const BARS = [28, 42, 36, 55, 48, 70, 62, 84];
+
+function EarningsCard() {
+  return (
+    <Card>
+      <div className="flex items-center justify-between">
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Earned this quarter</span>
+        <span className="inline-flex items-center gap-0.5 text-[11.5px] font-medium text-brand-600">
+          <ArrowUpRight className="h-3.5 w-3.5" /> 32%
+        </span>
+      </div>
+      <p className="mt-1.5 text-[26px] font-semibold tracking-[-0.035em] tabular-nums">₹1,84,500</p>
+      <div className="mt-3 flex h-14 items-end gap-1.5" aria-hidden="true">
+        {BARS.map((h, i) => (
+          <span
+            key={i}
+            className={`deck-bar flex-1 rounded-[4px] ${i === BARS.length - 1 ? "bg-brand-600" : "bg-elevated"}`}
+            style={{ height: `${h}%`, ["--i" as string]: i }}
+          />
+        ))}
+      </div>
+    </Card>
   );
 }
 
 export function WelcomeArt() {
-  const ref = useRef<HTMLDivElement>(null);
-  const layer = (depth: number) => ({ transform: `translate3d(calc(var(--px, 0) * ${depth}px), calc(var(--py, 0) * ${depth}px), 0)` });
-
   return (
     <div
-      ref={ref}
       onPointerMove={(e) => {
         if (e.pointerType !== "mouse" || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
         const r = e.currentTarget.getBoundingClientRect();
-        e.currentTarget.style.setProperty("--px", String(((e.clientX - r.left) / r.width - 0.5) * 2));
-        e.currentTarget.style.setProperty("--py", String(((e.clientY - r.top) / r.height - 0.5) * 2));
+        e.currentTarget.style.setProperty("--px", (((e.clientX - r.left) / r.width - 0.5) * 2).toFixed(3));
+        e.currentTarget.style.setProperty("--py", (((e.clientY - r.top) / r.height - 0.5) * 2).toFixed(3));
       }}
       onPointerLeave={(e) => {
         e.currentTarget.style.setProperty("--px", "0");
         e.currentTarget.style.setProperty("--py", "0");
       }}
-      className="relative mx-auto aspect-[1/1.05] w-full max-w-[440px] [&>*]:transition-transform [&>*]:duration-500 [&>*]:ease-out"
-      aria-hidden="true"
+      className="deck relative mx-auto aspect-[1/1.32] w-full max-w-[520px] sm:aspect-[1/1.02]"
     >
-      {/* colour field */}
-      <div style={layer(6)} className="bg-aurora-flow absolute inset-[8%] rounded-full opacity-70 blur-2xl" />
-      {/* geometric cutouts */}
-      <div style={layer(14)} className="absolute left-[4%] top-[10%] h-20 w-20 rounded-[28px] border-2 border-dashed border-brand-400/60" />
-      <div style={layer(-10)} className="bg-aurora absolute bottom-[6%] right-[8%] h-16 w-16 rounded-full" />
-      <div style={layer(18)} className="absolute right-[2%] top-[4%] h-0 w-0 border-x-[22px] border-b-[38px] border-x-transparent border-b-accent-4" />
-      {/* portraits */}
-      <div style={layer(-16)} className="absolute left-[6%] top-[16%] h-[62%] w-[46%]">
-        <div style={{ ["--r" as string]: "-6deg" }} className="animate-float h-full w-full overflow-hidden rounded-[34px] shadow-2xl ring-4 ring-surface">
-          <Portrait variant="creator" />
+      <div className="deck-stage absolute inset-0">
+        <div className="deck-layer absolute left-0 top-0 w-[88%] max-w-[320px] sm:top-[3%] sm:w-[74%] [--z:0px]">
+          <div className="deck-float [--fd:0s]"><MatchCard /></div>
         </div>
-      </div>
-      <div style={layer(12)} className="absolute bottom-[10%] right-[6%] h-[58%] w-[44%]">
-        <div style={{ ["--r" as string]: "5deg" }} className="h-full w-full overflow-hidden rounded-[34px] shadow-2xl ring-4 ring-surface [animation:float_8s_ease-in-out_-3s_infinite]">
-          <Portrait variant="brand" />
+        <div className="deck-layer absolute right-0 top-[30%] w-[90%] max-w-[330px] sm:top-[33%] sm:w-[74%] [--z:70px]">
+          <div className="deck-float [--fd:-2.5s]"><OfferCard /></div>
         </div>
-      </div>
-      {/* deal handshake */}
-      <div style={layer(4)} className="absolute left-[calc(50%-2rem)] top-[calc(50%-2rem)] grid h-16 w-16 place-items-center rounded-2xl bg-surface text-brand-600 shadow-xl ring-1 ring-line">
-        <Handshake className="h-8 w-8" />
-      </div>
-      {/* floating UI */}
-      <div style={layer(22)} className="absolute inset-0">
-        <Chip icon={<Sparkles className="h-4 w-4 text-accent-2" />} className="left-[38%] top-[6%]">Perfect match</Chip>
-        <Chip icon={<BadgeCheck className="h-4 w-4 text-brand-600" />} className="bottom-[4%] left-[2%]">Brand deal</Chip>
-        <Chip icon={<Link2 className="h-4 w-4 text-accent-1" />} className="right-[-2%] top-[34%] max-sm:hidden">Affiliate</Chip>
-        <Chip icon={<Heart className="h-4 w-4 fill-accent-3 text-accent-3" />} className="bottom-[34%] left-[-4%] max-sm:hidden">UGC</Chip>
+        <div className="deck-layer absolute bottom-0 left-[3%] w-[84%] max-w-[300px] sm:bottom-[2%] sm:left-[6%] sm:w-[70%] [--z:140px]">
+          <div className="deck-float [--fd:-5s]"><EarningsCard /></div>
+        </div>
       </div>
     </div>
   );

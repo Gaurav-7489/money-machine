@@ -8,13 +8,13 @@ type Variant = "primary" | "secondary" | "ghost" | "soft";
 
 const VARIANTS: Record<Variant, string> = {
   primary: "bg-aurora text-on-accent btn-glow",
-  secondary: "bg-surface text-ink border border-line hover:bg-elevated",
+  secondary: "bg-surface text-ink border border-line hover:border-ink/25",
   ghost: "text-ink hover:bg-elevated",
   soft: "bg-brand-50 text-brand-700 hover:bg-brand-100",
 };
 
 const base =
-  "press inline-flex items-center justify-center gap-2 rounded-full font-semibold disabled:cursor-not-allowed disabled:opacity-50";
+  "press inline-flex items-center justify-center gap-2 rounded-full font-medium tracking-[-0.01em] disabled:cursor-not-allowed disabled:opacity-50";
 const sizes = { sm: "h-9 px-3.5 text-[13px]", md: "h-11 px-5 text-sm", lg: "h-12 px-6 text-[15px]" };
 
 export function Button({
@@ -74,7 +74,7 @@ export function PageHeader({ title, back, action }: { title: string; back?: stri
           </svg>
         </Link>
       )}
-      <h1 className="min-w-0 flex-1 truncate text-[26px] font-extrabold">{title}</h1>
+      <h1 className="min-w-0 flex-1 truncate text-[24px] font-semibold tracking-[-0.03em]">{title}</h1>
       {action}
     </div>
   );
@@ -83,8 +83,8 @@ export function PageHeader({ title, back, action }: { title: string; back?: stri
 export function EmptyState({ icon, title, body, action }: { icon: ReactNode; title: string; body: string; action?: ReactNode }) {
   return (
     <div className="animate-fade-up flex flex-col items-center px-6 py-10 text-center">
-      <div className="bg-aurora-soft mb-3 grid h-14 w-14 place-items-center rounded-2xl text-brand-700 ring-1 ring-line">{icon}</div>
-      <p className="font-semibold">{title}</p>
+      <div className="mb-4 grid h-12 w-12 place-items-center rounded-xl border border-line bg-surface text-ink shadow-[var(--shadow-card)]">{icon}</div>
+      <p className="font-medium">{title}</p>
       <p className="mt-1 max-w-xs text-sm text-muted">{body}</p>
       {action && <div className="mt-4">{action}</div>}
     </div>
@@ -124,7 +124,7 @@ export function Field({
 }
 
 export const inputCls =
-  "w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-[15px] outline-none transition placeholder:text-muted/70 focus:border-brand-400 focus:ring-4 focus:ring-brand-100 aria-[invalid=true]:border-rose-400";
+  "w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-[15px] outline-none transition placeholder:text-muted/70 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 aria-[invalid=true]:border-rose-400";
 
 export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -155,11 +155,10 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
       }}
       onClick={(e) => e.target === ref.current && onClose()}
       aria-label={title}
-      className="m-auto w-[min(32rem,calc(100%-2rem))] overflow-hidden rounded-[28px] border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/45 backdrop:backdrop-blur-sm max-md:mb-0 max-md:w-full max-md:max-w-none max-md:rounded-b-none"
+      className="m-auto w-[min(32rem,calc(100%-2rem))] overflow-hidden rounded-[20px] border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-[2px] max-md:mb-0 max-md:w-full max-md:max-w-none max-md:rounded-b-none"
     >
-      <div className="bg-aurora h-1" aria-hidden="true" />
       <div className="flex items-center justify-between border-b border-line px-5 py-4">
-        <h2 className="text-lg font-bold">{title}</h2>
+        <h2 className="text-[17px] font-semibold tracking-[-0.02em]">{title}</h2>
         <button onClick={onClose} className="press grid h-9 w-9 place-items-center rounded-full hover:bg-elevated" aria-label="Close">
           <X className="h-4 w-4" />
         </button>
@@ -185,14 +184,14 @@ export function Toast({ message, onDone }: { message: string | null; onDone: () 
 
 /** Horizontal progress bar for a match percentage. */
 export function MatchMeter({ percent, label }: { percent: number; label: string }) {
-  const color = percent >= 90 ? "bg-aurora" : percent >= 70 ? "bg-gradient-to-r from-brand-500 to-fuchsia-500" : percent >= 50 ? "bg-gradient-to-r from-amber-400 to-orange-400" : "bg-slate-300";
+  const color = percent >= 90 ? "bg-brand-600" : percent >= 70 ? "bg-brand-400" : percent >= 50 ? "bg-accent-3" : "bg-slate-300";
   return (
     <div className="w-full">
       <div className="mb-1 flex items-baseline justify-between text-xs">
         <span className="font-semibold">{label}</span>
         <span className="font-bold tabular-nums">{percent}%</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-elevated ring-1 ring-line" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label={`${label}: ${percent}%`}>
+      <div className="h-1.5 overflow-hidden rounded-full bg-elevated" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label={`${label}: ${percent}%`}>
         <div className={`h-full rounded-full transition-[width] duration-700 ${color}`} style={{ width: `${Math.max(percent, 3)}%` }} />
       </div>
     </div>
@@ -200,4 +199,4 @@ export function MatchMeter({ percent, label }: { percent: number; label: string 
 }
 
 export const selectCls =
-  "w-full appearance-none rounded-xl border border-line bg-surface bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235f6f69%22 stroke-width=%222%22><path d=%22m6 9 6 6 6-6%22/></svg>')] bg-[length:18px] bg-[right_0.75rem_center] bg-no-repeat px-3.5 py-2.5 pr-10 text-[15px] outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 disabled:opacity-50";
+  "w-full appearance-none rounded-xl border border-line bg-surface bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236b6a63%22 stroke-width=%222%22><path d=%22m6 9 6 6 6-6%22/></svg>')] bg-[length:18px] bg-[right_0.75rem_center] bg-no-repeat px-3.5 py-2.5 pr-10 text-[15px] outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 disabled:opacity-50";

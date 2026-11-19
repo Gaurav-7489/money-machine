@@ -3,11 +3,11 @@
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
-/** Two themes: White ("Creative Pastel") and Dark ("Editorial Neon"). */
+/** Two themes: Light ("Paper") and Dark ("Ink"). */
 export type ThemeChoice = "light" | "dark";
 const KEY = "mm.theme";
 const EVENT = "mm-theme";
-const COLORS = { light: "#FAFAFD", dark: "#0D0B12" };
+const COLORS = { light: "#F7F6F2", dark: "#0B0B0A" };
 
 /** Runs before first paint (inlined in <head>) so there is no flash. First visit follows the device. */
 export const THEME_INIT_SCRIPT = `(function(){try{var c=localStorage.getItem("${KEY}");var d=c?c==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=d?"dark":"light";}catch(e){}})();`;
@@ -82,7 +82,7 @@ export function useTheme() {
 /** Light / dark switch. */
 export function ThemeToggle({ withLabel = false, className = "" }: { withLabel?: boolean; className?: string }) {
   const { dark, set } = useTheme();
-  const label = dark ? "Switch to white theme" : "Switch to dark theme";
+  const label = dark ? "Switch to light theme" : "Switch to dark theme";
   if (!withLabel) {
     return (
       <button type="button" onClick={(e) => set(dark ? "light" : "dark", e)} aria-label={label} title={label} className={`press grid h-10 w-10 place-items-center rounded-full text-ink hover:bg-elevated ${className}`}>
@@ -93,8 +93,8 @@ export function ThemeToggle({ withLabel = false, className = "" }: { withLabel?:
   return (
     <button type="button" role="switch" aria-checked={dark} aria-label="Dark theme" onClick={(e) => set(dark ? "light" : "dark", e)} className={`press flex h-11 items-center gap-3 rounded-full px-3 text-[15px] text-ink hover:bg-elevated ${className}`}>
       {dark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-      <span className="flex-1 text-left">{dark ? "Dark theme" : "White theme"}</span>
-      <span className={`relative h-6 w-11 rounded-full transition-colors ${dark ? "bg-aurora" : "bg-line"}`} aria-hidden="true">
+      <span className="flex-1 text-left">{dark ? "Dark theme" : "Light theme"}</span>
+      <span className={`relative h-6 w-11 rounded-full transition-colors ${dark ? "bg-brand-500" : "bg-line"}`} aria-hidden="true">
         <span className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-[left] duration-300" style={{ left: dark ? 22 : 2 }} />
       </span>
     </button>
@@ -105,8 +105,8 @@ export function ThemeToggle({ withLabel = false, className = "" }: { withLabel?:
 export function ThemePicker() {
   const { choice, set } = useTheme();
   const opts = [
-    { id: "light", label: "White", sub: "Creative pastel", swatch: "bg-[#FAFAFD] ring-1 ring-black/10", dot: "linear-gradient(110deg,#8edbff,#b9a0ff,#ffb4d5,#ffd1ae)" },
-    { id: "dark", label: "Dark", sub: "Editorial neon", swatch: "bg-[#0D0B12] ring-1 ring-white/15", dot: "linear-gradient(110deg,#ff8748,#f452a1,#965bff,#35c8f5)" },
+    { id: "light", label: "Light", sub: "Paper", swatch: "bg-[#F7F6F2] ring-1 ring-black/10", dot: "linear-gradient(#1c7149,#1c7149)" },
+    { id: "dark", label: "Dark", sub: "Ink", swatch: "bg-[#0B0B0A] ring-1 ring-white/15", dot: "linear-gradient(#5cc28e,#5cc28e)" },
   ] as const;
   return (
     <div role="radiogroup" aria-label="Theme" className="grid grid-cols-2 gap-2">
