@@ -4,7 +4,9 @@ import { TabIndicator } from "@/components/motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AtSign, Bookmark, Grid3x3, Link2, LogOut, Mail, MapPin, Palette, Pencil, Repeat2, Rocket, Settings, Smartphone, Star, Users, Wallet } from "lucide-react";
+import { AtSign, Bookmark, ChevronRight, Grid3x3, Link2, LogOut, Mail, MapPin, Palette, Pencil, Repeat2, Rocket, Settings, Smartphone, Star, Users, Wallet } from "lucide-react";
+import { Photo } from "@/components/photo";
+import { nichePhoto } from "@/lib/photos";
 import { Avatar, TONES } from "@/components/art";
 import { useFeedback } from "@/components/feedback";
 import { PostCard } from "@/components/feed/post-card";
@@ -257,88 +259,106 @@ export default function Profile() {
   ].filter(([, v]) => v) as [string, string][];
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="mb-2 flex justify-end">
-        <Button variant="ghost" size="sm" onClick={() => setSettings(true)} className="h-10 px-3 text-sm">
-          <Settings className="h-5 w-5" /> Settings
+    <div className="mx-auto max-w-5xl">
+      <div className="relative -mx-4 aspect-[16/9] overflow-hidden bg-elevated md:mx-0 md:aspect-[21/7] md:rounded-[16px]">
+        <Photo photo={nichePhoto(session.niches?.[0] ?? session.category)} sizes="(min-width: 1024px) 1024px, 100vw" priority decorative />
+        <span className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/15" aria-hidden="true" />
+        <Button variant="ghost" size="sm" onClick={() => setSettings(true)} className="glass absolute right-3 top-3 h-9 px-3.5 text-[13px]">
+          <Settings className="h-4 w-4" /> Settings
         </Button>
       </div>
-      <section className="card flex flex-col items-center p-5 text-center">
-        <Avatar name={session.displayName} tone={isBiz ? "violet" : "rose"} size="xl" square={isBiz} />
-        <h1 className="mt-3 text-xl font-bold">{session.displayName}</h1>
-        <p className="text-sm text-muted">@{session.handle} · {isBiz ? "Business" : "Creator"}</p>
-        {session.bio && <p className="mt-2 max-w-md text-[15px]">{session.bio}</p>}
-        {session.city && (
-          <p className="mt-2 flex items-center gap-1 text-sm text-muted"><MapPin className="h-4 w-4" /> {session.city}, {session.country}</p>
-        )}
-        {(session.niches ?? []).length > 0 && (
-          <p className="mt-2 flex flex-wrap justify-center gap-1.5">
-            {session.niches!.map((n) => <span key={n} className="bg-aurora-soft rounded-full px-2.5 py-0.5 text-xs font-semibold text-brand-700">{n}</span>)}
-          </p>
-        )}
-        {isBiz && (session.lookingFor ?? []).length > 0 && <p className="mt-2 text-xs text-muted">Looking for: <span className="font-semibold text-ink">{session.lookingFor!.join(", ")}</span> creators</p>}
-        {(socials.length > 0 || session.email) && (
-          <ul className="mt-2 flex flex-wrap justify-center gap-2 text-xs">
-            {socials.map(([k, v]) => (
-              <li key={k} className="inline-flex items-center gap-1 rounded-full bg-elevated px-2.5 py-1 ring-1 ring-line"><AtSign className="h-3 w-3" /> {k}: <span className="font-semibold">{v}</span></li>
-            ))}
-            {session.email && <li className="inline-flex items-center gap-1 rounded-full bg-elevated px-2.5 py-1 ring-1 ring-line"><Mail className="h-3 w-3" /> {session.email}</li>}
-          </ul>
-        )}
-        {(session.earningModels ?? []).length > 0 && (
-          <p className="mt-2 flex flex-wrap justify-center gap-1.5">
-            {session.earningModels!.map((m) => <span key={m} className="rounded-full bg-elevated px-2.5 py-0.5 text-xs font-medium text-muted ring-1 ring-line">{earningLabel(m)}</span>)}
-          </p>
-        )}
-        <dl className="mt-4 grid w-full max-w-sm grid-cols-3 text-center">
-          <div className="flex flex-col"><dt className="text-xs text-muted">Posts</dt><dd className="order-first text-lg font-bold">{myPosts.length}</dd></div>
-          <div className="flex flex-col">
-            <dt className="flex items-center justify-center gap-0.5 text-xs text-muted">Reposts</dt>
-            <dd className="order-first text-lg font-bold">{reposts.length}</dd>
-          </div>
-          <Link href="/friends" className="flex flex-col rounded-xl hover:bg-elevated"><dt className="text-xs text-muted">Friends</dt><dd className="order-first text-lg font-bold">{following.length}</dd></Link>
-        </dl>
-        <Button variant="secondary" className="mt-4 w-full max-w-sm" onClick={() => setEditing(true)}>
-          <Pencil className="h-4 w-4" /> Edit Profile
-        </Button>
-      </section>
 
-      {done.percent < 100 && (
-        <section className="card mt-4 p-4">
-          <div className="flex items-center justify-between text-sm">
-            <p className="font-semibold">Your profile is {done.percent}% complete</p>
-            <button onClick={() => setEditing(true)} className="font-semibold text-brand-700 hover:underline">Finish it</button>
-          </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-elevated ring-1 ring-line" role="progressbar" aria-valuenow={done.percent} aria-valuemin={0} aria-valuemax={100} aria-label="Profile completeness">
-            <div className="h-full rounded-full bg-aurora transition-[width] duration-700" style={{ width: `${done.percent}%` }} />
-          </div>
-          {done.next && <p className="mt-2 text-xs text-muted">Next step: {done.next.label}</p>}
+      <div className="grid gap-10 md:grid-cols-12 md:gap-12">
+        <section className="md:col-span-7" aria-label="About you">
+          <span className="relative z-10 -mt-10 inline-block rounded-full bg-canvas p-1.5 md:-mt-12" style={{ borderRadius: isBiz ? "30%" : undefined }}>
+            <Avatar name={session.displayName} tone={isBiz ? "violet" : "rose"} size="xl" square={isBiz} />
+          </span>
+          <h1 className="mt-4 text-[clamp(2.8rem,8vw,5.5rem)] leading-[0.88]">{session.displayName}</h1>
+          <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px] text-muted">
+            <span>@{session.handle}</span>
+            <span className="rounded-full border border-line px-2 py-px text-[12px] font-medium text-ink">{isBiz ? "Business" : "Creator"}</span>
+            {session.city && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {session.city}, {session.country}</span>}
+          </p>
+          {session.bio && <p className="mt-6 max-w-[34ch] text-[clamp(1.35rem,2.6vw,1.75rem)] font-medium leading-snug tracking-[-0.015em]">{session.bio}</p>}
+          {(session.niches ?? []).length > 0 && (
+            <p className="mt-5 flex flex-wrap gap-1.5">
+              {session.niches!.map((n) => <span key={n} className="rounded-full bg-elevated px-3 py-1 text-[13px] font-medium">{n}</span>)}
+            </p>
+          )}
+          {isBiz && (session.lookingFor ?? []).length > 0 && <p className="mt-3 text-[13px] text-muted">Looking for <span className="font-medium text-ink">{session.lookingFor!.join(", ")}</span> creators</p>}
+          {(socials.length > 0 || session.email) && (
+            <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-[13px] text-muted">
+              {socials.map(([k, v]) => (
+                <li key={k} className="inline-flex items-center gap-1"><AtSign className="h-3 w-3" /> {k} <span className="font-medium text-ink">{v}</span></li>
+              ))}
+              {session.email && <li className="inline-flex items-center gap-1"><Mail className="h-3 w-3" /> <span className="font-medium text-ink">{session.email}</span></li>}
+            </ul>
+          )}
+          {(session.earningModels ?? []).length > 0 && (
+            <p className="mt-4 flex flex-wrap gap-1.5">
+              {session.earningModels!.map((m) => <span key={m} className="rounded-full border border-line px-2.5 py-0.5 text-[12px] font-medium text-muted">{earningLabel(m)}</span>)}
+            </p>
+          )}
+          <dl className="mt-8 grid max-w-sm grid-cols-3 border-y border-line">
+            <div className="flex flex-col py-3"><dt className="text-[12px] text-muted">Posts</dt><dd className="font-display order-first text-[32px] leading-none tabular-nums">{myPosts.length}</dd></div>
+            <div className="flex flex-col border-l border-line py-3 pl-4"><dt className="text-[12px] text-muted">Reposts</dt><dd className="font-display order-first text-[32px] leading-none tabular-nums">{reposts.length}</dd></div>
+            <Link href="/friends" className="flex flex-col border-l border-line py-3 pl-4 transition-colors hover:bg-elevated"><dt className="text-[12px] text-muted">Friends</dt><dd className="font-display order-first text-[32px] leading-none tabular-nums">{following.length}</dd></Link>
+          </dl>
+          <Button variant="secondary" size="lg" className="mt-6" onClick={() => setEditing(true)}>
+            <Pencil className="h-4 w-4" /> Edit Profile
+          </Button>
         </section>
-      )}
 
-      <section className="mt-4 grid grid-cols-3 gap-3">
-        {tools.map(({ href, label, value, icon: Icon, tone }) => (
-          <Link key={href} href={href} className="card lift flex flex-col items-center p-3.5 text-center hover:border-brand-200">
-            <span className={`grid h-10 w-10 place-items-center rounded-xl ${tone}`}><Icon className="h-5 w-5" /></span>
-            <span className="mt-2 max-w-full truncate text-base font-bold">{value}</span>
-            <span className="text-[12px] leading-tight text-muted">{label}</span>
-          </Link>
-        ))}
-      </section>
+        <aside className="space-y-8 md:col-span-5 md:pt-14" aria-label="Your tools">
+          {done.percent < 100 && (
+            <section className="border-t border-ink pt-3">
+              <div className="flex items-baseline justify-between text-[14px]">
+                <p className="font-semibold">Your profile is {done.percent}% complete</p>
+                <button onClick={() => setEditing(true)} className="link-draw font-medium">Finish it</button>
+              </div>
+              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-elevated" role="progressbar" aria-valuenow={done.percent} aria-valuemin={0} aria-valuemax={100} aria-label="Profile completeness">
+                <div className="h-full rounded-full bg-signal transition-[width] duration-700" style={{ width: `${done.percent}%` }} />
+              </div>
+              {done.next && <p className="mt-2 text-[13px] text-muted">Next step: {done.next.label}</p>}
+            </section>
+          )}
 
-      <section className="mt-4 grid grid-cols-2 gap-3">
-        <Link href="/friends" className="card lift flex items-center gap-3 p-3.5 hover:border-brand-200">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-sky-50 text-sky-600"><Users className="h-5 w-5" /></span>
-          <span><span className="block text-sm font-semibold">Friends</span><span className="block text-xs text-muted">{following.length} {following.length === 1 ? "friend" : "friends"}</span></span>
-        </Link>
-        <Link href="/saved" className="card lift flex items-center gap-3 p-3.5 hover:border-brand-200">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-600"><Bookmark className="h-5 w-5" /></span>
-          <span><span className="block text-sm font-semibold">Saved</span><span className="block text-xs text-muted">{savedProfiles.length + saved.length} items</span></span>
-        </Link>
-      </section>
+          <section className="border-t border-ink pt-3">
+            <h2 className="font-text text-[14px] font-semibold">Your numbers</h2>
+            <ul className="mt-2 divide-y divide-line border-b border-line">
+              {tools.map(({ href, label, value, icon: Icon }) => (
+                <li key={href}>
+                  <Link href={href} className="group flex items-center gap-3 py-3.5">
+                    <Icon className="h-[18px] w-[18px] shrink-0 text-muted" strokeWidth={1.7} />
+                    <span className="flex-1 text-[14px] text-muted">{label}</span>
+                    <span className="font-display text-[26px] leading-none tabular-nums">{value}</span>
+                    <ChevronRight className="h-4 w-4 text-muted transition-transform group-hover:translate-x-0.5" />
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link href="/friends" className="group flex items-center gap-3 py-3.5">
+                  <Users className="h-[18px] w-[18px] shrink-0 text-muted" strokeWidth={1.7} />
+                  <span className="flex-1 text-[14px] text-muted">Friends</span>
+                  <span className="text-[14px] font-medium tabular-nums">{following.length} {following.length === 1 ? "friend" : "friends"}</span>
+                  <ChevronRight className="h-4 w-4 text-muted transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </li>
+              <li>
+                <Link href="/saved" className="group flex items-center gap-3 py-3.5">
+                  <Bookmark className="h-[18px] w-[18px] shrink-0 text-muted" strokeWidth={1.7} />
+                  <span className="flex-1 text-[14px] text-muted">Saved</span>
+                  <span className="text-[14px] font-medium tabular-nums">{savedProfiles.length + saved.length} items</span>
+                  <ChevronRight className="h-4 w-4 text-muted transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </li>
+            </ul>
+          </section>
+        </aside>
+      </div>
 
-      <section className="mt-6">
-        <div role="tablist" aria-label="Your content" className="mb-3 flex border-b border-line">
+      <section className="mt-16">
+        <div role="tablist" aria-label="Your content" className="mb-4 flex border-b border-line">
           {([["posts", "Posts", Grid3x3, myPosts.length], ["reposts", "Reposts", Repeat2, reposted.length]] as const).map(([id, label, Icon, n]) => (
             <button
               key={id}
@@ -354,17 +374,17 @@ export default function Profile() {
         </div>
         {tab === "posts" &&
           (myPosts.length === 0 ? (
-            <div className="card">
-              <EmptyState icon={<Grid3x3 className="h-5 w-5" />} title="No posts yet" body="Share your first post so others can see your work." action={<Link href="/create" className="inline-flex h-11 items-center rounded-full bg-brand-50 px-5 text-sm font-semibold text-brand-700">Create a post</Link>} />
+            <div>
+              <EmptyState icon={<Grid3x3 className="h-5 w-5" />} title="No posts yet" body="Share your first post so others can see your work." action={<Link href="/create" className="press inline-flex h-11 items-center rounded-full bg-ink px-5 text-sm font-semibold text-canvas">Create a post</Link>} />
             </div>
           ) : (
-            <ul className="grid grid-cols-3 gap-1.5">
+            <ul className="grid grid-cols-3 gap-1.5 md:grid-cols-4">
               {myPosts.map((p) => (
                 <li key={p.id}>
-                  <Link href={`/home#${p.id}`} className={`lift relative grid aspect-square place-items-center overflow-hidden rounded-xl bg-gradient-to-br p-2 text-center text-[11px] font-medium text-ink/80 ${TONES[p.tone ?? "mint"].bg}`} aria-label={p.caption}>
+                  <Link href={`/home#${p.id}`} className={`group relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[10px] bg-gradient-to-br p-3 text-center text-[13px] font-medium ${TONES[p.tone ?? "mint"].bg} ${TONES[p.tone ?? "mint"].fg}`} aria-label={p.caption}>
                     {p.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                      <img src={p.image} alt="" className="photo-zoom absolute inset-0 h-full w-full object-cover" />
                     ) : (
                       <span className="line-clamp-4">{p.caption}</span>
                     )}
@@ -375,9 +395,9 @@ export default function Profile() {
           ))}
         {tab === "reposts" &&
           (reposted.length ? (
-            <div className="space-y-5">{reposted.map((p) => <PostCard key={p.id} post={p} />)}</div>
+            <div className="max-w-2xl">{reposted.map((p) => <PostCard key={p.id} post={p} />)}</div>
           ) : (
-            <div className="card">
+            <div>
               <EmptyState icon={<Repeat2 className="h-5 w-5" />} title="No reposts yet" body="Tap Repost under a post in your feed to share it on your profile." />
             </div>
           ))}
@@ -398,7 +418,7 @@ export default function Profile() {
             <InstallGuide />
           </section>
           <section className="space-y-3 border-t border-line pt-4">
-            <Button variant="secondary" className="w-full text-rose-600" onClick={signOut}>
+            <Button variant="secondary" className="w-full text-danger" onClick={signOut}>
               <LogOut className="h-4 w-4" /> Sign out & clear preview data
             </Button>
           </section>

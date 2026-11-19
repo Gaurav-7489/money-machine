@@ -68,7 +68,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
             <div
               key={t.id}
               role={t.kind === "error" ? "alert" : "status"}
-              className={`animate-fade-up pointer-events-auto flex max-w-md items-center gap-2.5 rounded-2xl px-4 py-3 text-sm font-medium shadow-xl ${TONE[t.kind]}`}
+              className={`animate-fade-up pointer-events-auto flex max-w-md items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-medium shadow-xl ${TONE[t.kind]}`}
             >
               <Icon className={`h-5 w-5 shrink-0 ${t.kind === "success" ? "text-brand-300" : ""}`} />
               <span>{t.message}</span>
@@ -106,14 +106,14 @@ function ConfirmDialog({ opts, onDone }: { opts: ConfirmOptions | null; onDone: 
         onDone(false);
       }}
       aria-labelledby="confirm-title"
-      className="m-auto w-[min(26rem,calc(100%-2rem))] rounded-3xl bg-surface p-0 text-ink shadow-2xl backdrop:bg-ink/40 backdrop:backdrop-blur-sm"
+      className="m-auto w-[min(26rem,calc(100%-2rem))] rounded-xl bg-surface p-0 text-ink shadow-2xl backdrop:bg-ink/40 backdrop:backdrop-blur-sm"
     >
       {opts && (
         <div className="p-6 text-center">
-          <span className={`mx-auto grid h-12 w-12 place-items-center rounded-2xl ${opts.danger ? "bg-rose-50 text-rose-600" : "bg-brand-50 text-brand-700"}`}>
+          <span className={`mx-auto grid h-12 w-12 place-items-center rounded-xl ${opts.danger ? "bg-rose-50 text-danger" : "bg-brand-50 text-brand-700"}`}>
             {opts.danger ? <AlertTriangle className="h-6 w-6" /> : <Info className="h-6 w-6" />}
           </span>
-          <h2 id="confirm-title" className="mt-3 text-lg font-bold">{opts.title}</h2>
+          <h2 id="confirm-title" className="font-text mt-3 text-lg font-bold">{opts.title}</h2>
           {opts.body && <p className="mt-1 text-sm text-muted">{opts.body}</p>}
           <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row">
             <button onClick={() => onDone(false)} className="press h-11 flex-1 rounded-full border border-line bg-surface text-sm font-semibold hover:bg-elevated">

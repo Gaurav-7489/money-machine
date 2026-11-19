@@ -31,15 +31,15 @@ export default function Notifications() {
     <div className="mx-auto max-w-2xl">
       <PageHeader title="Notifications" back="/home" />
       {items.length === 0 ? (
-        <div className="card">
+        <div className="border-y border-line">
           <EmptyState icon={<Bell className="h-5 w-5" />} title="You're all caught up" body="New messages, badges and application updates will show up here." />
         </div>
       ) : (
-        <ul className="card divide-y divide-line">
+        <ul className="divide-y divide-line border-y border-line">
           {items.map((i) => (
             <li key={i.key}>
-              <Link href={i.href} className="flex items-center gap-3 px-4 py-3.5 text-[15px] transition-colors hover:bg-elevated">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-elevated">{i.icon}</span>
+              <Link href={i.href} className="group flex items-center gap-4 py-4 text-[15px] transition-colors hover:bg-surface">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line">{i.icon}</span>
                 <span className="flex-1">{i.text}</span>
               </Link>
             </li>

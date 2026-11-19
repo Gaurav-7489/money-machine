@@ -4,18 +4,19 @@ import { X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, type ComponentProps, type ReactNode } from "react";
 
-type Variant = "primary" | "secondary" | "ghost" | "soft";
+type Variant = "primary" | "secondary" | "ghost" | "soft" | "signal";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-aurora text-on-accent btn-glow",
-  secondary: "bg-surface text-ink border border-line hover:bg-elevated",
+  primary: "bg-ink text-canvas hover:opacity-90",
+  signal: "bg-signal text-on-signal hover:brightness-105",
+  secondary: "bg-transparent text-ink border border-line hover:border-ink",
   ghost: "text-ink hover:bg-elevated",
-  soft: "bg-brand-50 text-brand-700 hover:bg-brand-100",
+  soft: "bg-elevated text-ink hover:bg-line",
 };
 
 const base =
-  "press inline-flex items-center justify-center gap-2 rounded-full font-semibold disabled:cursor-not-allowed disabled:opacity-50";
-const sizes = { sm: "h-9 px-3.5 text-[13px]", md: "h-11 px-5 text-sm", lg: "h-12 px-6 text-[15px]" };
+  "press inline-flex items-center justify-center gap-2 rounded-full font-semibold tracking-[-0.005em] disabled:cursor-not-allowed disabled:opacity-45";
+const sizes = { sm: "h-9 px-4 text-[13px]", md: "h-11 px-5 text-sm", lg: "h-13 px-7 text-[15px]" };
 
 export function Button({
   variant = "primary",
@@ -38,7 +39,7 @@ export function ButtonLink({
 export function SampleTag({ className = "" }: { className?: string }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700 ring-1 ring-amber-200 ${className}`}
+      className={`inline-flex items-center rounded-full border border-line px-2 py-0.5 text-[11px] font-medium text-muted ${className}`}
       title="Fictional sample content for the development preview"
     >
       Sample
@@ -48,9 +49,9 @@ export function SampleTag({ className = "" }: { className?: string }) {
 
 export function StatusPill({ status }: { status: string }) {
   const map: Record<string, string> = {
-    active: "bg-emerald-50 text-emerald-700",
-    approved: "bg-emerald-50 text-emerald-700",
-    pending: "bg-amber-50 text-amber-700",
+    active: "bg-brand-50 text-brand-700",
+    approved: "bg-brand-50 text-brand-700",
+    pending: "bg-signal/25 text-ink",
     paused: "bg-slate-100 text-slate-600",
     draft: "bg-slate-100 text-slate-600",
     rejected: "bg-rose-50 text-rose-700",
@@ -64,28 +65,32 @@ export function StatusPill({ status }: { status: string }) {
   );
 }
 
-export function PageHeader({ title, back, action }: { title: string; back?: string; action?: ReactNode }) {
+/** Editorial page title: condensed display type on a hairline, with an optional action. */
+export function PageHeader({ title, back, action, lede }: { title: string; back?: string; action?: ReactNode; lede?: ReactNode }) {
   return (
-    <div className="mb-4 flex items-center gap-1.5">
-      {back && (
-        <Link href={back} className="press -ml-2 grid h-10 w-10 shrink-0 place-items-center rounded-full hover:bg-surface" aria-label="Back" title="Back">
-          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m15 18-6-6 6-6" />
-          </svg>
-        </Link>
-      )}
-      <h1 className="min-w-0 flex-1 truncate text-[26px] font-extrabold">{title}</h1>
-      {action}
+    <div className="mb-6 border-b border-line pb-4 md:mb-8 md:pb-5">
+      <div className="flex items-end gap-2">
+        {back && (
+          <Link href={back} className="press -ml-2 mb-1 grid h-10 w-10 shrink-0 place-items-center rounded-full hover:bg-elevated" aria-label="Back" title="Back">
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </Link>
+        )}
+        <h1 className="min-w-0 flex-1 truncate pb-0.5 text-[clamp(2.4rem,7vw,4.25rem)] leading-[0.9]">{title}</h1>
+        {action && <div className="mb-1 shrink-0">{action}</div>}
+      </div>
+      {lede && <p className="mt-3 max-w-xl text-[15px] text-muted">{lede}</p>}
     </div>
   );
 }
 
 export function EmptyState({ icon, title, body, action }: { icon: ReactNode; title: string; body: string; action?: ReactNode }) {
   return (
-    <div className="animate-fade-up flex flex-col items-center px-6 py-10 text-center">
-      <div className="bg-aurora-soft mb-3 grid h-14 w-14 place-items-center rounded-2xl text-brand-700 ring-1 ring-line">{icon}</div>
-      <p className="font-semibold">{title}</p>
-      <p className="mt-1 max-w-xs text-sm text-muted">{body}</p>
+    <div className="animate-fade-up flex flex-col items-center px-6 py-12 text-center">
+      <div className="mb-4 grid h-12 w-12 place-items-center rounded-full border border-line text-ink">{icon}</div>
+      <p className="font-display text-[26px]">{title}</p>
+      <p className="mt-2 max-w-xs text-sm text-muted">{body}</p>
       {action && <div className="mt-4">{action}</div>}
     </div>
   );
@@ -109,11 +114,11 @@ export function Field({
     <label className="block">
       <span className="mb-1.5 flex items-center gap-2 text-[13px] font-medium text-ink">
         {label}
-        {optional && <span className="rounded-full bg-elevated px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted ring-1 ring-line">Optional</span>}
+        {optional && <span className="text-[12px] font-normal text-muted">(optional)</span>}
       </span>
       {children}
       {error ? (
-        <span className="mt-1 block text-[12px] text-rose-600" role="alert">
+        <span className="mt-1 block text-[12px] text-danger" role="alert">
           {error}
         </span>
       ) : hint ? (
@@ -124,7 +129,7 @@ export function Field({
 }
 
 export const inputCls =
-  "w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-[15px] outline-none transition placeholder:text-muted/70 focus:border-brand-400 focus:ring-4 focus:ring-brand-100 aria-[invalid=true]:border-rose-400";
+  "w-full rounded-[10px] border border-line bg-surface px-3.5 py-2.5 text-[15px] outline-none transition placeholder:text-muted/70 hover:border-muted/60 focus:border-ink focus:ring-0 aria-[invalid=true]:border-danger";
 
 export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -155,11 +160,11 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
       }}
       onClick={(e) => e.target === ref.current && onClose()}
       aria-label={title}
-      className="m-auto w-[min(32rem,calc(100%-2rem))] overflow-hidden rounded-[28px] border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/45 backdrop:backdrop-blur-sm max-md:mb-0 max-md:w-full max-md:max-w-none max-md:rounded-b-none"
+      className="m-auto w-[min(32rem,calc(100%-2rem))] overflow-hidden rounded-[18px] border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-[2px] max-md:mb-0 max-md:w-full max-md:max-w-none max-md:rounded-b-none"
     >
-      <div className="bg-aurora h-1" aria-hidden="true" />
-      <div className="flex items-center justify-between border-b border-line px-5 py-4">
-        <h2 className="text-lg font-bold">{title}</h2>
+      <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-line md:hidden" aria-hidden="true" />
+      <div className="flex items-center justify-between px-5 pb-3 pt-4">
+        <h2 className="text-[28px] leading-none">{title}</h2>
         <button onClick={onClose} className="press grid h-9 w-9 place-items-center rounded-full hover:bg-elevated" aria-label="Close">
           <X className="h-4 w-4" />
         </button>
@@ -178,21 +183,21 @@ export function Toast({ message, onDone }: { message: string | null; onDone: () 
   if (!message) return null;
   return (
     <div role="status" className="fixed inset-x-0 bottom-24 z-50 flex justify-center px-4 md:bottom-8">
-      <div className="animate-fade-up rounded-full bg-ink px-4 py-2.5 text-sm font-medium text-surface shadow-xl">{message}</div>
+      <div className="animate-fade-up rounded-full bg-ink px-4 py-2.5 text-sm font-medium text-canvas shadow-xl">{message}</div>
     </div>
   );
 }
 
 /** Horizontal progress bar for a match percentage. */
 export function MatchMeter({ percent, label }: { percent: number; label: string }) {
-  const color = percent >= 90 ? "bg-aurora" : percent >= 70 ? "bg-gradient-to-r from-brand-500 to-fuchsia-500" : percent >= 50 ? "bg-gradient-to-r from-amber-400 to-orange-400" : "bg-slate-300";
+  const color = percent >= 90 ? "bg-signal" : percent >= 70 ? "bg-brand-500" : percent >= 50 ? "bg-accent-4" : "bg-muted/40";
   return (
     <div className="w-full">
       <div className="mb-1 flex items-baseline justify-between text-xs">
         <span className="font-semibold">{label}</span>
         <span className="font-bold tabular-nums">{percent}%</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-elevated ring-1 ring-line" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label={`${label}: ${percent}%`}>
+      <div className="h-1.5 overflow-hidden rounded-full bg-elevated" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label={`${label}: ${percent}%`}>
         <div className={`h-full rounded-full transition-[width] duration-700 ${color}`} style={{ width: `${Math.max(percent, 3)}%` }} />
       </div>
     </div>
@@ -200,4 +205,4 @@ export function MatchMeter({ percent, label }: { percent: number; label: string 
 }
 
 export const selectCls =
-  "w-full appearance-none rounded-xl border border-line bg-surface bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235f6f69%22 stroke-width=%222%22><path d=%22m6 9 6 6 6-6%22/></svg>')] bg-[length:18px] bg-[right_0.75rem_center] bg-no-repeat px-3.5 py-2.5 pr-10 text-[15px] outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 disabled:opacity-50";
+  "w-full appearance-none rounded-[10px] border border-line bg-surface bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235f6f69%22 stroke-width=%222%22><path d=%22m6 9 6 6 6-6%22/></svg>')] bg-[length:18px] bg-[right_0.75rem_center] bg-no-repeat px-3.5 py-2.5 pr-10 text-[15px] outline-none transition hover:border-muted/60 focus:border-ink focus:ring-0 disabled:opacity-50";

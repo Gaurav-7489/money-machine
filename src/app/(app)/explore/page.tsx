@@ -20,7 +20,7 @@ const numOrNull = (v: string) => (v.trim() === "" ? null : Number(digits(v)) || 
 
 function Chip({ on, onClick, children, title }: { on: boolean; onClick: () => void; children: React.ReactNode; title?: string }) {
   return (
-    <button type="button" aria-pressed={on} title={title} onClick={onClick} className={`press h-9 shrink-0 rounded-full px-3.5 text-[13px] font-semibold transition-colors ${on ? "bg-aurora text-on-accent shadow-sm" : "border border-line bg-surface text-ink hover:border-brand-300"}`}>
+    <button type="button" aria-pressed={on} title={title} onClick={onClick} className={`press h-9 shrink-0 rounded-full px-3.5 text-[13px] font-semibold transition-colors ${on ? "bg-aurora text-on-accent " : "border border-line bg-surface text-ink hover:border-ink"}`}>
       {children}
     </button>
   );
@@ -67,7 +67,7 @@ function FilterForm({ draft, setDraft, role, error, onSubmit, onClear }: { draft
           <label><span className="sr-only">Minimum per video</span><input inputMode="numeric" className={inputCls} placeholder="Min e.g. 3000" value={draft.priceMin} onChange={(e) => setDraft((d) => ({ ...d, priceMin: digits(e.target.value) }))} aria-invalid={!!error} /></label>
           <label><span className="sr-only">Maximum per video</span><input inputMode="numeric" className={inputCls} placeholder="Max e.g. 25000" value={draft.priceMax} onChange={(e) => setDraft((d) => ({ ...d, priceMax: digits(e.target.value) }))} aria-invalid={!!error} /></label>
         </div>
-        {error && <p role="alert" className="text-[12px] text-rose-600">{error}</p>}
+        {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
         <div className="grid grid-cols-2 gap-2">
           <label className="block">
             <span className="mb-1 block text-[12px] font-medium text-muted">{lookingForCreators ? "Commission up to %" : "Commission at least %"}</span>
@@ -201,30 +201,28 @@ function ExploreInner() {
 
   return (
     <div className="mx-auto max-w-6xl pb-24">
-      <header className="mb-4">
-        <h1 className="text-[26px] font-extrabold tracking-tight">
-          Find <span className="text-aurora">{who}</span>
-        </h1>
+      <header className="mb-6">
+        <h1 className="text-[clamp(2.6rem,7vw,4.25rem)] leading-[0.9]">Find {who}</h1>
       </header>
 
       <form onSubmit={(e) => { e.preventDefault(); go({ ...applied, q }, {}, custom); }} className="relative" role="search">
-        <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-brand-500" />
+        <Search className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
         <label htmlFor="explore-q" className="sr-only">Search by keyword, name or handle</label>
         <input
           id="explore-q"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder={`Try “skincare”: we search bios and posts`}
-          className="h-[52px] w-full rounded-full border border-line bg-surface pl-12 pr-24 text-[15px] shadow-sm outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+          className="h-14 w-full rounded-full border border-line bg-surface pl-13 pr-24 text-[17px] outline-none transition-colors placeholder:text-muted/80 hover:border-muted/60 focus:border-ink"
         />
         {q && (
           <button type="button" onClick={() => { setQ(""); go({ ...applied, q: "" }, {}, custom); }} className="absolute right-[58px] top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-muted hover:bg-elevated" aria-label="Clear search text">
             <X className="h-4 w-4" />
           </button>
         )}
-        <button type="button" onClick={() => setSheet(true)} className="press absolute right-1.5 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-aurora text-on-accent lg:hidden" aria-label={`Filters${count ? `, ${count} on` : ""}`}>
+        <button type="button" onClick={() => setSheet(true)} className="press absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-ink text-canvas lg:hidden" aria-label={`Filters${count ? `, ${count} on` : ""}`}>
           <SlidersHorizontal className="h-[18px] w-[18px]" />
-          {count > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-ink px-1 text-[10px] font-bold text-surface">{count}</span>}
+          {count > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-signal px-1 text-[10px] font-bold text-on-signal">{count}</span>}
         </button>
       </form>
 
@@ -232,24 +230,23 @@ function ExploreInner() {
         <button
           onClick={() => router.replace(`/explore${kind !== defaultKind ? `?type=${kind}` : ""}`, { scroll: false })}
           aria-pressed={!custom}
-          className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold ${!custom ? "bg-aurora text-on-accent" : "border border-line bg-surface"}`}
+          className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold ${!custom ? "bg-ink text-canvas" : "border border-line hover:border-ink"}`}
         >
           <Sparkles className="h-4 w-4" /> Matched to you
         </button>
-        <button onClick={() => setSheet(true)} aria-pressed={custom} className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold lg:hidden ${custom ? "bg-ink text-surface" : "border border-line bg-surface"}`}>
+        <button onClick={() => setSheet(true)} aria-pressed={custom} className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold lg:hidden ${custom ? "bg-ink text-canvas" : "border border-line hover:border-ink"}`}>
           <SlidersHorizontal className="h-4 w-4" /> Custom search{custom && count ? ` · ${count}` : ""}
         </button>
         <span className="mx-1 h-5 w-px shrink-0 bg-line" />
         {(["creator", "business"] as const).map((k) => (
-          <button key={k} onClick={() => setKind(k)} aria-pressed={kind === k} className={`press h-9 shrink-0 rounded-full px-3.5 text-[13px] font-semibold ${kind === k ? "bg-brand-50 text-brand-700 ring-1 ring-brand-200" : "text-muted hover:text-ink"}`}>
+          <button key={k} onClick={() => setKind(k)} aria-pressed={kind === k} className={`press h-9 shrink-0 rounded-full px-3.5 text-[13px] font-semibold ${kind === k ? "text-ink underline decoration-signal decoration-[3px] underline-offset-[10px]" : "text-muted hover:text-ink"}`}>
             {k === "creator" ? "Creators" : "Brands"}
           </button>
         ))}
       </div>
 
       {!custom && (
-        <p className="bg-aurora-soft mt-3 rounded-2xl px-4 py-3 text-[13px]">
-          <Sparkles className="mr-1 inline h-4 w-4 text-brand-600" />
+        <p className="mt-4 border-l-2 border-signal pl-3 text-[14px] text-muted">
           {applied.niches.length || applied.earningModels.length ? (
             <>Showing {who} for your setup: <strong>{[...applied.niches, ...EARNING_MODELS.filter((m) => applied.earningModels.includes(m.id)).map((m) => m.short)].slice(0, 5).join(", ")}</strong>. Tap <strong>Custom search</strong> to change it.</>
           ) : (
@@ -258,10 +255,10 @@ function ExploreInner() {
         </p>
       )}
 
-      <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
+      <div className="mt-8 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[300px_minmax(0,1fr)]">
         <aside className="hidden lg:block" aria-label="Filters">
-          <div className="card sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto p-5">
-            <h2 className="mb-4 flex items-center gap-2 font-bold"><SlidersHorizontal className="h-4 w-4 text-brand-600" /> Custom search</h2>
+          <div className="no-scrollbar sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto border-t border-ink pt-3">
+            <h2 className="font-text mb-4 flex items-center gap-2 text-[14px] font-semibold"><SlidersHorizontal className="h-4 w-4" /> Custom search</h2>
             <FilterForm draft={draft} setDraft={setDraft} role={role} error={error} onSubmit={apply} onClear={clearAll} />
           </div>
         </aside>
@@ -279,10 +276,10 @@ function ExploreInner() {
                   aria-checked={on}
                   disabled={disabled}
                   onClick={() => setLevel(v)}
-                  className={`press relative isolate flex h-12 shrink-0 flex-col items-center justify-center rounded-2xl px-4 leading-tight disabled:opacity-40 ${on ? "text-surface" : "border border-line bg-surface"}`}
+                  className={`press relative isolate flex h-12 shrink-0 flex-col items-center justify-center rounded-full px-5 leading-tight disabled:opacity-40 ${on ? "text-canvas" : "border border-line hover:border-ink"}`}
                 >
                   {on && <TabIndicator group="match" variant="pill" />}
-                  <span className="text-[13px] font-bold">{v === 0 ? "All" : `${v}%+`}</span>
+                  <span className="text-[14px] font-semibold tabular-nums">{v === 0 ? "All" : `${v}%+`}</span>
                   <span className={`text-[11px] ${on ? "opacity-80" : "text-muted"}`}>{n} {n === 1 ? "match" : "matches"}</span>
                 </button>
               );
@@ -290,17 +287,17 @@ function ExploreInner() {
           </div>
 
           <div className="mb-3 flex items-center gap-3">
-            <button type="button" onClick={() => setSelected(allSelected ? [] : handles)} disabled={!handles.length} className="press inline-flex h-10 items-center gap-2 rounded-full border border-line bg-surface px-3.5 text-[13px] font-semibold disabled:opacity-40">
-              {allSelected ? <CheckSquare className="h-4 w-4 text-brand-600" /> : <Square className="h-4 w-4" />}
+            <button type="button" onClick={() => setSelected(allSelected ? [] : handles)} disabled={!handles.length} className="press inline-flex h-10 items-center gap-2 rounded-full border border-line px-3.5 text-[13px] font-semibold hover:border-ink disabled:opacity-40">
+              {allSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
               {allSelected ? "Deselect all" : `Select all${level ? ` ${level}%+` : ""} (${handles.length})`}
             </button>
-            <p className="ml-auto text-sm font-semibold" aria-live="polite">{loading ? "Searching…" : `${results.length} ${results.length === 1 ? who.slice(0, -1) : who}`}</p>
+            <p className="ml-auto text-sm tabular-nums text-muted" aria-live="polite">{loading ? "Searching…" : `${results.length} ${results.length === 1 ? who.slice(0, -1) : who}`}</p>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 xl:grid-cols-3">{[0, 1, 2].map((i) => <MatchCardSkeleton key={i} />)}</div>
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">{[0, 1, 2].map((i) => <MatchCardSkeleton key={i} />)}</div>
           ) : results.length ? (
-            <ul key={params.toString()} className="stagger grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <ul key={params.toString()} className="stagger grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
               {results.map((r, i) => (
                 <li key={r.profile.handle} style={{ ["--i" as string]: Math.min(i, 6) }}>
                   <MatchCard
@@ -323,7 +320,7 @@ function ExploreInner() {
               ))}
             </ul>
           ) : (
-            <div className="card">
+            <div className="border-y border-line">
               <EmptyState
                 icon={<SearchX className="h-5 w-5" />}
                 title="No matches found. Try changing your filters."
@@ -334,7 +331,7 @@ function ExploreInner() {
           )}
 
           {hiddenProfiles.length > 0 && (
-            <button onClick={() => { setMany("hiddenProfiles", hiddenProfiles, false); toast("Removed profiles are back", "info"); }} className="mx-auto mt-4 flex items-center gap-1.5 text-[13px] font-semibold text-brand-700 hover:underline">
+            <button onClick={() => { setMany("hiddenProfiles", hiddenProfiles, false); toast("Removed profiles are back", "info"); }} className="mx-auto mt-6 flex items-center gap-1.5 text-[13px] font-semibold hover:underline">
               <Undo2 className="h-4 w-4" /> Restore {hiddenProfiles.length} removed {hiddenProfiles.length === 1 ? "profile" : "profiles"}
             </button>
           )}
@@ -342,15 +339,15 @@ function ExploreInner() {
       </div>
 
       {selected.length > 0 && (
-        <div className="animate-fade-up fixed inset-x-3 bottom-20 z-40 mx-auto flex max-w-xl items-center gap-2 rounded-full bg-ink p-1.5 pl-4 text-surface shadow-2xl md:bottom-6">
+        <div className="animate-fade-up fixed inset-x-3 bottom-24 z-40 mx-auto flex max-w-xl items-center gap-2 rounded-full bg-ink p-1.5 pl-5 text-canvas shadow-2xl md:bottom-6">
           <span className="mr-auto text-sm font-bold">{selected.length} selected</span>
-          <button onClick={() => { setMany("starredProfiles", selected, true); toast(`${selected.length} starred ⭐`); }} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-white/10" aria-label="Star selected" title="Star selected">
+          <button onClick={() => { setMany("starredProfiles", selected, true); toast(`${selected.length} starred ⭐`); }} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-canvas/10" aria-label="Star selected" title="Star selected">
             <Star className="h-5 w-5" />
           </button>
-          <button onClick={() => setSelected([])} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-white/10" aria-label="Clear selection" title="Clear selection">
+          <button onClick={() => setSelected([])} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-canvas/10" aria-label="Clear selection" title="Clear selection">
             <X className="h-5 w-5" />
           </button>
-          <button onClick={() => setBulkOpen(true)} className="press btn-glow inline-flex h-10 items-center gap-1.5 rounded-full bg-aurora px-4 text-sm font-bold text-on-accent">
+          <button onClick={() => setBulkOpen(true)} className="press inline-flex h-10 items-center gap-1.5 rounded-full bg-signal px-4 text-sm font-bold text-on-signal">
             <Send className="h-4 w-4" /> Bulk DM{bulkDaysLeft > 0 ? ` · ${bulkDaysLeft}d` : ""}
           </button>
         </div>

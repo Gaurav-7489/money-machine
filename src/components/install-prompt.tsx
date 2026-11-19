@@ -115,7 +115,7 @@ export function InstallBanner() {
   };
 
   return (
-    <div className="mx-4 mt-3 flex items-center gap-3 rounded-2xl border border-brand-100 bg-brand-50 p-3 md:mx-6">
+    <div className="mx-4 mt-3 flex items-center gap-3 rounded-xl border border-brand-100 bg-brand-50 p-3 md:mx-6">
       <LogoMark className="h-8 w-8 shrink-0" />
       <div className="min-w-0 flex-1 text-[13px] leading-tight">
         <p className="font-semibold">Add Money Machine to your Home Screen</p>

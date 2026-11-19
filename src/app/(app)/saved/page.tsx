@@ -25,9 +25,9 @@ export default function Saved() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="mb-4 text-2xl font-bold tracking-tight">Saved</h1>
+      <h1 className="mb-6 border-b border-line pb-4 text-[clamp(2.6rem,7vw,4.25rem)] leading-[0.9]">Saved</h1>
 
-      <div role="tablist" aria-label="Saved items" className="mb-4 grid grid-cols-2 gap-1.5 rounded-2xl bg-surface p-1 ring-1 ring-line">
+      <div role="tablist" aria-label="Saved items" className="mb-4 grid grid-cols-2 gap-1.5 rounded-xl bg-surface p-1 ring-1 ring-line">
         {([["people", `Starred people (${people.length})`], ["posts", `Posts (${posts.length})`]] as const).map(([id, label]) => (
           <button
             key={id}
@@ -73,7 +73,7 @@ export default function Saved() {
             ))}
           </ul>
         ) : (
-          <div className="card">
+          <div className="border-y border-line">
             <EmptyState
               icon={<Users className="h-5 w-5" />}
               title="No starred people yet"
@@ -89,7 +89,7 @@ export default function Saved() {
             {posts.map((p) => <PostCard key={p.id} post={p} />)}
           </div>
         ) : (
-          <div className="card">
+          <div className="border-y border-line">
             <EmptyState
               icon={<Bookmark className="h-5 w-5" />}
               title="No saved posts yet"

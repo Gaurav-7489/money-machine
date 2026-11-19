@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Briefcase, Check, Megaphone, Plus, Trash2 } from "lucide-react";
+import { Photo } from "./photo";
+import { nichePhoto } from "@/lib/photos";
 import { Avatar, VerifiedMark } from "./art";
 import { DealFields, budgetText, checkDeal, emptyDeal, type DealDraft } from "./deal-form";
 import { useFeedback } from "./feedback";
@@ -73,17 +75,6 @@ function PostOpportunity({ open, onClose }: { open: boolean; onClose: () => void
 }
 
 /** Restrained imagery for fictional opportunity examples only. */
-const OPPORTUNITY_PHOTOS: Record<string, string> = {
-  Skincare: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=1000&q=80&auto=format&fit=crop",
-  Makeup: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1000&q=80&auto=format&fit=crop",
-  Fashion: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1000&q=80&auto=format&fit=crop",
-  Travel: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1000&q=80&auto=format&fit=crop",
-  Fitness: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1000&q=80&auto=format&fit=crop",
-  Tech: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1000&q=80&auto=format&fit=crop",
-  Food: "https://images.unsplash.com/photo-1547592180-85f173990554?w=1000&q=80&auto=format&fit=crop",
-  "Home Decor": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1000&q=80&auto=format&fit=crop",
-};
-const SAMPLE_OPPORTUNITY_FALLBACK = OPPORTUNITY_PHOTOS.Fashion;
 
 export function OpportunityCard({ o }: { o: Opportunity }) {
   const { session, oppApplied, toggle, update } = useStore();
@@ -113,15 +104,12 @@ export function OpportunityCard({ o }: { o: Opportunity }) {
   return (
     <article className="card overflow-hidden" aria-label={o.title}>
       {o.sample ? (
-        <div
-          className="relative h-36 overflow-hidden bg-gradient-to-br from-brand-100 to-rose-100 bg-cover bg-center sm:h-40"
-          style={{ backgroundImage: `linear-gradient(0deg, rgba(13,11,20,.20), transparent 70%), url("${o.niches.map((n) => OPPORTUNITY_PHOTOS[n]).find(Boolean) ?? SAMPLE_OPPORTUNITY_FALLBACK}")` }}
-          role="img"
-          aria-label={`Sample campaign photograph for ${o.title}`}
-        >
-          <span className="absolute bottom-3 left-3 rounded-full border border-white/50 bg-white/85 px-3 py-1 text-xs font-semibold text-gray-900 backdrop-blur">Campaign preview</span>
+        <div className="group relative aspect-[16/7] overflow-hidden bg-elevated">
+          <Photo photo={nichePhoto(o.niches[0])} sizes="(min-width: 768px) 576px, 100vw" className="photo-zoom" decorative />
+          <span className="photo-shade absolute inset-0" aria-hidden="true" />
+          <span className="font-display absolute bottom-3 left-4 text-[28px] leading-none text-white">{o.niches[0] ?? "Campaign"}</span>
         </div>
-      ) : <div className="bg-aurora h-1.5" />}
+      ) : <div className="h-1 bg-signal" />}
       <div className="p-4">
         <div className="flex items-start gap-3">
           <Link href={mine ? "/profile" : `/u/${o.ownerHandle}`}><Avatar name={name} tone={owner?.tone ?? "violet"} square /></Link>
@@ -129,17 +117,17 @@ export function OpportunityCard({ o }: { o: Opportunity }) {
             <p className="flex items-center gap-1 text-[13px] text-muted">
               <span className="truncate font-semibold text-ink">{name}</span> {owner?.verified && <VerifiedMark />} · {timeAgo(o.createdAt)}
             </p>
-            <h3 className="mt-0.5 text-[17px] font-bold leading-snug">{o.title}</h3>
+            <h3 className="mt-1 text-[19px] font-semibold leading-snug tracking-[-0.01em]">{o.title}</h3>
           </div>
           {o.sample && <SampleTag />}
-          {mine && <button onClick={remove} className="grid h-9 w-9 place-items-center rounded-full text-muted hover:bg-rose-50 hover:text-rose-600" aria-label="Delete opportunity"><Trash2 className="h-4 w-4" /></button>}
+          {mine && <button onClick={remove} className="grid h-9 w-9 place-items-center rounded-full text-muted hover:bg-elevated hover:text-danger" aria-label="Delete opportunity"><Trash2 className="h-4 w-4" /></button>}
         </div>
         <p className="mt-2 text-[14px]">{o.details}</p>
         <div className="mt-3 flex flex-wrap gap-1.5 text-[12px]">
-          <span className="bg-aurora rounded-full px-2.5 py-1 font-bold text-on-accent">{earningLabel(o.type)}</span>
-          <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-semibold text-emerald-700">{budgetText(o.budgetMin, o.budgetMax)}</span>
-          {o.deliverables.length > 0 && <span className="rounded-full bg-elevated px-2.5 py-1 font-semibold ring-1 ring-line">{deliverablesText(o.deliverables)}</span>}
-          {o.niches.map((n) => <span key={n} className="rounded-full bg-brand-50 px-2.5 py-1 font-semibold text-brand-700">{n}</span>)}
+          <span className="rounded-full bg-ink px-2.5 py-1 font-semibold text-canvas">{earningLabel(o.type)}</span>
+          <span className="rounded-full bg-signal px-2.5 py-1 font-semibold tabular-nums text-on-signal">{budgetText(o.budgetMin, o.budgetMax)}</span>
+          {o.deliverables.length > 0 && <span className="rounded-full border border-line px-2.5 py-1 font-medium">{deliverablesText(o.deliverables)}</span>}
+          {o.niches.map((n) => <span key={n} className="rounded-full bg-elevated px-2.5 py-1 font-medium">{n}</span>)}
         </div>
         {session?.role === "creator" && !mine && (
           <Button className="mt-4 w-full" onClick={apply} disabled={applied} variant={applied ? "secondary" : "primary"}>
@@ -161,15 +149,15 @@ export function OpportunityList() {
   return (
     <div>
       {isBiz ? (
-        <button onClick={() => setPosting(true)} className="press bg-aurora btn-glow mb-4 flex w-full items-center gap-3 rounded-[var(--radius-card)] p-4 text-left text-on-accent">
-          <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/20"><Plus className="h-6 w-6" /></span>
+        <button onClick={() => setPosting(true)} className="press mb-4 flex w-full items-center gap-3 rounded-[var(--radius-card)] bg-signal p-4 text-left text-on-signal hover:brightness-105">
+          <span className="grid h-11 w-11 place-items-center rounded-full bg-on-signal text-signal"><Plus className="h-6 w-6" /></span>
           <span>
-            <span className="block font-bold">Post an opportunity</span>
-            <span className="block text-[13px] text-on-accent/75">Tell creators what you need. Applications land in your Messages.</span>
+            <span className="block font-semibold">Post an opportunity</span>
+            <span className="block text-[13px] opacity-75">Tell creators what you need. Applications land in your Messages.</span>
           </span>
         </button>
       ) : (
-        <p className="bg-aurora-soft mb-4 flex items-center gap-2 rounded-2xl px-4 py-3 text-[13px]"><Briefcase className="h-4 w-4 text-brand-600" /> Brands post paid work here. Tap <strong>Apply now</strong> and we send your application to their Messages.</p>
+        <p className="mb-4 flex items-center gap-2 border-l-2 border-signal pl-3 text-[13px] text-muted"><Briefcase className="h-4 w-4 shrink-0" /> Brands post paid work here. Tap <strong>Apply now</strong> and we send your application to their Messages.</p>
       )}
       {mineFirst.length ? (
         <ul className="stagger space-y-4">

@@ -55,13 +55,13 @@ export function BulkDm({ open, onClose, recipients, onSent }: { open: boolean; o
     <Sheet open={open} onClose={close} title={review ? "Review bulk DM" : "Bulk DM"}>
       {bulkDaysLeft > 0 ? (
         <div className="py-6 text-center">
-          <span className="bg-aurora-soft mx-auto grid h-14 w-14 place-items-center rounded-2xl text-brand-600"><CalendarClock className="h-7 w-7" /></span>
+          <span className="bg-aurora-soft mx-auto grid h-14 w-14 place-items-center rounded-xl text-brand-600"><CalendarClock className="h-7 w-7" /></span>
           <p className="mt-3 font-bold">Your next bulk DM unlocks in {bulkDaysLeft} {bulkDaysLeft === 1 ? "day" : "days"}</p>
           <Button variant="secondary" className="mt-4" onClick={close}>Got it</Button>
         </div>
       ) : (
         <>
-          <div className="mb-4 flex items-center gap-3 rounded-2xl bg-elevated p-3">
+          <div className="mb-4 flex items-center gap-3 rounded-xl bg-elevated p-3">
             <div className="flex -space-x-2">
               {recipients.slice(0, 4).map((p) => (
                 <span key={p.handle} className="rounded-full ring-2 ring-surface"><Avatar name={p.name} tone={p.tone} size="sm" square={p.kind === "business"} /></span>

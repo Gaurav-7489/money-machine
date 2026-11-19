@@ -68,17 +68,17 @@ export default function Friends() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="mb-5 text-2xl font-bold tracking-tight">
+      <h1 className="mb-6 border-b border-line pb-4 text-[clamp(2.6rem,7vw,4.25rem)] leading-[0.9]">
         Friends
       </h1>
 
-      <h2 className="mb-2 text-sm font-semibold text-muted">Your friends ({friends.length})</h2>
+      <h2 className="font-text mb-2 text-sm font-semibold text-muted">Your friends ({friends.length})</h2>
       {friends.length ? (
-        <ul className="card divide-y divide-line">
+        <ul className="divide-y divide-line border-y border-line">
           {friends.map((p) => <PersonRow key={p.handle} p={p} followingNow />)}
         </ul>
       ) : (
-        <div className="card">
+        <div className="border-y border-line">
           <EmptyState
             icon={<Users className="h-5 w-5" />}
             title="No friends yet"
@@ -90,8 +90,8 @@ export default function Friends() {
 
       {suggestions.length > 0 && (
         <>
-          <h2 className="mb-2 mt-8 text-sm font-semibold text-muted">Suggested for you</h2>
-          <ul className="card divide-y divide-line">
+          <h2 className="font-text mb-2 mt-8 text-sm font-semibold text-muted">Suggested for you</h2>
+          <ul className="divide-y divide-line border-y border-line">
             {suggestions.map((p) => <PersonRow key={p.handle} p={p} followingNow={false} />)}
           </ul>
         </>

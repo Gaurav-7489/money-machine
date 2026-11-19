@@ -96,10 +96,10 @@ export function Composer({ autoFocus = false, onDone }: { autoFocus?: boolean; o
     onDone?.();
   }
 
-  const tool = "press grid h-10 w-10 place-items-center rounded-full text-brand-600 hover:bg-brand-50 disabled:opacity-40";
+  const tool = "press grid h-10 w-10 place-items-center rounded-full text-muted hover:bg-elevated hover:text-ink disabled:opacity-40";
 
   return (
-    <form onSubmit={submit} className="card mb-5 p-4" aria-label="Create a post" noValidate>
+    <form onSubmit={submit} className="card mb-2 p-4 transition-colors focus-within:border-ink" aria-label="Create a post" noValidate>
       <div className="flex gap-3">
         <Avatar name={session.displayName} tone={session.role === "business" ? "violet" : "rose"} square={session.role === "business"} />
         <div className="min-w-0 flex-1">
@@ -121,12 +121,12 @@ export function Composer({ autoFocus = false, onDone }: { autoFocus?: boolean; o
             aria-invalid={!!error}
             aria-describedby={error ? "composer-err" : undefined}
           />
-          {error && <p id="composer-err" role="alert" className="mt-1 text-[12px] text-rose-600">{error}</p>}
+          {error && <p id="composer-err" role="alert" className="mt-1 text-[12px] text-danger">{error}</p>}
 
           {images.length > 0 && (
             <div className={`mt-2 grid gap-1.5 ${images.length > 1 ? "grid-cols-2" : ""}`}>
               {images.map((src, i) => (
-                <div key={i} className="relative overflow-hidden rounded-2xl ring-1 ring-line">
+                <div key={i} className="relative overflow-hidden rounded-xl">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={src} alt={`Photo ${i + 1} you're about to post`} className={`w-full object-cover ${images.length > 1 ? "aspect-square" : "max-h-72"}`} />
                   <button type="button" onClick={() => setImages((x) => x.filter((_, j) => j !== i))} className="absolute right-1.5 top-1.5 grid h-8 w-8 place-items-center rounded-full bg-black/70 text-white" aria-label={`Remove photo ${i + 1}`}>
@@ -153,7 +153,7 @@ export function Composer({ autoFocus = false, onDone }: { autoFocus?: boolean; o
             </div>
           )}
           {emojiOpen && (
-            <div className="animate-fade-in mt-2 flex flex-wrap gap-1 rounded-2xl bg-elevated p-2" aria-label="Emoji">
+            <div className="animate-fade-in mt-2 flex flex-wrap gap-1 rounded-xl bg-elevated p-2" aria-label="Emoji">
               {QUICK_EMOJI.map((em) => (
                 <button key={em} type="button" onClick={() => addEmoji(em)} className="press grid h-9 w-9 place-items-center rounded-xl text-xl hover:bg-surface" aria-label={`Add ${em}`}>
                   {em}

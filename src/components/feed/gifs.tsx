@@ -33,7 +33,7 @@ export function GifView({ id, size = "md" }: { id: string; size?: "sm" | "md" | 
   const box = size === "sm" ? "h-24 w-36 text-[11px]" : size === "lg" ? "aspect-[16/10] w-full text-2xl" : "h-36 w-56 text-sm";
   const emoji = size === "sm" ? "text-3xl" : size === "lg" ? "text-7xl" : "text-5xl";
   return (
-    <div role="img" aria-label={`GIF: ${g.text}`} className={`gif-hue relative grid place-items-center overflow-hidden rounded-2xl bg-gradient-to-br ${g.bg} ${box}`} style={{ animationDuration: "9s" }}>
+    <div role="img" aria-label={`GIF: ${g.text}`} className={`gif-hue relative grid place-items-center overflow-hidden rounded-xl bg-gradient-to-br ${g.bg} ${box}`} style={{ animationDuration: "9s" }}>
       <span className="absolute -left-6 -top-6 h-24 w-24 rounded-full bg-white/25 blur-xl" />
       <span className="absolute -bottom-8 -right-4 h-28 w-28 rounded-full bg-black/10 blur-xl" />
       <span className={`relative ${g.anim} ${emoji}`}>{g.emoji}</span>
@@ -49,7 +49,7 @@ function UploadedGif({ id, size }: { id: string; size: "sm" | "md" | "lg" }) {
   if (missing) return <p className="rounded-xl bg-elevated px-3 py-2 text-xs text-muted">GIF saved on another device</p>;
   if (!url) return <div className={`skeleton h-24 w-36`} />;
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={url} alt="GIF" className={`rounded-2xl object-contain ${cls}`} />;
+  return <img src={url} alt="GIF" className={`rounded-xl object-contain ${cls}`} />;
 }
 
 export function GifPicker({ open, onClose, onPick }: { open: boolean; onClose: () => void; onPick: (id: string) => void }) {
@@ -85,7 +85,7 @@ export function GifPicker({ open, onClose, onPick }: { open: boolean; onClose: (
               onPick(g.id);
               onClose();
             }}
-            className="press overflow-hidden rounded-2xl ring-1 ring-line hover:ring-2 hover:ring-brand-400"
+            className="press overflow-hidden rounded-xl ring-1 ring-line hover:ring-2 hover:ring-brand-400"
             aria-label={`Use GIF ${g.text}`}
           >
             <div className="pointer-events-none [&>div]:!h-24 [&>div]:!w-full">
@@ -95,7 +95,7 @@ export function GifPicker({ open, onClose, onPick }: { open: boolean; onClose: (
         ))}
       </div>
       <input ref={fileRef} type="file" accept="image/gif" className="sr-only" onChange={upload} tabIndex={-1} />
-      <button type="button" onClick={() => fileRef.current?.click()} disabled={busy} className="press mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-brand-300 text-sm font-semibold text-brand-700 hover:bg-brand-50">
+      <button type="button" onClick={() => fileRef.current?.click()} disabled={busy} className="press mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-brand-300 text-sm font-semibold text-brand-700 hover:bg-brand-50">
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} Upload your own GIF
       </button>
     </Sheet>

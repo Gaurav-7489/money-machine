@@ -179,7 +179,7 @@ test("theme switch: white and dark, remembered, no flash", async ({ page }) => {
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(13, 11, 18)");
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(11, 18, 14)");
 });
 
 test("no horizontal overflow or console errors on main pages", async ({ page }) => {

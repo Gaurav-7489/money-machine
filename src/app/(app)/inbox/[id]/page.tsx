@@ -30,7 +30,7 @@ function MatchesCard({ handles }: { handles: string[] }) {
         if (!p) return null;
         const already = all.some((t) => t.profile.handle === h && t.sentByMe);
         return (
-          <li key={h} className="flex items-center gap-3 rounded-2xl bg-surface p-2.5 ring-1 ring-line">
+          <li key={h} className="flex items-center gap-3 rounded-xl bg-surface p-2.5 ring-1 ring-line">
             <Link href={`/u/${h}`} className="flex min-w-0 flex-1 items-center gap-2.5">
               <Avatar name={p.name} tone={p.tone} square={p.kind === "business"} />
               <span className="min-w-0">
@@ -62,23 +62,23 @@ function Bubble({ m, name, tone, square, onReply }: { m: ViewMessage; name: stri
       <div className="animate-fade-up flex flex-col items-end">
         {m.deal && <div className="mb-1 w-[85%] max-w-sm"><DealSummary deal={{ ...m.deal, note: "" }} compact /></div>}
         {m.gif && <div className="mb-1"><GifView id={m.gif} size="md" /></div>}
-        {m.body && <p className="bg-aurora max-w-[80%] whitespace-pre-wrap break-words rounded-3xl rounded-br-md px-4 py-2.5 text-[15px] text-on-accent">{m.body}</p>}
-        <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted"><CheckCheck className="h-3.5 w-3.5 text-brand-500" /> Sent · {timeAgo(m.at)}</span>
+        {m.body && <p className="bg-aurora max-w-[80%] whitespace-pre-wrap break-words rounded-[18px] rounded-br-[6px] px-4 py-2.5 text-[15px] text-on-accent">{m.body}</p>}
+        <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted"><CheckCheck className="h-3.5 w-3.5 text-gain" /> Sent · {timeAgo(m.at)}</span>
       </div>
     );
   return (
     <div className="flex items-end gap-2">
       <Avatar name={name} tone={tone} size="xs" square={square} />
       <div className="max-w-[85%]">
-        {m.body && <p className="whitespace-pre-wrap break-words rounded-3xl rounded-bl-md bg-elevated px-4 py-2.5 text-[15px] ring-1 ring-line">{m.body}</p>}
+        {m.body && <p className="whitespace-pre-wrap break-words rounded-[18px] rounded-bl-[6px] border border-line bg-surface px-4 py-2.5 text-[15px]">{m.body}</p>}
         {m.matches && <MatchesCard handles={m.matches} />}
         {m.deal && (
           <div className="mt-1.5 w-[min(22rem,80vw)]">
             <DealSummary deal={m.deal} />
             <div className="mt-1.5 grid grid-cols-3 gap-1.5">
-              <button onClick={() => onReply("accept", m.deal!)} className="press h-9 rounded-full bg-emerald-600 text-[12px] font-bold text-white">Accept</button>
+              <button onClick={() => onReply("accept", m.deal!)} className="press h-9 rounded-full bg-signal text-[12px] font-bold text-on-signal">Accept</button>
               <button onClick={() => onReply("counter", m.deal!)} className="press h-9 rounded-full border border-line bg-surface text-[12px] font-bold">Counter</button>
-              <button onClick={() => onReply("decline", m.deal!)} className="press h-9 rounded-full border border-line bg-surface text-[12px] font-bold text-rose-600">Decline</button>
+              <button onClick={() => onReply("decline", m.deal!)} className="press h-9 rounded-full border border-line bg-surface text-[12px] font-bold text-danger">Decline</button>
             </div>
           </div>
         )}
@@ -117,7 +117,7 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
     return (
       <div className="mx-auto max-w-2xl">
         <PageHeader title="Conversation" back="/inbox" />
-        <div className="card">
+        <div className="border-y border-line">
           <EmptyState icon={<MessageCircleOff className="h-5 w-5" />} title="We couldn't find this conversation" body="It may have been deleted. Go back to your messages to start a new one." action={<ButtonLink href="/inbox" variant="soft">Back to Messages</ButtonLink>} />
         </div>
       </div>
@@ -189,25 +189,25 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
         action={
           <div className="flex items-center gap-1">
             {thread.sample && <SampleTag className="mr-1" />}
-            <button onClick={star} aria-pressed={thread.starred} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-surface" aria-label={thread.starred ? "Remove star" : "Star this conversation"} title={thread.starred ? "Remove star" : "Star"}>
-              <Star className={`h-5 w-5 ${thread.starred ? "animate-pop fill-amber-400 text-amber-400" : ""}`} />
+            <button onClick={star} aria-pressed={thread.starred} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-elevated" aria-label={thread.starred ? "Remove star" : "Star this conversation"} title={thread.starred ? "Remove star" : "Star"}>
+              <Star className={`h-5 w-5 ${thread.starred ? "animate-pop fill-signal text-signal" : ""}`} />
             </button>
             {!thread.pinned && (
-              <button onClick={trash} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-surface" aria-label={thread.trashed ? "Restore from Trash" : "Move to Trash"} title={thread.trashed ? "Restore" : "Move to Trash"}>
-                {thread.trashed ? <ArchiveRestore className="h-5 w-5 text-brand-700" /> : <Trash2 className="h-5 w-5" />}
+              <button onClick={trash} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-elevated" aria-label={thread.trashed ? "Restore from Trash" : "Move to Trash"} title={thread.trashed ? "Restore" : "Move to Trash"}>
+                {thread.trashed ? <ArchiveRestore className="h-5 w-5" /> : <Trash2 className="h-5 w-5" />}
               </button>
             )}
           </div>
         }
       />
-      {thread.trashed && <p className="mb-3 rounded-xl bg-amber-50 px-4 py-2.5 text-sm text-amber-700 ring-1 ring-amber-200">This conversation is in Trash. Tap the restore button above to move it back.</p>}
-      <div className="card flex min-h-[64dvh] flex-col p-4">
+      {thread.trashed && <p className="mb-3 border-l-2 border-signal py-1 pl-3 text-sm text-muted">This conversation is in Trash. Tap the restore button above to move it back.</p>}
+      <div className="flex min-h-[60dvh] flex-col">
         <Link href={p.system ? "#" : `/u/${p.handle}`} className="group mb-4 flex flex-col items-center text-center">
           <Avatar name={p.name} tone={p.tone} size="lg" square={p.kind === "business"} ring={thread.pinned} />
           <p className="mt-2 flex items-center gap-1 text-sm font-semibold group-hover:underline">{p.name} {p.verified && <VerifiedMark />}</p>
           <p className="text-xs text-muted">@{p.handle} · {p.niche}</p>
           <span className="mt-1.5 flex flex-wrap justify-center gap-1">
-            {folder && <span className="inline-flex items-center gap-1 rounded-full bg-elevated px-2 py-0.5 text-[11px] font-semibold text-muted ring-1 ring-line">{thread.pinned && <Pin className="h-3 w-3" />}{folder.label} folder</span>}
+            {folder && <span className="inline-flex items-center gap-1 rounded-full border border-line px-2 py-0.5 text-[11px] font-medium text-muted">{thread.pinned && <Pin className="h-3 w-3" />}{folder.label} folder</span>}
           </span>
         </Link>
         <div className="flex-1 space-y-3" aria-live="polite">
@@ -221,13 +221,13 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
               <button type="button" onClick={() => setGif(undefined)} className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-black/70 text-white" aria-label="Remove GIF"><X className="h-3.5 w-3.5" /></button>
             </div>
           )}
-          <div className="flex items-end gap-1.5 rounded-[28px] bg-surface p-1 ring-1 ring-line focus-within:ring-2 focus-within:ring-brand-300">
+          <div className="flex items-end gap-1.5 rounded-[24px] border border-line bg-surface p-1 transition-colors focus-within:border-ink">
             {!p.system && (
-              <button type="button" onClick={() => setOfferOpen(true)} className="press grid h-11 w-11 shrink-0 place-items-center rounded-full text-brand-600 hover:bg-brand-50" aria-label="Send a deal offer" title="Send a deal offer">
+              <button type="button" onClick={() => setOfferOpen(true)} className="press grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted hover:bg-elevated hover:text-ink" aria-label="Send a deal offer" title="Send a deal offer">
                 <Handshake className="h-5 w-5" />
               </button>
             )}
-            <button type="button" onClick={() => setGifOpen(true)} className="press grid h-11 w-11 shrink-0 place-items-center rounded-full text-brand-600 hover:bg-brand-50" aria-label="Add a GIF" title="GIF">
+            <button type="button" onClick={() => setGifOpen(true)} className="press grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted hover:bg-elevated hover:text-ink" aria-label="Add a GIF" title="GIF">
               <Sticker className="h-5 w-5" />
             </button>
             <label htmlFor="msg" className="sr-only">Write a message to {p.name}</label>
@@ -243,11 +243,11 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
               aria-describedby={error ? "msg-err" : undefined}
               className="max-h-40 min-h-11 flex-1 resize-none bg-transparent px-1 py-2.5 text-[15px] outline-none [field-sizing:content]"
             />
-            <button type="submit" className="press btn-glow grid h-11 w-11 shrink-0 place-items-center rounded-full bg-aurora text-on-accent" aria-label="Send">
+            <button type="submit" className="press grid h-11 w-11 shrink-0 place-items-center rounded-full bg-signal text-on-signal" aria-label="Send">
               <SendHorizontal className="h-5 w-5" />
             </button>
           </div>
-          {error && <p id="msg-err" role="alert" className="mt-1 px-3 text-[12px] text-rose-600">{error}</p>}
+          {error && <p id="msg-err" role="alert" className="mt-1 px-3 text-[12px] text-danger">{error}</p>}
         </form>
       </div>
 

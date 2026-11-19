@@ -8,22 +8,18 @@ export const contentType = "image/png";
 export default function OgImage() {
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", padding: 80, background: "linear-gradient(135deg, #ffffff 0%, #ecfbf5 55%, #d2f5e7 100%)", fontFamily: "sans-serif" }}>
-        <svg width="120" height="120" viewBox="0 0 48 48">
-          <defs>
-            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#FF8748" />
-              <stop offset="1" stopColor="#965BFF" />
-            </linearGradient>
-          </defs>
-          <path d="M6 38V14.5c0-2.6 3.2-3.9 5-2l13 13.6L37 12.5c1.8-1.9 5-.6 5 2V38" fill="none" stroke="url(#g)" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx="24" cy="38" r="3.5" fill="#EC4899" />
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 80, background: "#ECEEE7", fontFamily: "sans-serif", color: "#0F1A14" }}>
+        <svg width="96" height="96" viewBox="0 0 48 48">
+          <path d="M6 38V14.5c0-2.6 3.2-3.9 5-2l13 13.6L37 12.5c1.8-1.9 5-.6 5 2V38" fill="none" stroke="#0F1A14" strokeWidth="6.5" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="24" cy="38.5" r="4.25" fill="#F2B705" />
         </svg>
-        <div style={{ marginTop: 40, fontSize: 84, fontWeight: 800, color: "#0F1A17", letterSpacing: -2 }}>{SITE.name}</div>
-        <div style={{ marginTop: 12, fontSize: 44, color: "#5F6F69", display: "flex" }}>
-          Collaborate. Create.&nbsp;<span style={{ color: "#965BFF", fontWeight: 700 }}>Earn.</span>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ fontSize: 132, fontWeight: 800, letterSpacing: -4, lineHeight: 0.92 }}>Create. Collab.</div>
+          <div style={{ display: "flex", fontSize: 132, fontWeight: 800, letterSpacing: -4, lineHeight: 0.92 }}>
+            <span style={{ background: "#F2B705", padding: "0 18px" }}>Cash out.</span>
+          </div>
+          <div style={{ marginTop: 36, fontSize: 30, color: "#5B675F" }}>{SITE.name} · Brand deals, affiliate programs and UGC for creators and businesses</div>
         </div>
-        <div style={{ marginTop: 36, fontSize: 28, color: "#0B503E" }}>Creators × Brands · Affiliate programs · Income tracking</div>
       </div>
     ),
     size,

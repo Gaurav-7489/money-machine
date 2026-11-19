@@ -37,8 +37,8 @@ function ProgramRow({ p, right }: { p: AffiliateProgram; right: React.ReactNode 
 function CommissionRecords() {
   return (
     <section className="mt-6">
-      <h2 className="mb-2 text-sm font-semibold text-muted">Commission records</h2>
-      <div className="card">
+      <h2 className="font-text mb-2 text-sm font-semibold text-muted">Commission records</h2>
+      <div className="border-y border-line">
         <EmptyState
           icon={<Receipt className="h-5 w-5" />}
           title="No commission records yet"
@@ -87,7 +87,7 @@ function CreatorView() {
       <Tabs tabs={[["mine", "My Programs"], ["discover", "Discover"]]} value={tab} onChange={(v) => setTab(v as typeof tab)} />
       {tab === "mine" &&
         (mine.length === 0 ? (
-          <div className="card">
+          <div className="border-y border-line">
             <EmptyState
               icon={<Link2 className="h-5 w-5" />}
               title="You haven't joined a program yet"
@@ -105,7 +105,7 @@ function CreatorView() {
                   <>
                     <StatusPill status={status} />
                     {status === "pending" && (
-                      <button onClick={() => withdraw(program.id)} className="text-xs font-medium text-muted hover:text-rose-600">Withdraw</button>
+                      <button onClick={() => withdraw(program.id)} className="text-xs font-medium text-muted hover:text-danger">Withdraw</button>
                     )}
                   </>
                 }
@@ -158,7 +158,7 @@ function BusinessView() {
       <Tabs tabs={[["mine", "My Programs"], ["applications", `Applications${pending ? ` (${pending})` : ""}`]]} value={tab} onChange={(v) => setTab(v as typeof tab)} />
       {tab === "mine" &&
         (mine.length === 0 ? (
-          <div className="card">
+          <div className="border-y border-line">
             <EmptyState
               icon={<Link2 className="h-5 w-5" />}
               title="No affiliate programs yet"
@@ -192,7 +192,7 @@ function BusinessView() {
         ))}
       {tab === "applications" &&
         (apps.length === 0 ? (
-          <div className="card">
+          <div className="border-y border-line">
             <EmptyState icon={<Inbox className="h-5 w-5" />} title="No applications yet" body="When creators apply to your programs, you'll review them here." />
           </div>
         ) : (

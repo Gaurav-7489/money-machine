@@ -72,7 +72,7 @@ export function DealFields({ draft, onChange, errors, noteLabel = "Note / messag
             <input inputMode="numeric" className={inputCls} placeholder="Max e.g. 20000" value={draft.budgetMax} onChange={(e) => set("budgetMax", e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!errors.budget} />
           </label>
         </div>
-        {errors.budget && <p role="alert" className="mt-1 text-[12px] text-rose-600">{errors.budget}</p>}
+        {errors.budget && <p role="alert" className="mt-1 text-[12px] text-danger">{errors.budget}</p>}
       </div>
 
       <div>
@@ -97,7 +97,7 @@ export function DealFields({ draft, onChange, errors, noteLabel = "Note / messag
                   {DELIVERABLE_TYPES.filter((t) => t === d.type || !used.has(t)).map((t) => <option key={t}>{t}</option>)}
                 </select>
               </label>
-              <button type="button" onClick={() => set("deliverables", draft.deliverables.filter((_, j) => j !== i))} className="press grid h-10 w-10 place-items-center rounded-full text-muted hover:bg-rose-50 hover:text-rose-600" aria-label={`Remove ${d.type}`}>
+              <button type="button" onClick={() => set("deliverables", draft.deliverables.filter((_, j) => j !== i))} className="press grid h-10 w-10 place-items-center rounded-full text-muted hover:bg-rose-50 hover:text-danger" aria-label={`Remove ${d.type}`}>
                 <X className="h-4 w-4" />
               </button>
             </li>
@@ -120,7 +120,7 @@ export function DealFields({ draft, onChange, errors, noteLabel = "Note / messag
 /** Read-only summary of a deal offer (used in messages and the bulk DM review step). */
 export function DealSummary({ deal, compact = false }: { deal: DealOffer; compact?: boolean }) {
   return (
-    <div className={`overflow-hidden rounded-2xl ring-1 ring-brand-200 ${compact ? "" : "bg-surface"}`}>
+    <div className={`overflow-hidden rounded-xl ring-1 ring-brand-200 ${compact ? "" : "bg-surface"}`}>
       <div className="bg-aurora flex items-center justify-between px-3.5 py-2 text-on-accent">
         <span className="text-[13px] font-bold">{earningLabel(deal.type)}</span>
         <span className="text-[12px] font-semibold opacity-90">Deal offer</span>

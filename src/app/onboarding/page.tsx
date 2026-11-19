@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Briefcase, Check, ChevronLeft, Sparkles, UserRound } from "lucide-react";
+import { Logo } from "@/components/logo";
+import { Photo } from "@/components/photo";
+import { STORY } from "@/lib/photos";
 import Link from "next/link";
 import { Button, Field, inputCls, selectCls } from "@/components/ui";
 import { COUNTRIES, EARNING_MODELS, LOCATIONS, NICHES } from "@/lib/catalog";
@@ -21,7 +24,7 @@ function Chips({ options, value, onChange }: { options: readonly { id: string; l
       {options.map((o) => {
         const on = value.includes(o.id);
         return (
-          <button key={o.id} type="button" aria-pressed={on} title={o.hint} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`press inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold transition-colors ${on ? "bg-aurora text-on-accent shadow-sm" : "border border-line bg-surface hover:border-brand-300"}`}>
+          <button key={o.id} type="button" aria-pressed={on} title={o.hint} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`press inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold transition-colors ${on ? "bg-aurora text-on-accent " : "border border-line bg-surface hover:border-ink"}`}>
             {on && <Check className="h-4 w-4" strokeWidth={3} />} {o.label}
           </button>
         );
@@ -89,9 +92,27 @@ export default function Onboarding() {
     setStep((s) => s + 1);
   }
 
+  const panel = [
+    { photo: isBiz ? STORY.team : STORY.creatorPortrait, line: isBiz ? "Brands that know who they need." : "Your work, in front of the right brands." },
+    { photo: isBiz ? STORY.shop : STORY.camera, line: "Search reads what people post, not only their bio." },
+    { photo: STORY.phone, line: "Offers arrive sorted, with the budget up front." },
+    { photo: STORY.deal, line: "One minute now. Matches the moment you finish." },
+  ][step]!;
+
   return (
-    <main className="min-h-dvh bg-surface md:grid md:place-items-center md:bg-elevated">
-      <form onSubmit={next} className="mx-auto w-full max-w-md px-5 pb-28 pt-6 md:card md:p-8 md:pb-8" noValidate>
+    <main className="min-h-dvh md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] xl:grid-cols-2">
+      <aside className="relative hidden h-dvh overflow-hidden bg-ink md:sticky md:top-0 md:block" aria-hidden="true">
+        <div key={`${step}-${isBiz}`} className="absolute inset-0 animate-[fade-in_0.7s_ease-out_both]">
+          <Photo photo={panel.photo} sizes="50vw" priority={step === 0} decorative />
+        </div>
+        <span className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/60" />
+        <Link href="/" className="pointer-events-auto absolute left-8 top-7 text-white [&_*]:!text-white" tabIndex={-1}><Logo /></Link>
+        <div className="absolute inset-x-8 bottom-8 text-white">
+          <p className="font-display text-[clamp(2.4rem,4.5vw,4.25rem)] leading-[0.9]">{panel.line}</p>
+          <p className="mt-4 text-[14px] tabular-nums opacity-80">Step {step + 1} of {STEPS}</p>
+        </div>
+      </aside>
+      <form onSubmit={next} className="mx-auto w-full max-w-md px-5 pb-28 pt-6 md:self-center md:px-8 md:py-14" noValidate>
         <div className="mb-5 flex items-center gap-3">
           {step === 0 ? (
             <Link href="/" aria-label="Back" className="press -ml-2 grid h-9 w-9 place-items-center rounded-full text-ink hover:bg-elevated"><ChevronLeft className="h-5 w-5" /></Link>
@@ -99,23 +120,23 @@ export default function Onboarding() {
             <button type="button" onClick={() => { setErrors({}); setStep((s) => s - 1); }} aria-label="Back" className="press -ml-2 grid h-9 w-9 place-items-center rounded-full text-ink hover:bg-elevated"><ChevronLeft className="h-5 w-5" /></button>
           )}
           <div className="flex flex-1 gap-1.5" aria-label={`Step ${step + 1} of ${STEPS}`}>
-            {Array.from({ length: STEPS }, (_, i) => <span key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i <= step ? "bg-aurora" : "bg-line"}`} />)}
+            {Array.from({ length: STEPS }, (_, i) => <span key={i} className={`h-1 flex-1 rounded-full transition-colors duration-500 ${i < step ? "bg-ink" : i === step ? "bg-signal" : "bg-line"}`} />)}
           </div>
         </div>
 
         <div key={step} className="animate-fade-up">
           {step === 0 && (
             <>
-              <h1 className="text-[28px] font-extrabold tracking-tight">Who are you?</h1>
-              <fieldset className="mt-6 grid grid-cols-2 gap-3">
+              <h1 className="mb-6 text-[clamp(2.6rem,7vw,3.75rem)] leading-[0.9]">Who are you?</h1>
+              <fieldset className="grid grid-cols-2 gap-3">
                 <legend className="sr-only">Account type</legend>
                 {ROLES.map(({ id, title, body, icon: Icon }) => {
                   const selected = role === id;
                   return (
-                    <label key={id} className={`press relative flex cursor-pointer flex-col items-center gap-2 rounded-3xl border p-4 text-center transition ${selected ? "border-transparent ring-aurora bg-aurora-soft" : "border-line hover:bg-elevated"}`}>
+                    <label key={id} className={`press relative flex cursor-pointer flex-col items-start gap-2 rounded-[14px] border p-4 text-left transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink ${selected ? "border-ink bg-surface" : "border-line hover:border-muted/60"}`}>
                       <input type="radio" name="role" value={id} checked={selected} onChange={() => setRole(id)} className="sr-only" />
-                      <span className={`grid h-12 w-12 place-items-center rounded-2xl ${selected ? "bg-aurora text-on-accent" : "bg-elevated text-brand-600"}`}><Icon className="h-6 w-6" /></span>
-                      <span className="font-bold">{title}</span>
+                      <span className={`grid h-10 w-10 place-items-center rounded-full transition-colors ${selected ? "bg-signal text-on-signal" : "bg-elevated text-ink"}`}><Icon className="h-5 w-5" /></span>
+                      <span className="mt-4 font-semibold">{title}</span>
                       <span className="text-[12px] leading-snug text-muted">{body}</span>
                     </label>
                   );
@@ -137,9 +158,9 @@ export default function Onboarding() {
 
           {step === 1 && (
             <>
-              <h1 className="text-[28px] font-extrabold tracking-tight">{isBiz ? "What does your business do?" : "What content do you create?"}</h1>
+              <h1 className="mb-6 text-[clamp(2.6rem,7vw,3.75rem)] leading-[0.9]">{isBiz ? "What does your business do?" : "What content do you create?"}</h1>
               <Chips options={nicheOpts} value={niches} onChange={setNiches} />
-              {errors.niches && <p role="alert" className="mt-3 text-[13px] text-rose-600">{errors.niches}</p>}
+              {errors.niches && <p role="alert" className="mt-3 text-[13px] text-danger">{errors.niches}</p>}
             </>
           )}
 
@@ -147,24 +168,24 @@ export default function Onboarding() {
             <>
               {isBiz ? (
                 <>
-                  <h1 className="text-[28px] font-extrabold tracking-tight">What creators are you looking for?</h1>
+                  <h1 className="mb-6 text-[clamp(2.6rem,7vw,3.75rem)] leading-[0.9]">What creators are you looking for?</h1>
                   <Chips options={nicheOpts} value={lookingFor} onChange={setLookingFor} />
-                  <h2 className="mb-2 mt-6 font-bold">How do you want to work with them?</h2>
+                  <h2 className="font-text mb-2 mt-8 font-semibold">How do you want to work with them?</h2>
                   <Chips options={earnOpts} value={earning} onChange={setEarning} />
                 </>
               ) : (
                 <>
-                  <h1 className="text-[28px] font-extrabold tracking-tight">How do you want to earn?</h1>
+                  <h1 className="mb-6 text-[clamp(2.6rem,7vw,3.75rem)] leading-[0.9]">How do you want to earn?</h1>
                   <Chips options={earnOpts} value={earning} onChange={setEarning} />
                 </>
               )}
-              {errors.step2 && <p role="alert" className="mt-3 text-[13px] text-rose-600">{errors.step2}</p>}
+              {errors.step2 && <p role="alert" className="mt-3 text-[13px] text-danger">{errors.step2}</p>}
             </>
           )}
 
           {step === 3 && (
             <>
-              <h1 className="text-[28px] font-extrabold tracking-tight">Almost there</h1>
+              <h1 className="mb-6 text-[clamp(2.6rem,7vw,3.75rem)] leading-[0.9]">Almost there</h1>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-2">
                   <Field label="Country" optional>
@@ -186,14 +207,14 @@ export default function Onboarding() {
                     <label><span className="sr-only">Minimum</span><input inputMode="numeric" className={inputCls} placeholder="Min" value={payMin} onChange={(e) => setPayMin(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!errors.pay} /></label>
                     <label><span className="sr-only">Maximum</span><input inputMode="numeric" className={inputCls} placeholder="Max" value={payMax} onChange={(e) => setPayMax(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!errors.pay} /></label>
                   </div>
-                  {errors.pay && <p role="alert" className="mt-1 text-[12px] text-rose-600">{errors.pay}</p>}
+                  {errors.pay && <p role="alert" className="mt-1 text-[12px] text-danger">{errors.pay}</p>}
                 </div>
               </div>
             </>
           )}
         </div>
 
-        <div className="fixed inset-x-0 bottom-0 border-t border-line bg-surface/95 px-5 py-3 pb-safe backdrop-blur md:static md:mt-8 md:border-0 md:bg-transparent md:p-0">
+        <div className="glass fixed inset-x-0 bottom-0 border-t border-line px-5 py-3 pb-safe md:static md:mt-10 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
           <Button type="submit" size="lg" className="mx-auto w-full max-w-md">
             {step === 3 ? <><Sparkles className="h-5 w-5" /> Show my matches</> : "Continue"}
           </Button>

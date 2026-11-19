@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { BadgeCheck, CreditCard, Handshake, Link2, Megaphone, Package, PlusCircle, Rocket, ShoppingCart, Sparkles, Trash2, TrendingDown, TrendingUp, Video, Wallet } from "lucide-react";
 import { useFeedback } from "@/components/feedback";
+import { MonthChart } from "@/components/month-chart";
 import { Button, EmptyState, Field, PageHeader, Sheet, inputCls, selectCls } from "@/components/ui";
 import { formatDate, formatINR, uid } from "@/lib/format";
 import { useGrowth, useMoney } from "@/lib/hooks";
@@ -25,17 +26,6 @@ const LABEL: Record<Kind, { one: string; add: string; from: string; ph: string }
   spending: { one: "Investment", add: "Add investment", from: "Paid to (optional)", ph: "e.g. Reel with @kavya.fit" },
   revenue: { one: "Revenue", add: "Add revenue", from: "Source (optional)", ph: "e.g. Website sales, November" },
 };
-
-function Bars({ values, tone = "bg-aurora" }: { values: number[]; tone?: string }) {
-  const max = Math.max(...values.map(Math.abs), 1);
-  return (
-    <div className="flex h-14 items-end gap-1.5" aria-hidden="true">
-      {values.map((v, i) => (
-        <span key={i} className={`w-3 rounded-full ${v < 0 ? "bg-rose-400" : i === values.length - 1 ? tone : "bg-white/35"}`} style={{ height: `${Math.max(10, (Math.abs(v) / max) * 100)}%` }} />
-      ))}
-    </div>
-  );
-}
 
 function RecordForm({ kind, open, onClose }: { kind: Kind; open: boolean; onClose: () => void }) {
   const { update } = useStore();
@@ -99,7 +89,7 @@ function RecordList({ kind }: { kind: Kind }) {
   }
   if (!list.length)
     return (
-      <div className="card">
+      <div className="border-y border-line">
         <EmptyState
           icon={<Wallet className="h-5 w-5" />}
           title={kind === "income" ? "No income recorded yet" : kind === "spending" ? "No investments yet" : "No revenue yet"}
@@ -109,18 +99,18 @@ function RecordList({ kind }: { kind: Kind }) {
     );
   const sign = kind === "spending" ? "−" : "+";
   return (
-    <ul className="card divide-y divide-line">
+    <ul className="divide-y divide-line border-y border-line">
       {list.map((r) => {
         const Icon = CAT_ICON[r.category] ?? Wallet;
         return (
-          <li key={r.id} className="flex items-center gap-3 px-4 py-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-elevated text-ink"><Icon className="h-4 w-4" /></span>
+          <li key={r.id} className="flex items-center gap-3 py-3.5">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line text-ink"><Icon className="h-4 w-4" strokeWidth={1.7} /></span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-semibold">{r.title}</span>
               <span className="block text-xs text-muted">{formatDate(r.date)}{r.counterparty ? ` · ${r.counterparty}` : ""} · {r.source === "verified" ? "Verified" : "Self-reported"}</span>
             </span>
-            <span className={`text-sm font-bold tabular-nums ${kind === "spending" ? "text-ink" : "text-emerald-600"}`}>{sign}{formatINR(r.amount)}</span>
-            <button onClick={() => remove(r.id)} className="grid h-8 w-8 place-items-center rounded-full text-muted hover:bg-rose-50 hover:text-rose-600" aria-label={`Delete ${r.title}`}><Trash2 className="h-4 w-4" /></button>
+            <span className={`font-display text-[22px] leading-none tabular-nums ${kind === "spending" ? "text-ink" : "text-gain"}`}>{sign}{formatINR(r.amount)}</span>
+            <button onClick={() => remove(r.id)} className="grid h-8 w-8 place-items-center rounded-full text-muted hover:bg-elevated hover:text-danger" aria-label={`Delete ${r.title}`}><Trash2 className="h-4 w-4" /></button>
           </li>
         );
       })}
@@ -132,13 +122,13 @@ function StripeCard({ purpose }: { purpose: "payouts" | "revenue" }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button onClick={() => setOpen(true)} className="press card flex w-full items-center gap-3 p-4 text-left hover:border-brand-300">
-        <span className="grid h-11 w-11 place-items-center rounded-xl bg-[#635bff] text-white"><CreditCard className="h-5 w-5" /></span>
+      <button onClick={() => setOpen(true)} className="press flex w-full items-center gap-3 rounded-[12px] border border-dashed border-muted/50 p-4 text-left transition-colors hover:border-ink">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-elevated"><CreditCard className="h-5 w-5" strokeWidth={1.7} /></span>
         <span className="min-w-0 flex-1">
-          <span className="block font-bold">Connect Stripe</span>
+          <span className="block font-semibold">Connect Stripe</span>
           <span className="block text-[13px] text-muted">{purpose === "payouts" ? "Show real, verified earnings from your payouts." : "Import real revenue and payments to measure scaling."}</span>
         </span>
-        <span className="rounded-full bg-elevated px-2.5 py-1 text-[11px] font-bold text-muted ring-1 ring-line">Soon</span>
+        <span className="rounded-full border border-line px-2.5 py-1 text-[11px] font-medium text-muted">Soon</span>
       </button>
       <Sheet open={open} onClose={() => setOpen(false)} title="Connect Stripe">
         <div className="space-y-3 text-[15px]">
@@ -161,48 +151,48 @@ function CreatorEarnings() {
   const [open, setOpen] = useState(false);
   const bySource = CATS.income.map(([id, label]) => ({ id, label, total: records.filter((r) => r.category === id).reduce((s, r) => s + r.amount, 0) })).filter((x) => x.total > 0);
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-4xl">
       <PageHeader title="Earnings" back="/profile" />
-      <section className="bg-money relative overflow-hidden rounded-[var(--radius-card)] p-5 text-on-accent shadow-lg">
-        <span className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/15 blur-2xl" />
-        <div className="relative flex items-end justify-between gap-4">
-          <div>
-            <p className="text-sm text-on-accent/75">Total earned</p>
-            <p className="mt-1 text-4xl font-extrabold tracking-tight">{formatINR(summary.total)}</p>
-            <p className="mt-1.5 text-xs">
-              {summary.changePercent !== null ? (
-                <span className="rounded-full bg-white/20 px-2 py-0.5 font-bold">{summary.changePercent >= 0 ? "▲" : "▼"} {Math.abs(summary.changePercent)}% vs last month</span>
-              ) : (
-                <span className="text-on-accent/75">This month: {formatINR(summary.thisMonth)}</span>
-              )}
-            </p>
-          </div>
-          <Bars values={summary.monthly.map((m) => m.total)} tone="bg-white" />
+      <section className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-12" aria-label="Summary">
+        <div>
+          <p className="text-[14px] text-muted">Total earned</p>
+          <p className="font-display mt-2 text-[clamp(3.6rem,11vw,6.5rem)] leading-[0.85] tabular-nums">{formatINR(summary.total)}</p>
+          <p className="mt-3 text-[14px]">
+            {summary.changePercent !== null ? (
+              <span className={`font-semibold tabular-nums ${summary.changePercent >= 0 ? "text-gain" : "text-loss"}`}>{summary.changePercent >= 0 ? "▲" : "▼"} {Math.abs(summary.changePercent)}% vs last month</span>
+            ) : (
+              <span className="text-muted">This month: <span className="font-medium tabular-nums text-ink">{formatINR(summary.thisMonth)}</span></span>
+            )}
+          </p>
+          <dl className="mt-6 grid grid-cols-2 border-y border-line text-[13px]">
+            <div className="py-3"><dt className="flex items-center gap-1 text-muted"><BadgeCheck className="h-3.5 w-3.5" /> Verified</dt><dd className="mt-1 text-[17px] font-semibold tabular-nums">{formatINR(summary.verifiedTotal)}</dd></div>
+            <div className="border-l border-line py-3 pl-4"><dt className="text-muted">Self-reported</dt><dd className="mt-1 text-[17px] font-semibold tabular-nums">{formatINR(summary.selfReportedTotal)}</dd></div>
+          </dl>
         </div>
-        <div className="relative mt-4 grid grid-cols-2 gap-3 border-t border-white/25 pt-3 text-sm">
-          <div><p className="flex items-center gap-1 text-xs text-on-accent/75"><BadgeCheck className="h-3.5 w-3.5" /> Verified</p><p className="font-bold">{formatINR(summary.verifiedTotal)}</p></div>
-          <div><p className="text-xs text-on-accent/75">Self-reported</p><p className="font-bold">{formatINR(summary.selfReportedTotal)}</p></div>
-        </div>
+        <MonthChart data={summary.monthly} caption="Earnings for the last six months" />
       </section>
 
       {bySource.length > 0 && (
-        <section className="card mt-4 p-4">
-          <h2 className="mb-3 text-sm font-bold">Where your money comes from</h2>
-          <ul className="space-y-2.5">
-            {bySource.map((s) => (
+        <section className="mt-12 border-t border-ink pt-3">
+          <h2 className="font-text mb-4 text-[14px] font-semibold">Where your money comes from</h2>
+          <ul className="space-y-4">
+            {bySource.map((s, i) => (
               <li key={s.id}>
-                <div className="mb-1 flex justify-between text-[13px]"><span className="font-medium">{s.label}</span><span className="font-bold tabular-nums">{formatINR(s.total)}</span></div>
-                <div className="h-2 overflow-hidden rounded-full bg-elevated"><div className="bg-aurora h-full rounded-full" style={{ width: `${Math.max(4, (s.total / summary.total) * 100)}%` }} /></div>
+                <div className="mb-1.5 flex justify-between text-[14px]"><span>{s.label}</span><span className="font-semibold tabular-nums">{formatINR(s.total)}</span></div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-elevated"><div className={`h-full origin-left rounded-full ${i === 0 ? "bg-signal" : "bg-ink"} animate-[grow-x_0.9s_var(--ease-out-expo)_both]`} style={{ width: `${Math.max(4, (s.total / summary.total) * 100)}%` }} /></div>
               </li>
             ))}
           </ul>
         </section>
       )}
 
-      <div className="mt-4"><StripeCard purpose="payouts" /></div>
-      <section className="mt-4">
+      <section className="mt-12" aria-labelledby="records-title">
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <h2 id="records-title" className="text-[clamp(2rem,5vw,3rem)]">Records</h2>
+          <Button onClick={() => setOpen(true)}><PlusCircle className="h-4 w-4" /> Add earning</Button>
+        </div>
         <RecordList kind="income" />
-        <Button variant="secondary" className="mt-4 w-full" onClick={() => setOpen(true)}><PlusCircle className="h-4 w-4" /> Add earning</Button>
+        <div className="mt-6"><StripeCard purpose="payouts" /></div>
       </section>
       <RecordForm kind="income" open={open} onClose={() => setOpen(false)} />
     </div>
@@ -220,39 +210,36 @@ function BusinessGrowth() {
   }, [params]);
   const up = g.profit >= 0;
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-4xl">
       <PageHeader title="Grow & Scale" back="/profile" />
-      <section className="bg-aurora relative overflow-hidden rounded-[var(--radius-card)] p-5 text-on-accent shadow-lg">
-        <span className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/15 blur-2xl" />
-        <div className="relative flex items-end justify-between gap-4">
-          <div>
-            <p className="flex items-center gap-1.5 text-sm text-on-accent/75"><Rocket className="h-4 w-4" /> Profit</p>
-            <p className="mt-1 text-4xl font-extrabold tracking-tight">{up ? "" : "−"}{formatINR(Math.abs(g.profit))}</p>
-            <p className="mt-1.5 text-xs">
-              {g.roi !== null ? <span className="rounded-full bg-white/20 px-2 py-0.5 font-bold">{g.roi >= 0 ? "▲" : "▼"} {Math.abs(g.roi)}% return on investment</span> : <span className="text-on-accent/75">Add investments and revenue to see your return.</span>}
-            </p>
-          </div>
-          <Bars values={g.monthlyProfit.map((m) => m.total)} tone="bg-white" />
+      <section className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-12" aria-label="Summary">
+        <div>
+          <p className="flex items-center gap-1.5 text-[14px] text-muted"><Rocket className="h-4 w-4" /> Profit</p>
+          <p className={`font-display mt-2 text-[clamp(3.6rem,11vw,6.5rem)] leading-[0.85] tabular-nums ${up ? "" : "text-loss"}`}>{up ? "" : "−"}{formatINR(Math.abs(g.profit))}</p>
+          <p className="mt-3 text-[14px]">
+            {g.roi !== null ? <span className={`font-semibold tabular-nums ${g.roi >= 0 ? "text-gain" : "text-loss"}`}>{g.roi >= 0 ? "▲" : "▼"} {Math.abs(g.roi)}% return on investment</span> : <span className="text-muted">Add investments and revenue to see your return.</span>}
+          </p>
+          <dl className="mt-6 grid grid-cols-2 border-y border-line text-[13px]">
+            <div className="py-3"><dt className="flex items-center gap-1 text-muted"><TrendingDown className="h-3.5 w-3.5" /> Invested</dt><dd className="mt-1 text-[17px] font-semibold tabular-nums">{formatINR(g.spending.total)}</dd></div>
+            <div className="border-l border-line py-3 pl-4"><dt className="flex items-center gap-1 text-muted"><TrendingUp className="h-3.5 w-3.5" /> Revenue</dt><dd className="mt-1 text-[17px] font-semibold tabular-nums">{formatINR(g.revenue.total)}</dd></div>
+          </dl>
         </div>
-        <div className="relative mt-4 grid grid-cols-2 gap-3 border-t border-white/25 pt-3 text-sm">
-          <div><p className="flex items-center gap-1 text-xs text-on-accent/75"><TrendingDown className="h-3.5 w-3.5" /> Invested</p><p className="font-bold">{formatINR(g.spending.total)}</p></div>
-          <div><p className="flex items-center gap-1 text-xs text-on-accent/75"><TrendingUp className="h-3.5 w-3.5" /> Revenue</p><p className="font-bold">{formatINR(g.revenue.total)}</p></div>
-        </div>
+        <MonthChart data={g.monthlyProfit} caption="Profit for the last six months" />
       </section>
 
-      <div role="tablist" aria-label="Show" className="mt-4 grid grid-cols-2 gap-1 rounded-2xl bg-surface p-1 ring-1 ring-line">
+      <div role="tablist" aria-label="Show" className="mt-12 grid grid-cols-2 gap-1 rounded-full border border-line p-1">
         {([["spending", "Invest", TrendingDown], ["revenue", "Scaling", TrendingUp]] as const).map(([id, label, Icon]) => (
-          <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`press relative isolate flex h-11 items-center justify-center gap-1.5 rounded-xl text-sm font-bold ${tab === id ? "text-surface" : "text-muted"}`}>
+          <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`press relative isolate flex h-10 items-center justify-center gap-1.5 rounded-full text-sm font-semibold ${tab === id ? "text-canvas" : "text-muted hover:text-ink"}`}>
             {tab === id && <TabIndicator group="money" variant="pill" />}
             <Icon className="h-4 w-4" /> {label}
           </button>
         ))}
       </div>
 
-      <div className="mt-4 space-y-4">
-        {tab === "revenue" && <StripeCard purpose="revenue" />}
+      <div className="mt-6 space-y-6">
+        <div className="flex justify-end"><Button onClick={() => setOpen(true)}><PlusCircle className="h-4 w-4" /> {LABEL[tab].add}</Button></div>
         <RecordList kind={tab} />
-        <Button variant="secondary" className="w-full" onClick={() => setOpen(true)}><PlusCircle className="h-4 w-4" /> {LABEL[tab].add}</Button>
+        {tab === "revenue" && <StripeCard purpose="revenue" />}
       </div>
       <RecordForm kind={tab} open={open} onClose={() => setOpen(false)} />
     </div>
