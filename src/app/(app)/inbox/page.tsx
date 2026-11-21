@@ -71,7 +71,7 @@ function FolderTile({ f, threads }: { f: FolderDef; threads: ThreadView[] }) {
             )}
           </span>
           <span className="absolute inset-x-3 bottom-3">
-            <span className="font-display block text-[clamp(1.4rem,2.6vw,1.75rem)] leading-[1.1]">{f.label}</span>
+            <span className="font-display block text-lg">{f.label}</span>
             <span className="mt-1.5 flex items-center gap-2">
               <span className="flex -space-x-1.5" aria-hidden="true">
                 {threads.slice(0, 3).map((t) => (
@@ -134,7 +134,7 @@ function InboxInner() {
   return (
     <div className="mx-auto max-w-4xl">
       <div className="mb-6 flex items-end gap-3">
-        <h1 className="flex-1 text-[clamp(1.75rem,4vw,2.25rem)] leading-[1.1]">Messages</h1>
+        <h1 className="flex-1 text-xl font-bold tracking-tight">Messages</h1>
         <Button onClick={() => setComposing(true)} aria-label="New message"><PenSquare className="h-4 w-4" /> <span className="max-sm:hidden">New</span></Button>
       </div>
 

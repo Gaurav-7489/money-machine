@@ -75,7 +75,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
               <Avatar name={p.name} tone={p.tone} size="xl" square={!isCreator} />
             </span>
           </div>
-          <h1 className="mt-4 flex items-center gap-2 text-[clamp(1.75rem,5vw,2.5rem)] leading-[0.88]">
+          <h1 className="mt-4 flex items-center gap-2 text-xl font-bold tracking-tight">
             {p.name}
             {p.verified && <span className="mt-2 self-start [&_svg]:h-6 [&_svg]:w-6"><VerifiedMark /></span>}
           </h1>
@@ -84,7 +84,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
             <span className="rounded-full border border-line px-2 py-px text-[12px] font-medium text-ink">{isCreator ? "Creator" : "Business"}</span>
             <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {[p.city, p.region, p.country].filter(Boolean).join(", ")}</span>
           </p>
-          <p className="mt-6 max-w-[34ch] text-[clamp(1.35rem,2.6vw,1.75rem)] font-medium leading-snug tracking-[-0.015em]">{p.bio}</p>
+          <p className="mt-2 max-w-md text-sm">{p.bio}</p>
           <p className="mt-5 flex flex-wrap gap-1.5">
             {p.niches.map((n) => <span key={n} className="rounded-full bg-elevated px-3 py-1 text-[13px] font-medium">{n}</span>)}
           </p>
@@ -155,7 +155,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
           <aside className="md:col-span-5 md:pt-14" aria-labelledby="peer-title">
             <div className="border-t border-line pt-3">
               <h2 id="peer-title" className="font-text text-[14px] font-semibold">{isCreator ? "Fellow creator" : "Fellow business"}</h2>
-              <p className="font-display mt-5 text-[clamp(1.5rem,3vw,2rem)] leading-[1.1]">
+              <p className="font-display mt-5 text-xl">
                 {shared.length ? `You both work in ${shared.join(" and ")}.` : `A ${isCreator ? "creator" : "business"} in ${p.niche}.`}
               </p>
               <p className="mt-4 text-[15px] text-muted">
@@ -175,7 +175,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
             <h2 id="terms-title" className="font-text text-[14px] font-semibold">Working together</h2>
             {fit !== null && (
               <div className="mt-5 flex items-end justify-between gap-3 border-b border-line pb-5" role="img" aria-label={`${fit}% match with you, ${matchLabel(fit)}`}>
-                <p className="font-display text-[88px] leading-[0.8] tabular-nums" aria-hidden="true">{fit}<span className="text-[0.5em]">%</span></p>
+                <p className="font-display text-5xl leading-none tabular-nums" aria-hidden="true">{fit}<span className="text-[0.5em]">%</span></p>
                 <p className="text-right text-[13px] text-muted" aria-hidden="true">match with you<br /><span className="font-medium text-ink">{matchLabel(fit)}</span></p>
               </div>
             )}
@@ -210,7 +210,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
       </div>
 
       <section className="mt-16" aria-labelledby="posts-title">
-        <h2 id="posts-title" className="flex items-baseline gap-3 border-b border-line pb-3 text-[clamp(1.4rem,3.5vw,1.85rem)]">
+        <h2 id="posts-title" className="flex items-baseline gap-3 border-b border-line pb-3 text-lg font-semibold">
           Posts <span className="font-text text-[15px] font-normal text-muted tabular-nums">{posts.length}</span>
         </h2>
         {posts.length ? (

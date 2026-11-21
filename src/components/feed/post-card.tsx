@@ -46,7 +46,7 @@ export const REACTIONS = ["❤️", "🔥", "😂", "😍", "👏", "💸", "�
 function RichText({ text }: { text: string }) {
   const parts = text.split(/([#@][\p{L}\p{N}_.]+)/gu);
   return (
-    <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed">
+    <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">
       {parts.map((p, i) =>
         p.startsWith("#") ? (
           <Link key={i} href={`/explore?q=${encodeURIComponent(p.slice(1))}`} className="font-medium text-brand-600 underline decoration-brand-300 underline-offset-2 hover:decoration-current">{p}</Link>
@@ -63,9 +63,9 @@ function RichText({ text }: { text: string }) {
 function Photos({ list, alt }: { list: string[]; alt: string }) {
   if (list.length === 1)
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={list[0]} alt={alt} className="max-h-[560px] w-full rounded-[20px] bg-elevated object-cover" />;
+    return <img src={list[0]} alt={alt} className="max-h-[560px] w-full bg-canvas object-cover" />;
   return (
-    <div className="grid grid-cols-2 gap-1 overflow-hidden rounded-[20px]">
+    <div className="grid grid-cols-2 gap-0.5 overflow-hidden">
       {list.map((src, i) => (
         // eslint-disable-next-line @next/next/no-img-element
         <img key={i} src={src} alt={`${alt} (${i + 1} of ${list.length})`} className={`w-full object-cover ${list.length === 3 && i === 0 ? "row-span-2 h-full" : "aspect-square"}`} />
@@ -81,7 +81,7 @@ function Stat({ onClick, pressed, label, count, icon, activeCls = "", title }: {
       onClick={onClick}
       aria-pressed={pressed}
       title={title ?? label}
-      className={`press flex h-10 items-center gap-1 rounded-full px-2 text-[13px] font-medium transition-colors hover:bg-elevated max-[360px]:px-1 sm:gap-1.5 sm:px-2.5 ${pressed ? activeCls : "text-muted hover:text-ink"}`}
+      className={`press flex h-9 items-center gap-1.5 text-sm font-medium transition-colors ${pressed ? activeCls : "text-ink"}`}
     >
       {icon}
       <span className="sr-only">{label}</span>
@@ -130,6 +130,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
   const authorHref = post.mine ? "/profile" : `/u/${post.authorHandle}`;
   const photos = [post.image, ...(post.images ?? [])].filter(Boolean) as string[];
   const visibleComments = showComments ? allComments : allComments.slice(-2);
+  const textCard = photos.length === 0 && !post.videoId && !post.gif && !post.media && !post.quoteOf && !!post.caption && post.caption.length <= 140;
 
   async function share() {
     const url = `${window.location.origin}/home#${post.id}`;
@@ -203,104 +204,104 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
   }
 
   return (
-    <article id={post.id} aria-label={`Post by ${post.authorName}`} className="card scroll-mt-28 mb-4 px-4 pb-2 pt-4 sm:px-5">
+    <article id={post.id} aria-label={`Post by ${post.authorName}`} className="card scroll-mt-28 overflow-hidden">
       {isReposted && (
-        <p className="mb-1.5 ml-12 flex items-center gap-1.5 text-xs font-semibold text-muted">
+        <p className="flex items-center gap-1.5 px-4 pt-3 text-xs font-semibold text-muted">
           <Repeat2 className="h-3.5 w-3.5" /> You reposted
         </p>
       )}
-      <div className="flex gap-3">
-        <div className="flex flex-col items-center">
-          <Link href={authorHref} aria-label={`View ${post.authorName}'s profile`}>
-            <Avatar name={post.authorName} tone={post.authorTone} square={post.authorKind === "business"} photoId={post.mine ? session?.avatarId : undefined} />
-          </Link>
-          {allComments.length > 0 && <span className="mt-2 w-0.5 flex-1 rounded-full bg-line" aria-hidden="true" />}
-        </div>
+      <header className="flex items-center gap-3 px-4 py-3">
+        <Link href={authorHref} aria-label={`View ${post.authorName}'s profile`}>
+          <Avatar name={post.authorName} tone={post.authorTone} square={post.authorKind === "business"} photoId={post.mine ? session?.avatarId : undefined} />
+        </Link>
         <div className="min-w-0 flex-1">
-          <header className="flex items-start gap-2">
-            <p className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 text-[14px] leading-tight">
-              <Link href={authorHref} className="truncate font-semibold hover:underline">{post.authorName}</Link>
-              {post.verified && <VerifiedMark />}
-              <span className="truncate text-muted max-sm:hidden">@{post.authorHandle}</span>
-              <span className="whitespace-nowrap text-muted">· {timeAgo(post.createdAt)}</span>
-              {post.authorKind === "business" && <span className="rounded-full bg-tone-violet px-2 py-px text-[11px] font-semibold text-tone-violet-ink">Business</span>}
-            </p>
-            {post.sample && <SampleTag />}
-            {post.mine && (
-              <button onClick={removePost} className="press -mr-1 -mt-1 grid h-8 w-8 place-items-center rounded-full text-muted hover:bg-elevated hover:text-danger" aria-label="Delete post" title="Delete post">
-                <Trash2 className="h-4 w-4" />
-              </button>
-            )}
-          </header>
-
-          {post.caption && <div className="mt-1"><RichText text={post.caption} /></div>}
-          {post.tags.length > 0 && !post.caption.includes("#") && (
-            <p className="mt-1 flex flex-wrap gap-x-2 text-[14px] text-brand-600">
-              {post.tags.map((t) => <Link key={t} href={`/explore?q=${encodeURIComponent(t)}`} className="hover:underline">#{t}</Link>)}
-            </p>
-          )}
-
-          <div className="mt-3 empty:hidden">
-            {photos.length > 0 ? (
-              <Photos list={photos} alt={post.caption || "Photo"} />
-            ) : post.videoId ? (
-              <VideoView id={post.videoId} />
-            ) : post.gif ? (
-              <GifView id={post.gif} size="lg" />
-            ) : post.media ? (
-              <MediaArt tone={post.tone} media={post.media} label={post.caption} />
-            ) : !post.quoteOf && post.caption.length < 90 && post.sample ? null : null}
-          </div>
-          {post.quoteOf && <QuotedPost post={quoted} />}
-
-          {myReaction && (
-            <p className="mt-2 inline-flex items-center gap-1 rounded-full border border-line px-2 py-0.5 text-[12px]">
-              <span>{myReaction}</span> <span className="text-muted">You reacted</span>
-            </p>
-          )}
-
-          <div className="relative mt-1 flex items-center -ml-2.5 max-sm:-ml-[54px] max-sm:w-[calc(100%+54px)] max-sm:justify-between">
-            <Stat
-              onClick={() => toggle("liked", post.id)}
-              pressed={isLiked}
-              label={isLiked ? "Liked" : "Like"}
-              count={likeCount}
-              activeCls="text-accent-2"
-              icon={<span key={String(isLiked)} className={isLiked ? "burst" : ""}><Heart className={`h-[19px] w-[19px] ${isLiked ? "animate-pop fill-accent-2 text-accent-2" : ""}`} /></span>}
-            />
-            <Stat onClick={() => setShowComments((v) => !v)} pressed={showComments} label="Comment" count={commentCount} activeCls="text-brand-600" icon={<MessageCircle className="h-[19px] w-[19px]" />} />
-            <div className="relative">
-              <Stat onClick={() => (post.mine ? setQuoting(true) : setRepostMenu((v) => !v))} pressed={isReposted} label={isReposted ? "Reposted" : "Repost"} count={repostCount} activeCls="text-gain" icon={<Repeat2 className={`h-[19px] w-[19px] ${isReposted ? "animate-pop" : ""}`} />} />
-              {repostMenu && (
-                <div className="animate-scale-in absolute bottom-full left-0 z-20 mb-1 w-44 origin-bottom-left overflow-hidden rounded-xl border border-line bg-surface shadow-xl" role="menu">
-                  <button role="menuitem" onClick={repost} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm font-medium hover:bg-elevated"><Repeat2 className="h-4 w-4" /> {isReposted ? "Undo repost" : "Repost"}</button>
-                  <button role="menuitem" onClick={() => { setRepostMenu(false); setQuoting(true); }} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm font-medium hover:bg-elevated"><Quote className="h-4 w-4" /> Quote</button>
-                </div>
-              )}
-            </div>
-            <div>
-              <Stat onClick={() => setReactOpen((v) => !v)} pressed={!!myReaction} label="React with an emoji" activeCls="text-ink" icon={myReaction ? <span className="text-[17px] leading-none">{myReaction}</span> : <SmilePlus className="h-[19px] w-[19px]" />} />
-              {reactOpen && (
-                <div className="animate-scale-in absolute bottom-full left-0 right-0 z-20 mx-auto mb-1 flex w-fit max-w-full origin-bottom flex-wrap justify-center gap-0.5 rounded-full border border-line bg-surface p-1 shadow-xl" role="menu" aria-label="Reactions">
-                  {REACTIONS.map((e) => (
-                    <button key={e} role="menuitem" onClick={() => react(e)} className={`press grid h-9 w-9 place-items-center rounded-full text-xl transition-transform hover:scale-125 ${myReaction === e ? "bg-signal/30" : ""}`} aria-label={`React ${e}`}>
-                      {e}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <Stat onClick={share} label="Share" icon={<Send className="h-[18px] w-[18px]" />} />
-            <span className="flex-1 max-sm:hidden" />
-            <Stat onClick={saveToggle} pressed={isSaved} label={isSaved ? "Saved" : "Save"} activeCls="text-ink" icon={<Bookmark className={`h-[19px] w-[19px] ${isSaved ? "animate-pop fill-current" : ""}`} />} />
-          </div>
+          <p className="flex items-center gap-1 text-sm font-semibold">
+            <Link href={authorHref} className="truncate hover:underline">{post.authorHandle}</Link>
+            {post.verified && <VerifiedMark />}
+          </p>
+          <p className="text-xs text-muted">
+            {timeAgo(post.createdAt)}
+            {post.authorKind === "business" && " · Business"}
+          </p>
         </div>
+        {post.sample && <SampleTag />}
+        {post.mine && (
+          <button onClick={removePost} className="press -mr-1 grid h-8 w-8 place-items-center rounded-full text-muted hover:bg-canvas hover:text-rose-600" aria-label="Delete post" title="Delete post">
+            <Trash2 className="h-4 w-4" />
+          </button>
+        )}
+      </header>
+
+      {photos.length > 0 ? (
+        <Photos list={photos} alt={post.caption || "Photo"} />
+      ) : post.videoId ? (
+        <VideoView id={post.videoId} />
+      ) : post.gif ? (
+        <div className="px-4"><GifView id={post.gif} size="lg" /></div>
+      ) : post.media ? (
+        <MediaArt tone={post.tone} media={post.media} label={post.caption} />
+      ) : textCard ? (
+        <div className={`grid aspect-[4/3] place-items-center bg-gradient-to-br px-8 text-center ${TONES[post.tone].bg}`}>
+          <p className="text-xl font-semibold leading-snug text-ink/80 dark:text-slate-900/80 md:text-2xl">{post.caption}</p>
+        </div>
+      ) : null}
+
+      <div className="relative flex items-center gap-4 px-4 pt-3">
+        <Stat
+          onClick={() => toggle("liked", post.id)}
+          pressed={isLiked}
+          label={isLiked ? "Unlike" : "Like"}
+          count={likeCount}
+          activeCls="text-rose-500"
+          icon={<span key={String(isLiked)} className={isLiked ? "burst" : ""}><Heart className={`h-[22px] w-[22px] transition-colors ${isLiked ? "animate-pop fill-rose-500 text-rose-500" : ""}`} /></span>}
+        />
+        <Stat onClick={() => setShowComments((v) => !v)} pressed={showComments} label="Comment" count={commentCount} activeCls="text-brand-600" icon={<MessageCircle className="h-[22px] w-[22px]" />} />
+        <div className="relative">
+          <Stat onClick={() => (post.mine ? setQuoting(true) : setRepostMenu((v) => !v))} pressed={isReposted} label={isReposted ? "Reposted" : "Repost"} count={repostCount} activeCls="text-brand-600" icon={<Repeat2 className={`h-[22px] w-[22px] ${isReposted ? "animate-pop" : ""}`} />} />
+          {repostMenu && (
+            <div className="animate-scale-in absolute bottom-full left-0 z-20 mb-1 w-44 origin-bottom-left overflow-hidden rounded-2xl border border-line bg-surface shadow-xl" role="menu">
+              <button role="menuitem" onClick={repost} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm font-medium hover:bg-canvas"><Repeat2 className="h-4 w-4" /> {isReposted ? "Undo repost" : "Repost"}</button>
+              <button role="menuitem" onClick={() => { setRepostMenu(false); setQuoting(true); }} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm font-medium hover:bg-canvas"><Quote className="h-4 w-4" /> Quote</button>
+            </div>
+          )}
+        </div>
+        <div>
+          <Stat onClick={() => setReactOpen((v) => !v)} pressed={!!myReaction} label="React with an emoji" activeCls="text-ink" icon={myReaction ? <span className="text-[19px] leading-none">{myReaction}</span> : <SmilePlus className="h-[22px] w-[22px]" />} />
+          {reactOpen && (
+            <div className="animate-scale-in absolute bottom-full left-0 right-0 z-20 mx-auto mb-1 flex w-fit max-w-full origin-bottom flex-wrap justify-center gap-0.5 rounded-full border border-line bg-surface p-1 shadow-xl" role="menu" aria-label="Reactions">
+              {REACTIONS.map((e) => (
+                <button key={e} role="menuitem" onClick={() => react(e)} className={`press grid h-9 w-9 place-items-center rounded-full text-xl transition-transform hover:scale-125 ${myReaction === e ? "bg-brand-50" : ""}`} aria-label={`React ${e}`}>
+                  {e}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <Stat onClick={share} label="Share" icon={<Send className="h-[21px] w-[21px]" />} />
+        <span className="ml-auto">
+          <Stat onClick={saveToggle} pressed={isSaved} label={isSaved ? "Remove from saved" : "Save"} activeCls="text-ink" icon={<Bookmark className={`h-[22px] w-[22px] transition-colors ${isSaved ? "animate-pop fill-current" : ""}`} />} />
+        </span>
+      </div>
+
+      <div className="px-4 pb-4 pt-2 text-sm">
+        {post.caption && !textCard && <RichText text={post.caption} />}
+        {post.tags.length > 0 && !post.caption.includes("#") && (
+          <p className="mt-1 flex flex-wrap gap-x-2 text-brand-600">
+            {post.tags.map((t) => <Link key={t} href={`/explore?q=${encodeURIComponent(t)}`} className="hover:underline">#{t}</Link>)}
+          </p>
+        )}
+        {post.quoteOf && <QuotedPost post={quoted} />}
+        {myReaction && (
+          <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-canvas px-2 py-0.5 text-[12px]">
+            <span>{myReaction}</span> <span className="text-muted">You reacted</span>
+          </p>
+        )}
       </div>
 
       {(visibleComments.length > 0 || showComments) && (
-        <section className="animate-fade-in pb-2" aria-label="Comments">
+        <section className="animate-fade-in border-t border-line px-4 pb-4 pt-3" aria-label="Comments">
           {!showComments && allComments.length > 2 && (
-            <button onClick={() => setShowComments(true)} className="mb-1 ml-12 text-[13px] font-semibold text-muted hover:text-ink">View all {allComments.length} comments</button>
+            <button onClick={() => setShowComments(true)} className="mb-2 text-[13px] font-semibold text-muted hover:text-ink">View all {allComments.length} comments</button>
           )}
           {visibleComments.length > 0 && (
             <ul className="space-y-2.5">
@@ -331,7 +332,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
           {showComments && (
             <form onSubmit={addComment} className="mt-3">
               {draftGif && (
-                <div className="relative mb-2 ml-12 inline-block">
+                <div className="relative mb-2 inline-block">
                   <GifView id={draftGif} size="sm" />
                   <button type="button" onClick={() => setDraftGif(undefined)} className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-black/70 text-white" aria-label="Remove GIF from comment">
                     <X className="h-3.5 w-3.5" />
@@ -339,7 +340,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
                 </div>
               )}
               {emojiOpen && (
-                <div className="mb-2 ml-12 flex flex-wrap gap-1">
+                <div className="mb-2 flex flex-wrap gap-1">
                   {QUICK_EMOJI.map((em) => (
                     <button key={em} type="button" onClick={() => setDraft((d) => d + em)} className="press grid h-8 w-8 place-items-center rounded-lg text-lg hover:bg-elevated" aria-label={`Add ${em}`}>{em}</button>
                   ))}
@@ -359,9 +360,9 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
                   onChange={(e) => setDraft(e.target.value)}
                   maxLength={500}
                   placeholder={`Reply to ${post.authorName}…`}
-                  className="h-10 min-w-0 flex-1 rounded-full border border-line bg-surface px-4 text-sm outline-none transition-colors focus:border-brand-400"
+                  className="h-10 min-w-0 flex-1 rounded-full border border-line bg-surface px-4 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
                 />
-                <button type="submit" disabled={!draft.trim() && !draftGif} className="press grid h-10 w-10 shrink-0 place-items-center rounded-full bg-aurora text-on-accent disabled:opacity-40" aria-label="Post comment">
+                <button type="submit" disabled={!draft.trim() && !draftGif} className="press grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-600 text-white disabled:opacity-40 dark:bg-primary dark:text-on-primary" aria-label="Post comment">
                   <SendHorizontal className="h-4 w-4" />
                 </button>
               </div>

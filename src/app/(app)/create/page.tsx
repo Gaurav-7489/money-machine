@@ -51,7 +51,7 @@ export default function Create() {
   return (
     <div className="mx-auto grid max-w-4xl gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
       <form onSubmit={submit} className="card p-5" noValidate>
-        <h1 className="text-[clamp(1.75rem,4vw,2.25rem)] leading-[1.1]">New post</h1>
+        <h1 className="text-xl font-bold tracking-tight">New post</h1>
         {image ? (
           <div className="relative mb-4 overflow-hidden rounded-xl ring-1 ring-line">
             {/* eslint-disable-next-line @next/next/no-img-element */}

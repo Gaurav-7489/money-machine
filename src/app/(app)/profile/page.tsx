@@ -280,13 +280,13 @@ export default function Profile() {
           <span className="relative z-10 -mt-10 inline-block rounded-full bg-canvas p-1.5 md:-mt-12" style={{ borderRadius: isBiz ? "30%" : undefined }}>
             <Avatar name={session.displayName} tone={isBiz ? "violet" : "rose"} size="xl" square={isBiz} photoId={session.avatarId} />
           </span>
-          <h1 className="mt-4 text-[clamp(1.75rem,5vw,2.5rem)] leading-[0.88]">{session.displayName}</h1>
+          <h1 className="mt-4 text-xl font-bold tracking-tight">{session.displayName}</h1>
           <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px] text-muted">
             <span>@{session.handle}</span>
             <span className="rounded-full border border-line px-2 py-px text-[12px] font-medium text-ink">{isBiz ? "Business" : "Creator"}</span>
             {session.country && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {[session.city, session.region, session.country].filter(Boolean).join(", ")}</span>}
           </p>
-          {session.bio && <p className="mt-6 max-w-[34ch] text-[clamp(1.35rem,2.6vw,1.75rem)] font-medium leading-snug tracking-[-0.015em]">{session.bio}</p>}
+          {session.bio && <p className="mt-2 max-w-md text-sm">{session.bio}</p>}
           {(session.niches ?? []).length > 0 && (
             <p className="mt-5 flex flex-wrap gap-1.5">
               {session.niches!.map((n) => <span key={n} className="rounded-full bg-elevated px-3 py-1 text-[13px] font-medium">{n}</span>)}
@@ -307,9 +307,9 @@ export default function Profile() {
             </p>
           )}
           <dl className="mt-8 grid max-w-sm grid-cols-3 border-y border-line">
-            <div className="flex flex-col py-3"><dt className="text-[12px] text-muted">Posts</dt><dd className="font-display order-first text-[32px] leading-none tabular-nums">{myPosts.length}</dd></div>
-            <div className="flex flex-col border-l border-line py-3 pl-4"><dt className="text-[12px] text-muted">Reposts</dt><dd className="font-display order-first text-[32px] leading-none tabular-nums">{reposts.length}</dd></div>
-            <Link href="/friends" className="flex flex-col border-l border-line py-3 pl-4 transition-colors hover:bg-elevated"><dt className="text-[12px] text-muted">Friends</dt><dd className="font-display order-first text-[32px] leading-none tabular-nums">{following.length}</dd></Link>
+            <div className="flex flex-col py-3"><dt className="text-[12px] text-muted">Posts</dt><dd className="font-display order-first text-xl leading-tight tabular-nums">{myPosts.length}</dd></div>
+            <div className="flex flex-col border-l border-line py-3 pl-4"><dt className="text-[12px] text-muted">Reposts</dt><dd className="font-display order-first text-xl leading-tight tabular-nums">{reposts.length}</dd></div>
+            <Link href="/friends" className="flex flex-col border-l border-line py-3 pl-4 transition-colors hover:bg-elevated"><dt className="text-[12px] text-muted">Friends</dt><dd className="font-display order-first text-xl leading-tight tabular-nums">{following.length}</dd></Link>
           </dl>
           <Button variant="secondary" size="lg" className="mt-6" onClick={() => setEditing(true)}>
             <Pencil className="h-4 w-4" /> Edit Profile
@@ -338,7 +338,7 @@ export default function Profile() {
                   <Link href={href} className="group flex items-center gap-3 py-3.5">
                     <Icon className="h-[18px] w-[18px] shrink-0 text-muted" strokeWidth={1.7} />
                     <span className="flex-1 text-[14px] text-muted">{label}</span>
-                    <span className="font-display text-[26px] leading-none tabular-nums">{value}</span>
+                    <span className="font-display text-xl leading-tight tabular-nums">{value}</span>
                     <ChevronRight className="h-4 w-4 text-muted transition-transform group-hover:translate-x-0.5" />
                   </Link>
                 </li>

@@ -16,7 +16,7 @@ export function TabIndicator({ group, variant = "line", className = "" }: { grou
   return variant === "pill" ? (
     <motion.span layoutId={`tab-${group}`} className={`absolute inset-0 -z-10 rounded-[inherit] bg-primary ${className}`} aria-hidden="true" />
   ) : (
-    <motion.span layoutId={`tab-${group}`} className={`bg-aurora absolute inset-x-4 -bottom-px h-[3px] rounded-full ${className}`} aria-hidden="true" />
+    <motion.span layoutId={`tab-${group}`} className={`absolute inset-x-4 -bottom-px h-0.5 rounded-full bg-brand-600 ${className}`} aria-hidden="true" />
   );
 }
 

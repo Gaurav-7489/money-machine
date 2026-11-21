@@ -113,7 +113,7 @@ export function OpportunityCard({ o }: { o: Opportunity }) {
         <div className="group relative aspect-[16/7] overflow-hidden bg-elevated">
           <MediaImage id={o.coverId} alt="" className="photo-zoom absolute inset-0 h-full w-full" fallback={<Photo photo={nichePhoto(o.niches[0])} sizes="(min-width: 768px) 576px, 100vw" className="photo-zoom" decorative />} />
           <span className="photo-shade absolute inset-0" aria-hidden="true" />
-          <span className="font-display absolute bottom-3 left-4 text-[28px] leading-none text-white">{o.niches[0] ?? "Campaign"}</span>
+          <span className="font-display absolute bottom-3 left-4 text-xl leading-none text-white">{o.niches[0] ?? "Campaign"}</span>
         </div>
       ) : <div className="h-1 bg-signal" />}
       <div className="p-4">

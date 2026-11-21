@@ -1,82 +1,82 @@
 @import "tailwindcss";
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ════════════════════════════════════════════════════════════════════════
-   Money Machine — "Fresh" design system
-   Minimal, light and friendly: clean white surfaces, one aqua-green brand,
-   soft rounded shapes and gentle shadows. Pastel tints add a little fun.
-     • Fresh (light):  #F6FAF9 canvas, #FFFFFF surface, #0F1A17 ink
-     • Lagoon (dark):  #07110F canvas, #0D1A17 surface, #E8F3EF ink
-   Brand: aqua green. primary #0B8068 (buttons, white text),
-          signal #2DE3C8 (bright aqua highlights, deep-green text).
-   Type: Plus Jakarta Sans, one width, bold for headings.
+   Money Machine — original design system (restored from the first build)
+   deep green #0E7A5C, aqua #2DE3C8, lime #A6E88E, cream #FBF3CC.
+   Minimal: white cards on a cool off-white canvas, soft shadows, rounded
+   shapes, pastel gradients for avatars and placeholder media.
+     • Light: #F5F8F7 canvas, #FFFFFF surface, #0F1A17 ink
+     • Dark (Lagoon): #07110F canvas, #0D1A17 surface, #E8F3EF ink
+   Type: Inter / system sans, bold + tracking-tight for headings.
    Components use semantic tokens only (canvas, surface, elevated, ink, muted,
    line, primary, signal, brand-*, accent-*). Never hard-code hex in components.
    ════════════════════════════════════════════════════════════════════════ */
 
 @theme {
   /* semantic surfaces & text (Fresh values; Lagoon overrides below) */
-  --color-canvas: #f6faf9;
+  --color-canvas: #f5f8f7;
   --color-surface: #ffffff;
-  --color-elevated: #eef6f3;
+  --color-elevated: #eef3f1;
   --color-ink: #0f1a17;
   --color-muted: #5f6f69;
-  --color-line: #e3ebe8;
+  --color-line: #e6ece9;
   --color-on-accent: #ffffff;
   --color-cream: #fbf3cc;
-  --color-danger: #d9473a;
+  --color-danger: #e11d48;
   --color-on-danger: #ffffff;
 
   /* primary action colour: deep aqua green with white text */
-  --color-primary: #0b8068;
+  --color-primary: #0e7a5c;
   --color-on-primary: #ffffff;
 
   /* signal: bright aqua. Always a fill under deep-green text. */
-  --color-signal: #2de3c8;
-  --color-on-signal: #053b30;
-  --color-gain: #0e9f6e;
-  --color-loss: #d9473a;
+  --color-signal: #0e7a5c;
+  --color-on-signal: #ffffff;
+  --color-gain: #047857;
+  --color-loss: #be123c;
 
   /* accent stops (reactions & charts) — a playful pastel set */
-  --color-accent-1: #14b394;
-  --color-accent-2: #ff5c86;
-  --color-accent-3: #ffc94d;
-  --color-accent-4: #8b7cf6;
+  --color-accent-1: #14a77d;
+  --color-accent-2: #f43f5e;
+  --color-accent-3: #fbbf24;
+  --color-accent-4: #8b5cf6;
   --color-aqua: #2de3c8;
   --color-lime: #a6e88e;
   --color-mint: #a6ebd2;
 
   /* brand = aqua green. 600+ is safe for text on white. */
-  --color-brand-50: #e9fbf5;
-  --color-brand-100: #d2f5e9;
-  --color-brand-200: #a6ebd6;
-  --color-brand-300: #6fdcbf;
-  --color-brand-400: #33c9a6;
-  --color-brand-500: #14ad8e;
-  --color-brand-600: #0b8068;
-  --color-brand-700: #0b7360;
-  --color-brand-800: #0b5a4b;
-  --color-brand-900: #093f35;
+  --color-brand-50: #ecfbf5;
+  --color-brand-100: #d2f5e7;
+  --color-brand-200: #a6ebd2;
+  --color-brand-300: #6fd9b7;
+  --color-brand-400: #34c497;
+  --color-brand-500: #14a77d;
+  --color-brand-600: #0e7a5c;
+  --color-brand-700: #0c654d;
+  --color-brand-800: #0b503e;
+  --color-brand-900: #093f32;
 
   /* six pastel tints for avatars & placeholders (fill / ink pairs) */
-  --color-tone-rose: #ffe3ea;
-  --color-tone-rose-ink: #a3324f;
-  --color-tone-mint: #d2f5e9;
-  --color-tone-mint-ink: #0b6b55;
-  --color-tone-violet: #ece8ff;
-  --color-tone-violet-ink: #5443c4;
-  --color-tone-amber: #fff1cc;
-  --color-tone-amber-ink: #7a5600;
-  --color-tone-sky: #dcf1ff;
-  --color-tone-sky-ink: #1c5f86;
-  --color-tone-lime: #e6f8d4;
-  --color-tone-lime-ink: #3e6b12;
+  --color-tone-rose: #fecdd3;
+  --color-tone-rose-ink: #f43f5e;
+  --color-tone-mint: #a7f3d0;
+  --color-tone-mint-ink: #059669;
+  --color-tone-violet: #ddd6fe;
+  --color-tone-violet-ink: #8b5cf6;
+  --color-tone-amber: #fde68a;
+  --color-tone-amber-ink: #f59e0b;
+  --color-tone-sky: #bae6fd;
+  --color-tone-sky-ink: #0284c7;
+  --color-tone-lime: #d9f99d;
+  --color-tone-lime-ink: #65a30d;
 
-  --font-sans: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-display: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-sans);
 
-  --radius-card: 1.5rem;
-  --shadow-card: 0 1px 2px rgb(15 26 23 / 0.04), 0 8px 24px -14px rgb(15 26 23 / 0.1);
-  --shadow-lift: 0 2px 4px rgb(15 26 23 / 0.04), 0 20px 40px -18px rgb(11 128 104 / 0.28);
+  --radius-card: 1.25rem;
+  --shadow-card: 0 1px 2px rgb(15 26 23 / 0.04), 0 8px 24px -12px rgb(15 26 23 / 0.08);
+  --shadow-lift: 0 2px 4px rgb(15 26 23 / 0.04), 0 18px 40px -16px rgb(14 122 92 / 0.22);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
@@ -99,11 +99,11 @@
 
 :root {
   color-scheme: light;
-  --gradient-chart: linear-gradient(180deg, rgb(20 173 142 / 0.22), rgb(20 173 142 / 0));
-  --gradient-brand: linear-gradient(135deg, #0b8068 0%, #14ad8e 55%, #2de3c8 100%);
-  --gradient-soft: linear-gradient(135deg, #e9fbf5 0%, #f3fbff 50%, #fff0f4 100%);
-  --glass: rgb(255 255 255 / 0.82);
-  --ring: #14ad8e;
+  --gradient-chart: linear-gradient(180deg, rgb(20 167 125 / 0.22), rgb(20 167 125 / 0));
+  --gradient-brand: linear-gradient(135deg, #0e7a5c 0%, #14a77d 100%);
+  --gradient-soft: linear-gradient(135deg, #ecfbf5 0%, rgb(45 227 200 / 0.2) 50%, #ede9fe 100%);
+  --glass: rgb(255 255 255 / 0.85);
+  --ring: #14a77d;
   --photo-shade: linear-gradient(180deg, transparent 55%, rgb(4 24 20 / 0.5));
 }
 
@@ -208,6 +208,15 @@
   --color-slate-100: #15231f;
   --color-slate-300: #2f443d;
   --color-slate-600: #b2c4bd;
+  --color-emerald-100: #12302a;
+  --color-emerald-200: #164036;
+  --color-rose-500: #ff8aa5;
+  --color-violet-500: #b3a8ff;
+  --color-amber-300: #a17a1a;
+  --color-amber-400: #f0b43c;
+  --color-amber-500: #f5c862;
+  --color-lime-600: #b5e07a;
+  --color-sky-500: #6cc4e8;
 }
 
 /* ── Base ─────────────────────────────────────────────────────────────── */
@@ -220,12 +229,12 @@ body {
     -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-/* Display: the same friendly sans, bold and slightly tight. No condensing. */
+/* Headings: the same sans, bold and slightly tight. */
 h1, h2, .font-display {
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.025em;
-  line-height: 1.08;
+  line-height: 1.15;
 }
 h3 { letter-spacing: -0.015em; }
 .font-wide { font-stretch: 112%; }
@@ -280,15 +289,15 @@ h3 { letter-spacing: -0.015em; }
 .photo-shade { background-image: var(--photo-shade); }
 
 /* ── Motion ───────────────────────────────────────────────────────────── */
-.page-enter { animation: fade-in 0.32s ease-out both; }
-.stagger > * { animation: var(--animate-fade-up); animation-duration: 0.5s; animation-delay: calc(var(--i, 0) * 40ms); }
+.page-enter { animation: var(--animate-fade-up); animation-duration: 0.5s; }
+.stagger > * { animation: var(--animate-fade-up); animation-delay: calc(var(--i, 0) * 60ms); }
 
 .press { transition: transform 0.16s var(--ease-out-quart), background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.25s, opacity 0.2s; }
 .press:active { transform: scale(0.97); }
 
 /* Buttons that carry a trailing arrow nudge it on hover */
-.btn-glow { box-shadow: 0 8px 20px -10px rgb(11 128 104 / 0.55); }
-@media (hover: hover) { .btn-glow:hover { filter: brightness(1.05); } }
+.btn-glow { box-shadow: 0 1px 2px rgb(9 63 50 / 0.1); }
+@media (hover: hover) { .btn-glow:hover { filter: brightness(0.95); } }
 
 /* Underline that draws in from the left on hover */
 .link-draw { background-image: linear-gradient(currentColor, currentColor); background-size: 0% 1px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size 0.45s var(--ease-out-expo); }
@@ -308,7 +317,8 @@ dialog[data-closing]::backdrop { animation: fade-out 0.18s ease-in both; }
 @keyframes scale-out { to { opacity: 0; transform: scale(0.97); } }
 @keyframes fade-out { to { opacity: 0; } }
 
-.tab-indicator { transform-origin: center; }
+.tab-indicator { animation: tab-in 0.35s var(--ease-out-expo) both; transform-origin: center; }
+@keyframes tab-in { from { transform: scaleX(0.3); opacity: 0; } to { transform: none; opacity: 1; } }
 
 /* Like burst */
 .burst { position: relative; }

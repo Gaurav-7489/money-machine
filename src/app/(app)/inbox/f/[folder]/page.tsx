@@ -44,7 +44,7 @@ export default function FolderPage({ params }: { params: Promise<{ folder: strin
           </Link>
           <div className="absolute inset-x-4 bottom-4 md:inset-x-6 md:bottom-5">
             <p className="flex items-center gap-1.5 text-[13px] opacity-85"><Icon className="h-4 w-4" /> Folder</p>
-            <h1 className="mt-1 text-[clamp(1.75rem,4vw,2.25rem)] leading-[1.1]">{f.label}</h1>
+            <h1 className="mt-1 text-xl font-bold tracking-tight">{f.label}</h1>
             <p className="mt-2 text-[14px] tabular-nums opacity-85">
               {inside.length} {inside.length === 1 ? "conversation" : "conversations"}
               {unread > 0 && <> · <span className="font-semibold text-signal">{unread} unread</span></>}

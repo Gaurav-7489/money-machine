@@ -1,16 +1,13 @@
 "use client";
 
-import { TabIndicator } from "@/components/motion";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ArrowRight, Plus, UsersRound } from "lucide-react";
-import { Photo } from "@/components/photo";
-import { nichePhoto } from "@/lib/photos";
+import { Plus, UsersRound } from "lucide-react";
 import { Avatar } from "@/components/art";
 import { Composer } from "@/components/feed/composer";
 import { PostCard, type FeedPost } from "@/components/feed/post-card";
 import { OpportunityList } from "@/components/opportunities";
-import { CreateCard, GrowthCard, ProgramsCard, TabletQuickCards } from "@/components/side-panels";
+import { GrowthCard, ProgramsCard, TabletQuickCards } from "@/components/side-panels";
 import { EmptyState } from "@/components/ui";
 import { useFeed } from "@/lib/feed";
 import { filtersFromProfile, findMatches } from "@/lib/match";
@@ -19,42 +16,41 @@ import { usePostIndex } from "@/lib/search-index";
 import { useStore } from "@/lib/store";
 
 const TABS = [
-  { id: "foryou", label: "For you" },
-  { id: "friends", label: "Friends" },
+  { id: "foryou", label: "For You" },
+  { id: "friends", label: "Following" },
   { id: "opps", label: "Opportunities" },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
 
-/** "Matched for you" avatars: the people Money Machine thinks you should meet. */
+/** "Matched for you": story-style avatars of the people Money Machine thinks you should meet. */
 function MatchedRow() {
   const { session } = useStore();
   const posts = usePostIndex();
-  const list = useMemo(() => (session ? findMatches(SEARCHABLE_PROFILES, filtersFromProfile(session), 50, posts).slice(0, 10) : []), [session, posts]);
+  const list = useMemo(() => (session ? findMatches(SEARCHABLE_PROFILES, filtersFromProfile(session), 50, posts).slice(0, 12) : []), [session, posts]);
   if (!session) return null;
   return (
-    <section className="mb-6" aria-labelledby="matched-title">
-      <div className="mb-3 flex items-baseline justify-between">
-        <h2 id="matched-title" className="font-text text-[15px]">Matched for you ✨</h2>
-        <Link href="/explore" className="text-[13px] font-semibold text-brand-600 hover:text-brand-700">See all</Link>
-      </div>
-      <div className="no-scrollbar -mx-4 flex snap-x gap-2.5 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0">
-        <Link href="/create" className="press group flex aspect-[3/4] w-[104px] shrink-0 snap-start flex-col justify-between rounded-[20px] border-2 border-dashed border-brand-200 bg-brand-50/60 p-2.5 hover:border-brand-400">
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-signal text-on-signal"><Plus className="h-4 w-4" strokeWidth={2.6} /></span>
-          <span className="text-[13px] font-medium leading-tight">New post</span>
-        </Link>
-        {list.map(({ profile: p, percent }) => (
-          <Link key={p.handle} href={`/u/${p.handle}`} className="group relative aspect-[3/4] w-[104px] shrink-0 snap-start overflow-hidden rounded-[20px] bg-elevated" aria-label={`${p.name}${percent !== null ? `, ${percent}% match` : ""}`}>
-            <Photo photo={nichePhoto(p.category)} sizes="104px" className="photo-zoom" decorative />
-            <span className="photo-shade absolute inset-0" aria-hidden="true" />
-            {percent !== null && <span className="absolute left-2 top-2 rounded-full bg-signal px-1.5 py-px text-[11px] font-semibold tabular-nums text-on-signal">{percent}%</span>}
-            <span className="absolute inset-x-2 bottom-2 flex items-center gap-1.5 text-white">
-              <Avatar name={p.name} tone={p.tone} size="xs" square={p.kind === "business"} />
-              <span className="truncate text-[12px] font-medium">{p.name.split(" ")[0]}</span>
+    <div className="no-scrollbar -mx-4 mb-4 flex gap-4 overflow-x-auto px-4 pb-1 md:hidden" aria-label="Matched for you">
+      <Link href="/create" className="flex w-16 shrink-0 flex-col items-center gap-1">
+        <span className="relative">
+          <Avatar name={session.displayName} tone="rose" size="lg" photoId={session.avatarId} />
+          <span className="absolute bottom-0 right-0 grid h-5 w-5 place-items-center rounded-full bg-brand-600 text-white ring-2 ring-canvas">
+            <Plus className="h-3 w-3" strokeWidth={3} />
+          </span>
+        </span>
+        <span className="text-[11px]">Your post</span>
+      </Link>
+      {list.map(({ profile: p, percent }) => (
+        <Link key={p.handle} href={`/u/${p.handle}`} className="flex w-16 shrink-0 flex-col items-center gap-1" aria-label={`${p.name}${percent !== null ? `, ${percent}% match` : ""}`}>
+          <span className="relative rounded-full bg-gradient-to-tr from-brand-500 via-aqua to-lime p-[2px]">
+            <span className="block rounded-full bg-canvas p-[2px]">
+              <Avatar name={p.name} tone={p.tone} size="lg" square={p.kind === "business"} />
             </span>
-          </Link>
-        ))}
-      </div>
-    </section>
+            {percent !== null && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-brand-600 px-1.5 text-[10px] font-bold tabular-nums text-white ring-2 ring-canvas">{percent}%</span>}
+          </span>
+          <span className="w-full truncate text-center text-[11px]">{p.handle}</span>
+        </Link>
+      ))}
+    </div>
   );
 }
 
@@ -81,11 +77,11 @@ export default function Home() {
       <div className="mx-auto w-full max-w-xl">
         <h1 className="sr-only">Feed</h1>
         <MatchedRow />
-        <div role="tablist" aria-label="Feed" className="glass sticky top-[57px] z-20 -mx-4 mb-5 flex gap-6 border-b border-line px-4 md:top-[69px] md:mx-0 md:px-1">
+        <div role="tablist" aria-label="Feed" className="mb-4 flex border-b border-line">
           {TABS.map((t) => (
-            <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={`relative py-3 text-[15px] transition-colors ${tab === t.id ? "font-semibold text-brand-700" : "text-muted hover:text-ink"}`}>
+            <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={`relative flex-1 pb-3 text-sm transition md:flex-none md:px-5 ${tab === t.id ? "font-semibold text-ink" : "text-muted hover:text-ink"}`}>
               {t.label}
-              {tab === t.id && <TabIndicator group="feed" />}
+              {tab === t.id && <span className="tab-indicator absolute inset-x-4 -bottom-px h-0.5 rounded-full bg-brand-600" />}
             </button>
           ))}
         </div>
@@ -96,7 +92,7 @@ export default function Home() {
           <>
             <Composer />
             {list.length ? (
-              <div key={tab} className="stagger">
+              <div key={tab} className="stagger space-y-5">
                 {list.map((p, i) => (
                   <div key={p.id} style={{ ["--i" as string]: Math.min(i, 6) }}>
                     <PostCard post={p} quoted={p.quoteOf ? byId.get(p.quoteOf) : undefined} />
@@ -106,9 +102,9 @@ export default function Home() {
             ) : (
               <EmptyState
                 icon={<UsersRound className="h-5 w-5" />}
-                title="No posts from friends yet"
-                body="Add creators and brands as friends from Search or their profile, and their posts show up here."
-                action={<Link href="/explore" className="press inline-flex h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-semibold text-on-primary">Find friends <ArrowRight className="h-4 w-4" /></Link>}
+                title="Your following feed is empty"
+                body="Follow creators and brands in Explore to see their posts here."
+                action={<Link href="/explore" className="text-sm font-semibold text-brand-700">Go to Explore</Link>}
               />
             )}
           </>
@@ -116,12 +112,11 @@ export default function Home() {
       </div>
 
       <aside className="hidden md:block" aria-label="Your summary">
-        <div className="sticky top-28 space-y-4">
+        <div className="sticky top-24 space-y-4">
           <div className="lg:hidden"><TabletQuickCards /></div>
           <div className="hidden space-y-4 lg:block">
             <GrowthCard />
             <ProgramsCard />
-            <CreateCard />
           </div>
         </div>
       </aside>

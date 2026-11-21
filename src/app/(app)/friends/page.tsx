@@ -137,7 +137,7 @@ export default function Friends() {
       )}
 
       <section className="mt-12" aria-labelledby="peers-title">
-        <h2 id="peers-title" className="mb-4 text-[clamp(1.4rem,3.5vw,1.85rem)]">{needle ? `${side[0]!.toUpperCase()}${side.slice(1)} matching “${q.trim()}”` : `${isBiz ? "Businesses" : "Creators"} like you`}</h2>
+        <h2 id="peers-title" className="mb-4 text-lg font-semibold">{needle ? `${side[0]!.toUpperCase()}${side.slice(1)} matching “${q.trim()}”` : `${isBiz ? "Businesses" : "Creators"} like you`}</h2>
         {peers.length ? (
           <ul className="grid grid-cols-2 gap-3 md:grid-cols-3">
             {peers.map(({ p, shared }) => <PeerCard key={p.handle} p={p} shared={shared} />)}

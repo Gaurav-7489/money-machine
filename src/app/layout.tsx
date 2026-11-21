@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { MotionProvider } from "@/components/motion";
 import { StoreProvider } from "@/lib/store";
@@ -8,8 +7,6 @@ import { FeedbackProvider } from "@/components/feedback";
 import { THEME_INIT_SCRIPT } from "@/components/theme";
 import { SITE } from "@/lib/site";
 
-// One friendly, rounded sans for everything: bold for headings, regular for reading.
-const body = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -45,7 +42,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F6FAF9" },
+    { media: "(prefers-color-scheme: light)", color: "#F5F8F7" },
     { media: "(prefers-color-scheme: dark)", color: "#07110F" },
   ],
   width: "device-width",
@@ -55,7 +52,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-IN" suppressHydrationWarning className={body.variable}>
+    <html lang="en-IN" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>

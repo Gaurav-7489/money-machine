@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 export type ThemeChoice = "light" | "dark";
 const KEY = "mm.theme";
 const EVENT = "mm-theme";
-const COLORS = { light: "#F6FAF9", dark: "#07110F" };
+const COLORS = { light: "#F5F8F7", dark: "#07110F" };
 
 /** Runs before first paint (inlined in <head>) so there is no flash. First visit follows the device. */
 export const THEME_INIT_SCRIPT = `(function(){try{var c=localStorage.getItem("${KEY}");var d=c?c==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=d?"dark":"light";}catch(e){}})();`;
@@ -105,7 +105,7 @@ export function ThemeToggle({ withLabel = false, className = "" }: { withLabel?:
 export function ThemePicker() {
   const { choice, set } = useTheme();
   const opts = [
-    { id: "light", label: "White", sub: "Fresh", swatch: "bg-[#F6FAF9] ring-1 ring-black/10", dot: "#2DE3C8" },
+    { id: "light", label: "White", sub: "Fresh", swatch: "bg-[#F5F8F7] ring-1 ring-black/10", dot: "#2DE3C8" },
     { id: "dark", label: "Dark", sub: "Lagoon", swatch: "bg-[#07110F] ring-1 ring-white/15", dot: "#2DE3C8" },
   ] as const;
   return (

@@ -30,7 +30,7 @@ function ProgramRow({ p, right }: { p: AffiliateProgram; right: React.ReactNode 
           <p className="flex flex-wrap items-center gap-2 text-[17px] font-semibold leading-tight">
             {p.name} {p.sample && <SampleTag />}
           </p>
-          <p className="font-display mt-1 text-[30px] leading-none tabular-nums">{p.commissionPercent}%<span className="font-text ml-1.5 text-[13px] font-medium text-muted">commission</span></p>
+          <p className="font-display mt-1 text-2xl leading-tight tabular-nums">{p.commissionPercent}%<span className="font-text ml-1.5 text-[13px] font-medium text-muted">commission</span></p>
           <p className="mt-1 text-sm text-muted">{p.description}</p>
           <details className="mt-2 text-sm">
             <summary className="cursor-pointer text-[13px] font-medium text-ink">Terms</summary>

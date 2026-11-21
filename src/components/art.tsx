@@ -1,17 +1,15 @@
 import { BadgeCheck, Dumbbell, Headphones, Lamp, Mountain, ShoppingBag, Soup, Sparkles } from "lucide-react";
 import type { Tone } from "@/lib/sample-data";
 import { initials } from "@/lib/format";
-import { NICHE_PHOTOS, STORY, type Photo as PhotoT } from "@/lib/photos";
-import { Photo } from "./photo";
 import { MediaImage } from "./image-slot";
 
 export const TONES: Record<Tone, { bg: string; fg: string; soft: string }> = {
-  rose: { bg: "from-tone-rose to-tone-rose", fg: "text-tone-rose-ink", soft: "bg-tone-rose text-tone-rose-ink" },
-  mint: { bg: "from-tone-mint to-tone-mint", fg: "text-tone-mint-ink", soft: "bg-tone-mint text-tone-mint-ink" },
-  violet: { bg: "from-tone-violet to-tone-violet", fg: "text-tone-violet-ink", soft: "bg-tone-violet text-tone-violet-ink" },
-  amber: { bg: "from-tone-amber to-tone-amber", fg: "text-tone-amber-ink", soft: "bg-tone-amber text-tone-amber-ink" },
-  sky: { bg: "from-tone-sky to-tone-sky", fg: "text-tone-sky-ink", soft: "bg-tone-sky text-tone-sky-ink" },
-  lime: { bg: "from-tone-lime to-tone-lime", fg: "text-tone-lime-ink", soft: "bg-tone-lime text-tone-lime-ink" },
+  rose: { bg: "from-rose-200 via-pink-100 to-orange-100", fg: "text-rose-500", soft: "bg-rose-50 text-rose-600" },
+  mint: { bg: "from-emerald-200 via-teal-100 to-lime-100", fg: "text-emerald-600", soft: "bg-emerald-50 text-emerald-700" },
+  violet: { bg: "from-violet-200 via-fuchsia-100 to-pink-100", fg: "text-violet-500", soft: "bg-violet-50 text-violet-600" },
+  amber: { bg: "from-amber-200 via-yellow-100 to-orange-50", fg: "text-amber-500", soft: "bg-amber-50 text-amber-700" },
+  sky: { bg: "from-sky-200 via-cyan-100 to-teal-50", fg: "text-sky-600", soft: "bg-sky-50 text-sky-700" },
+  lime: { bg: "from-lime-200 via-emerald-100 to-teal-50", fg: "text-lime-600", soft: "bg-lime-50 text-lime-700" },
 };
 
 const SIZES = { xs: "h-7 w-7 text-[10px]", sm: "h-9 w-9 text-xs", md: "h-11 w-11 text-sm", lg: "h-16 w-16 text-lg", xl: "h-24 w-24 text-2xl" };
@@ -34,7 +32,7 @@ export function Avatar({
 }) {
   return (
     <span
-      className={`inline-grid shrink-0 place-items-center bg-gradient-to-br font-semibold ${TONES[tone].bg} ${TONES[tone].fg} ${SIZES[size]} ${square ? "rounded-[28%]" : "rounded-full"} ${ring ? "ring-2 ring-surface outline-2 outline-offset-1 outline-ink" : ""}`}
+      className={`inline-grid shrink-0 place-items-center bg-gradient-to-br font-semibold ${TONES[tone].bg} ${TONES[tone].fg} ${SIZES[size]} ${square ? "rounded-xl" : "rounded-full"} ${ring ? "ring-2 ring-surface outline-2 outline-offset-1 outline-brand-400" : ""}`}
       aria-hidden="true"
     >
       {photoId ? (
@@ -50,30 +48,22 @@ export function Avatar({
 }
 
 export function VerifiedMark() {
-  return <BadgeCheck className="h-4 w-4 shrink-0 fill-ink text-canvas" aria-label="Verified" />;
+  return <BadgeCheck className="h-4 w-4 shrink-0 fill-sky-500 text-white" aria-label="Verified" />;
 }
 
 const MEDIA = { bottle: Sparkles, mountain: Mountain, dumbbell: Dumbbell, bag: ShoppingBag, lamp: Lamp, headphones: Headphones, bowl: Soup };
 export type MediaKind = keyof typeof MEDIA;
 
-/** Editorial photograph per sample media kind (fictional SAMPLE posts only). */
-const SAMPLE_PHOTOS: Record<MediaKind, PhotoT> = {
-  bottle: NICHE_PHOTOS.Skincare!,
-  mountain: NICHE_PHOTOS.Travel!,
-  dumbbell: NICHE_PHOTOS.Fitness!,
-  bag: STORY.rack,
-  lamp: NICHE_PHOTOS["Home Decor"]!,
-  headphones: NICHE_PHOTOS.Tech!,
-  bowl: NICHE_PHOTOS.Food!,
-};
-
-/** Photograph for demo content; the tone tint and icon show while it loads or offline. */
+/** Illustrative media placeholder for sample posts (no stock or real photos). */
 export function MediaArt({ tone, media, label }: { tone: Tone; media: MediaKind; label?: string }) {
   const Icon = MEDIA[media];
   return (
-    <div className={`group relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-gradient-to-br ${TONES[tone].bg}`}>
-      <Icon className={`absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 ${TONES[tone].fg}`} strokeWidth={1.5} aria-hidden="true" />
-      <Photo photo={{ ...SAMPLE_PHOTOS[media], alt: label ? `Photo for: ${label}` : SAMPLE_PHOTOS[media].alt }} sizes="(min-width: 768px) 560px, 100vw" className="photo-zoom" />
+    <div className={`relative grid aspect-[4/3] w-full place-items-center overflow-hidden bg-gradient-to-br ${TONES[tone].bg}`} role="img" aria-label={label ?? "Post media"}>
+      <div className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-white/40 blur-2xl" />
+      <div className="absolute -bottom-12 -right-6 h-48 w-48 rounded-full bg-white/30 blur-2xl" />
+      <div className="relative grid h-24 w-24 place-items-center rounded-[2rem] bg-white/60 shadow-lg backdrop-blur">
+        <Icon className={`h-11 w-11 ${TONES[tone].fg}`} strokeWidth={1.6} />
+      </div>
     </div>
   );
 }

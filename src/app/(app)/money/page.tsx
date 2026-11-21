@@ -160,7 +160,7 @@ function CreatorEarnings() {
       <section className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-12" aria-label="Summary">
         <div>
           <p className="text-[14px] text-muted">Total earned</p>
-          <p className="font-display mt-2 text-[clamp(2.5rem,8vw,3.75rem)] leading-[0.85] tabular-nums">{money(summary.total)}</p>
+          <p className="font-display mt-2 text-3xl leading-tight tabular-nums">{money(summary.total)}</p>
           <p className="mt-3 text-[14px]">
             {summary.changePercent !== null ? (
               <span className={`font-semibold tabular-nums ${summary.changePercent >= 0 ? "text-gain" : "text-loss"}`}>{summary.changePercent >= 0 ? "▲" : "▼"} {Math.abs(summary.changePercent)}% vs last month</span>
@@ -192,7 +192,7 @@ function CreatorEarnings() {
 
       <section className="mt-12" aria-labelledby="records-title">
         <div className="mb-3 flex items-end justify-between gap-3">
-          <h2 id="records-title" className="text-[clamp(1.4rem,3.5vw,1.85rem)]">Records</h2>
+          <h2 id="records-title" className="text-lg font-semibold">Records</h2>
           <Button onClick={() => setOpen(true)}><PlusCircle className="h-4 w-4" /> Add earning</Button>
         </div>
         <RecordList kind="income" />
@@ -221,7 +221,7 @@ function BusinessGrowth() {
       <section className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-12" aria-label="Summary">
         <div>
           <p className="flex items-center gap-1.5 text-[14px] text-muted"><Rocket className="h-4 w-4" /> Profit</p>
-          <p className={`font-display mt-2 text-[clamp(2.5rem,8vw,3.75rem)] leading-[0.85] tabular-nums ${up ? "" : "text-loss"}`}>{up ? "" : "−"}{money(Math.abs(g.profit))}</p>
+          <p className={`font-display mt-2 text-3xl leading-tight tabular-nums ${up ? "" : "text-loss"}`}>{up ? "" : "−"}{money(Math.abs(g.profit))}</p>
           <p className="mt-3 text-[14px]">
             {g.roi !== null ? <span className={`font-semibold tabular-nums ${g.roi >= 0 ? "text-gain" : "text-loss"}`}>{g.roi >= 0 ? "▲" : "▼"} {Math.abs(g.roi)}% return on investment</span> : <span className="text-muted">Add investments and revenue to see your return.</span>}
           </p>

@@ -68,7 +68,7 @@ export function MatchCard({ result, selected, onSelect, starred, onStar, onRemov
         <span className="absolute right-3 top-3">{percent === null && <SampleTag className="border-white/50 bg-black/25 text-white backdrop-blur-sm" />}</span>
         {percent !== null && (
           <p className="absolute inset-x-3 bottom-2.5 flex items-end justify-between text-white" role="img" aria-label={`${percent}% match, ${matchLabel(percent)}`}>
-            <span className="font-display text-[52px] leading-[0.85] tabular-nums" aria-hidden="true">{percent}<span className="text-[0.55em]">%</span></span>
+            <span className="font-display text-4xl leading-none tabular-nums" aria-hidden="true">{percent}<span className="text-[0.55em]">%</span></span>
             <span className={`mb-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${strong ? "bg-signal text-on-signal" : "bg-black/35 backdrop-blur-sm"}`} aria-hidden="true">{matchLabel(percent)}</span>
           </p>
         )}

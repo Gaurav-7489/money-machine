@@ -115,7 +115,7 @@ function ExploreInner() {
   return (
     <div className="mx-auto max-w-6xl pb-24">
       <header className="mb-6">
-        <h1 className="text-[clamp(1.75rem,4vw,2.25rem)] leading-[1.1]">Find {who}</h1>
+        <h1 className="text-xl font-bold tracking-tight">Find {who}</h1>
       </header>
 
       <form onSubmit={(e) => { e.preventDefault(); go({ ...applied, q }, {}, custom); }} className="relative" role="search">

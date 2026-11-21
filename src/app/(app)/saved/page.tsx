@@ -25,7 +25,7 @@ export default function Saved() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="mb-6 border-b border-line pb-4 text-[clamp(1.75rem,4vw,2.25rem)] leading-[1.1]">Saved</h1>
+      <h1 className="mb-4 text-xl font-bold tracking-tight">Saved</h1>
 
       <div role="tablist" aria-label="Saved items" className="mb-4 grid grid-cols-2 gap-1.5 rounded-xl bg-surface p-1 ring-1 ring-line">
         {([["people", `Starred people (${people.length})`], ["posts", `Posts (${posts.length})`]] as const).map(([id, label]) => (
