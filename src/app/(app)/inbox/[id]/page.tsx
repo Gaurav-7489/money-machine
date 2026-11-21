@@ -224,7 +224,7 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
         <form onSubmit={submit} className="sticky bottom-20 mt-3 md:bottom-4" noValidate>
           {photo && (
             <div className="relative mb-2 inline-block">
-              <MediaImage id={photo} alt="Photo to send" className="h-28 w-auto rounded-[12px]" />
+              <MediaImage id={photo} alt="Photo to send" className="h-28 w-auto rounded-[18px]" />
               <button type="button" onClick={() => { void deleteMedia(photo); setPhoto(undefined); }} className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-black/70 text-white" aria-label="Remove photo"><X className="h-3.5 w-3.5" /></button>
             </div>
           )}
@@ -234,7 +234,7 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
               <button type="button" onClick={() => setGif(undefined)} className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-black/70 text-white" aria-label="Remove GIF"><X className="h-3.5 w-3.5" /></button>
             </div>
           )}
-          <div className="flex items-end gap-1.5 rounded-[24px] border border-line bg-surface p-1 transition-colors focus-within:border-ink">
+          <div className="flex items-end gap-1.5 rounded-[24px] border border-line bg-surface p-1 transition-colors focus-within:border-brand-400">
             {!p.system && (
               <button type="button" onClick={() => setOfferOpen(true)} className="press grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted hover:bg-elevated hover:text-ink" aria-label="Send a deal offer" title="Send a deal offer">
                 <Handshake className="h-5 w-5" />

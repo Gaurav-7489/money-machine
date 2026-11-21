@@ -99,7 +99,7 @@ export function Composer({ autoFocus = false, onDone }: { autoFocus?: boolean; o
   const tool = "press grid h-10 w-10 place-items-center rounded-full text-muted hover:bg-elevated hover:text-ink disabled:opacity-40";
 
   return (
-    <form onSubmit={submit} className="card mb-2 p-4 transition-colors focus-within:border-ink" aria-label="Create a post" noValidate>
+    <form onSubmit={submit} className="card mb-4 p-4 transition-colors focus-within:border-brand-400" aria-label="Create a post" noValidate>
       <div className="flex gap-3">
         <Avatar name={session.displayName} tone={session.role === "business" ? "violet" : "rose"} square={session.role === "business"} photoId={session.avatarId} />
         <div className="min-w-0 flex-1">

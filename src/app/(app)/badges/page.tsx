@@ -17,7 +17,7 @@ export default function Badges() {
           <span className="animate-[scale-in_0.7s_var(--ease-spring)_both]"><BadgeMedal icon={featured.badge.icon} earned={featured.earned} size="lg" /></span>
           <div className="min-w-0 flex-1">
             <p className="text-[13px] text-muted">{featured.earned ? "Latest badge" : "Closest to earning"}</p>
-            <p className="font-display mt-1 text-[clamp(2rem,5vw,3rem)] leading-[0.9]">{featured.badge.name}</p>
+            <p className="font-display mt-1 text-[clamp(1.4rem,3.5vw,1.85rem)] leading-[1.1]">{featured.badge.name}</p>
             <p className="mt-2 text-[14px] text-muted">{featured.badge.description}</p>
             {!featured.earned && (
               <div className="mt-4 h-1.5 max-w-xs overflow-hidden rounded-full bg-elevated">

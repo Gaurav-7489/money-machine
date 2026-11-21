@@ -63,9 +63,9 @@ function RichText({ text }: { text: string }) {
 function Photos({ list, alt }: { list: string[]; alt: string }) {
   if (list.length === 1)
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={list[0]} alt={alt} className="max-h-[560px] w-full rounded-xl bg-elevated object-cover" />;
+    return <img src={list[0]} alt={alt} className="max-h-[560px] w-full rounded-[20px] bg-elevated object-cover" />;
   return (
-    <div className="grid grid-cols-2 gap-1 overflow-hidden rounded-xl">
+    <div className="grid grid-cols-2 gap-1 overflow-hidden rounded-[20px]">
       {list.map((src, i) => (
         // eslint-disable-next-line @next/next/no-img-element
         <img key={i} src={src} alt={`${alt} (${i + 1} of ${list.length})`} className={`w-full object-cover ${list.length === 3 && i === 0 ? "row-span-2 h-full" : "aspect-square"}`} />
@@ -94,7 +94,7 @@ function Stat({ onClick, pressed, label, count, icon, activeCls = "", title }: {
 export function QuotedPost({ post }: { post: FeedPost | undefined }) {
   if (!post) return <p className="mt-2 rounded-xl border border-line px-3 py-2 text-sm text-muted">This post isn&apos;t available.</p>;
   return (
-    <Link href={`/home#${post.id}`} className="mt-2 block rounded-xl border border-line p-3 transition-colors hover:border-ink">
+    <Link href={`/home#${post.id}`} className="mt-2 block rounded-2xl border border-line bg-canvas p-3 transition-colors hover:border-brand-300">
       <p className="flex items-center gap-1.5 text-[13px]">
         <Avatar name={post.authorName} tone={post.authorTone} size="xs" square={post.authorKind === "business"} />
         <span className="font-semibold">{post.authorName}</span>
@@ -203,7 +203,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
   }
 
   return (
-    <article id={post.id} aria-label={`Post by ${post.authorName}`} className="scroll-mt-28 border-b border-line pb-3 pt-5">
+    <article id={post.id} aria-label={`Post by ${post.authorName}`} className="card scroll-mt-28 mb-4 px-4 pb-2 pt-4 sm:px-5">
       {isReposted && (
         <p className="mb-1.5 ml-12 flex items-center gap-1.5 text-xs font-semibold text-muted">
           <Repeat2 className="h-3.5 w-3.5" /> You reposted
@@ -223,7 +223,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
               {post.verified && <VerifiedMark />}
               <span className="truncate text-muted max-sm:hidden">@{post.authorHandle}</span>
               <span className="whitespace-nowrap text-muted">· {timeAgo(post.createdAt)}</span>
-              {post.authorKind === "business" && <span className="rounded-full border border-line px-1.5 py-px text-[11px] font-medium text-muted">Business</span>}
+              {post.authorKind === "business" && <span className="rounded-full bg-tone-violet px-2 py-px text-[11px] font-semibold text-tone-violet-ink">Business</span>}
             </p>
             {post.sample && <SampleTag />}
             {post.mine && (
@@ -359,7 +359,7 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
                   onChange={(e) => setDraft(e.target.value)}
                   maxLength={500}
                   placeholder={`Reply to ${post.authorName}…`}
-                  className="h-10 min-w-0 flex-1 rounded-full border border-line bg-surface px-4 text-sm outline-none transition-colors focus:border-ink"
+                  className="h-10 min-w-0 flex-1 rounded-full border border-line bg-surface px-4 text-sm outline-none transition-colors focus:border-brand-400"
                 />
                 <button type="submit" disabled={!draft.trim() && !draftGif} className="press grid h-10 w-10 shrink-0 place-items-center rounded-full bg-aurora text-on-accent disabled:opacity-40" aria-label="Post comment">
                   <SendHorizontal className="h-4 w-4" />
@@ -374,11 +374,11 @@ export function PostCard({ post, quoted }: { post: FeedPost; quoted?: FeedPost }
       <Sheet open={quoting} onClose={() => setQuoting(false)} title="Quote post">
         <form onSubmit={sendQuote} className="space-y-3">
           <label htmlFor={`q-${post.id}`} className="sr-only">Add your thoughts</label>
-          <textarea id={`q-${post.id}`} value={quoteText} onChange={(e) => setQuoteText(e.target.value)} maxLength={2200} rows={3} autoFocus placeholder="Add your thoughts…" className="w-full resize-none rounded-xl border border-line bg-surface px-4 py-3 text-[15px] outline-none focus:border-ink" />
+          <textarea id={`q-${post.id}`} value={quoteText} onChange={(e) => setQuoteText(e.target.value)} maxLength={2200} rows={3} autoFocus placeholder="Add your thoughts…" className="w-full resize-none rounded-xl border border-line bg-surface px-4 py-3 text-[15px] outline-none focus:border-brand-400" />
           <QuotedPost post={post} />
           <div className="flex gap-2">
-            <button type="button" onClick={() => setQuoting(false)} className="press h-11 flex-1 rounded-full border border-line font-semibold hover:border-ink">Cancel</button>
-            <button type="submit" className="press h-11 flex-1 rounded-full bg-ink font-semibold text-canvas">Post quote</button>
+            <button type="button" onClick={() => setQuoting(false)} className="press h-11 flex-1 rounded-full border border-line font-semibold hover:border-brand-300">Cancel</button>
+            <button type="submit" className="press h-11 flex-1 rounded-full bg-primary font-semibold text-on-primary">Post quote</button>
           </div>
         </form>
       </Sheet>

@@ -14,7 +14,7 @@ export function MotionProvider({ children }: { children: ReactNode }) {
  */
 export function TabIndicator({ group, variant = "line", className = "" }: { group: string; variant?: "line" | "pill"; className?: string }) {
   return variant === "pill" ? (
-    <motion.span layoutId={`tab-${group}`} className={`absolute inset-0 -z-10 rounded-[inherit] bg-ink ${className}`} aria-hidden="true" />
+    <motion.span layoutId={`tab-${group}`} className={`absolute inset-0 -z-10 rounded-[inherit] bg-primary ${className}`} aria-hidden="true" />
   ) : (
     <motion.span layoutId={`tab-${group}`} className={`bg-aurora absolute inset-x-4 -bottom-px h-[3px] rounded-full ${className}`} aria-hidden="true" />
   );

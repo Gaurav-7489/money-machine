@@ -262,7 +262,7 @@ export default function Profile() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="relative -mx-4 aspect-[16/9] overflow-hidden bg-elevated md:mx-0 md:aspect-[21/7] md:rounded-[16px]">
+      <div className="relative -mx-4 aspect-[16/9] overflow-hidden bg-elevated md:mx-0 md:aspect-[21/7] md:rounded-[22px]">
         <MediaImage id={session.coverId} alt="Your cover photo" className="absolute inset-0 h-full w-full" fallback={<Photo photo={nichePhoto(session.niches?.[0] ?? session.category)} sizes="(min-width: 1024px) 1024px, 100vw" priority decorative />} />
         <span className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/15" aria-hidden="true" />
         <div className="absolute right-3 top-3 flex gap-2">
@@ -280,7 +280,7 @@ export default function Profile() {
           <span className="relative z-10 -mt-10 inline-block rounded-full bg-canvas p-1.5 md:-mt-12" style={{ borderRadius: isBiz ? "30%" : undefined }}>
             <Avatar name={session.displayName} tone={isBiz ? "violet" : "rose"} size="xl" square={isBiz} photoId={session.avatarId} />
           </span>
-          <h1 className="mt-4 text-[clamp(2.8rem,8vw,5.5rem)] leading-[0.88]">{session.displayName}</h1>
+          <h1 className="mt-4 text-[clamp(1.75rem,5vw,2.5rem)] leading-[0.88]">{session.displayName}</h1>
           <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px] text-muted">
             <span>@{session.handle}</span>
             <span className="rounded-full border border-line px-2 py-px text-[12px] font-medium text-ink">{isBiz ? "Business" : "Creator"}</span>
@@ -318,7 +318,7 @@ export default function Profile() {
 
         <aside className="space-y-8 md:col-span-5 md:pt-14" aria-label="Your tools">
           {done.percent < 100 && (
-            <section className="border-t border-ink pt-3">
+            <section className="border-t border-line pt-3">
               <div className="flex items-baseline justify-between text-[14px]">
                 <p className="font-semibold">Your profile is {done.percent}% complete</p>
                 <button onClick={() => setEditing(true)} className="link-draw font-medium">Finish it</button>
@@ -330,7 +330,7 @@ export default function Profile() {
             </section>
           )}
 
-          <section className="border-t border-ink pt-3">
+          <section className="border-t border-line pt-3">
             <h2 className="font-text text-[14px] font-semibold">Your numbers</h2>
             <ul className="mt-2 divide-y divide-line border-b border-line">
               {tools.map(({ href, label, value, icon: Icon }) => (
@@ -382,13 +382,13 @@ export default function Profile() {
         {tab === "posts" &&
           (myPosts.length === 0 ? (
             <div>
-              <EmptyState icon={<Grid3x3 className="h-5 w-5" />} title="No posts yet" body="Share your first post so others can see your work." action={<Link href="/create" className="press inline-flex h-11 items-center rounded-full bg-ink px-5 text-sm font-semibold text-canvas">Create a post</Link>} />
+              <EmptyState icon={<Grid3x3 className="h-5 w-5" />} title="No posts yet" body="Share your first post so others can see your work." action={<Link href="/create" className="press inline-flex h-11 items-center rounded-full bg-primary px-5 text-sm font-semibold text-on-primary">Create a post</Link>} />
             </div>
           ) : (
             <ul className="grid grid-cols-3 gap-1.5 md:grid-cols-4">
               {myPosts.map((p) => (
                 <li key={p.id}>
-                  <Link href={`/home#${p.id}`} className={`group relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[10px] bg-gradient-to-br p-3 text-center text-[13px] font-medium ${TONES[p.tone ?? "mint"].bg} ${TONES[p.tone ?? "mint"].fg}`} aria-label={p.caption}>
+                  <Link href={`/home#${p.id}`} className={`group relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[14px] bg-gradient-to-br p-3 text-center text-[13px] font-medium ${TONES[p.tone ?? "mint"].bg} ${TONES[p.tone ?? "mint"].fg}`} aria-label={p.caption}>
                     {p.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={p.image} alt="" className="photo-zoom absolute inset-0 h-full w-full object-cover" />

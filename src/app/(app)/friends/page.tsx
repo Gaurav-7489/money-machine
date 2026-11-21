@@ -47,7 +47,7 @@ function PersonRow({ p, followingNow }: { p: Profile; followingNow: boolean }) {
         {followingNow && (
           <button
             onClick={() => router.push(`/inbox/${startThread(p.handle)}`)}
-            className="press inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-ink px-4 text-[13px] font-semibold text-canvas sm:flex-none"
+            className="press inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-primary px-4 text-[13px] font-semibold text-on-primary sm:flex-none"
           >
             <MessageCircle className="h-4 w-4" /> DM
           </button>
@@ -55,7 +55,7 @@ function PersonRow({ p, followingNow }: { p: Profile; followingNow: boolean }) {
         <button
           onClick={follow}
           aria-pressed={followingNow}
-          className={`press inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-[13px] font-semibold sm:flex-none ${followingNow ? "border border-line hover:border-ink" : "bg-signal text-on-signal hover:brightness-105"}`}
+          className={`press inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-[13px] font-semibold sm:flex-none ${followingNow ? "border border-line hover:border-brand-300" : "bg-signal text-on-signal hover:brightness-105"}`}
         >
           {followingNow ? "Friends ✓" : <><UserPlus className="h-4 w-4" /> Add friend</>}
         </button>
@@ -90,7 +90,7 @@ function PeerCard({ p, shared }: { p: Profile; shared: string[] }) {
             toggle("following", p.handle);
             toast(`${p.name} added to friends 🤝`);
           }}
-          className="press inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-full border border-line text-[13px] font-semibold hover:border-ink"
+          className="press inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-full border border-line text-[13px] font-semibold hover:border-brand-300"
           aria-label={`Add ${p.name} as a friend`}
         >
           <UserPlus className="h-4 w-4" /> Add friend
@@ -122,7 +122,7 @@ export default function Friends() {
       <div className="relative mb-8">
         <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
         <label htmlFor="peer-q" className="sr-only">Search {side}</label>
-        <input id="peer-q" value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Search ${side} by name, niche or city`} className="h-13 w-full rounded-full border border-line bg-surface pl-12 pr-4 text-[16px] outline-none transition-colors hover:border-muted/60 focus:border-ink" />
+        <input id="peer-q" value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Search ${side} by name, niche or city`} className="h-13 w-full rounded-full border border-line bg-surface pl-12 pr-4 text-[16px] outline-none transition-colors hover:border-muted/60 focus:border-brand-400" />
       </div>
 
       <h2 className="font-text mb-2 text-sm font-semibold">Your friends ({friends.length})</h2>
@@ -137,7 +137,7 @@ export default function Friends() {
       )}
 
       <section className="mt-12" aria-labelledby="peers-title">
-        <h2 id="peers-title" className="mb-4 text-[clamp(2rem,5vw,3rem)]">{needle ? `${side[0]!.toUpperCase()}${side.slice(1)} matching “${q.trim()}”` : `${isBiz ? "Businesses" : "Creators"} like you`}</h2>
+        <h2 id="peers-title" className="mb-4 text-[clamp(1.4rem,3.5vw,1.85rem)]">{needle ? `${side[0]!.toUpperCase()}${side.slice(1)} matching “${q.trim()}”` : `${isBiz ? "Businesses" : "Creators"} like you`}</h2>
         {peers.length ? (
           <ul className="grid grid-cols-2 gap-3 md:grid-cols-3">
             {peers.map(({ p, shared }) => <PeerCard key={p.handle} p={p} shared={shared} />)}

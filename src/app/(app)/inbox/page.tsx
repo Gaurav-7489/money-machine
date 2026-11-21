@@ -22,7 +22,7 @@ function NewMessage({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <Sheet open={open} onClose={onClose} title="New message">
       <label htmlFor="nm-q" className="mb-1.5 block text-[13px] font-medium">Who do you want to message?</label>
-      <input id="nm-q" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Type a name, e.g. FitLife" className="mb-3 h-11 w-full rounded-full border border-line bg-surface px-4 text-[15px] outline-none focus:border-ink" />
+      <input id="nm-q" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Type a name, e.g. FitLife" className="mb-3 h-11 w-full rounded-full border border-line bg-surface px-4 text-[15px] outline-none focus:border-brand-400" />
       <ul className="divide-y divide-line">
         {list.map((p) => (
           <li key={p.handle}>
@@ -57,7 +57,7 @@ function FolderTile({ f, threads }: { f: FolderDef; threads: ThreadView[] }) {
   const strong = f.kind === "mm" || f.kind === "owner";
   return (
     <li>
-      <Link href={folderHref(f.id)} className="group relative block overflow-hidden rounded-[16px] bg-ink text-white" aria-label={`${f.label}: ${threads.length} ${threads.length === 1 ? "chat" : "chats"}${unread ? `, ${unread} unread` : ""}`}>
+      <Link href={folderHref(f.id)} className="group relative block overflow-hidden rounded-[22px] bg-primary text-on-primary" aria-label={`${f.label}: ${threads.length} ${threads.length === 1 ? "chat" : "chats"}${unread ? `, ${unread} unread` : ""}`}>
         <span className="relative block aspect-[16/9] sm:aspect-[5/4]">
           <Photo photo={folderPhoto(f)} sizes="(min-width: 1024px) 300px, 50vw" className="photo-zoom" decorative />
           <span className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-black/80" aria-hidden="true" />
@@ -71,7 +71,7 @@ function FolderTile({ f, threads }: { f: FolderDef; threads: ThreadView[] }) {
             )}
           </span>
           <span className="absolute inset-x-3 bottom-3">
-            <span className="font-display block text-[clamp(1.6rem,3vw,2.2rem)] leading-[0.95]">{f.label}</span>
+            <span className="font-display block text-[clamp(1.4rem,2.6vw,1.75rem)] leading-[1.1]">{f.label}</span>
             <span className="mt-1.5 flex items-center gap-2">
               <span className="flex -space-x-1.5" aria-hidden="true">
                 {threads.slice(0, 3).map((t) => (
@@ -134,7 +134,7 @@ function InboxInner() {
   return (
     <div className="mx-auto max-w-4xl">
       <div className="mb-6 flex items-end gap-3">
-        <h1 className="flex-1 text-[clamp(2.6rem,7vw,4.25rem)] leading-[0.9]">Messages</h1>
+        <h1 className="flex-1 text-[clamp(1.75rem,4vw,2.25rem)] leading-[1.1]">Messages</h1>
         <Button onClick={() => setComposing(true)} aria-label="New message"><PenSquare className="h-4 w-4" /> <span className="max-sm:hidden">New</span></Button>
       </div>
 
@@ -142,7 +142,7 @@ function InboxInner() {
         {BOXES.map((b) => {
           const n = select(b.id, null).filter((t) => (b.id === "all" ? t.unread : true)).length;
           return (
-            <button key={b.id} role="tab" aria-selected={box === b.id} onClick={() => nav(b.id)} className={`press relative isolate h-9 rounded-full text-[13px] font-semibold ${box === b.id ? "text-canvas" : "text-muted hover:text-ink"}`}>
+            <button key={b.id} role="tab" aria-selected={box === b.id} onClick={() => nav(b.id)} className={`press relative isolate h-9 rounded-full text-[13px] font-semibold ${box === b.id ? "text-on-primary" : "text-muted hover:text-ink"}`}>
               {box === b.id && <TabIndicator group="dm-box" variant="pill" />}
               {b.id === "all" ? "Folders" : b.label}
               {n > 0 && b.id !== "trash" && <span className={`ml-1 text-[11px] tabular-nums ${box === b.id ? "opacity-70" : "text-ink"}`}>{n}</span>}
@@ -154,7 +154,7 @@ function InboxInner() {
       <div className="relative mb-6 max-w-2xl">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
         <label htmlFor="inbox-q" className="sr-only">Search messages</label>
-        <input id="inbox-q" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search all messages" className="h-11 w-full rounded-full border border-line bg-surface pl-10 pr-4 text-[15px] outline-none focus:border-ink" />
+        <input id="inbox-q" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search all messages" className="h-11 w-full rounded-full border border-line bg-surface pl-10 pr-4 text-[15px] outline-none focus:border-brand-400" />
       </div>
 
       {showShelf ? (

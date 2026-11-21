@@ -22,7 +22,7 @@ function ProgramRow({ p, right }: { p: AffiliateProgram; right: React.ReactNode 
   return (
     <li id={p.id} className="scroll-mt-24 border-b border-line py-5 first:border-t">
       <div className="flex items-start gap-4">
-        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-[12px] bg-elevated sm:h-28 sm:w-28">
+        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-[18px] bg-elevated sm:h-28 sm:w-28">
           <MediaImage id={p.imageId} alt={`${p.name} image`} className="absolute inset-0 h-full w-full" fallback={<Photo photo={nichePhoto(owner?.category ?? session?.niches?.[0])} sizes="112px" decorative />} />
           <span className="absolute bottom-1.5 left-1.5"><Avatar name={p.brand} tone={owner?.tone ?? "violet"} size="xs" square /></span>
         </div>

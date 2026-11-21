@@ -20,14 +20,17 @@ export function GrowthCard() {
   const label = isBiz ? "Profit" : "Earned";
   const summary = isBiz ? { ...income, total: growth.profit, monthly: growth.monthlyProfit, changePercent: growth.roi } : income;
   return (
-    <Link href="/money" className="group block border-t border-ink pt-3">
+    <Link href="/money" className="card lift group block p-5">
       <div className="flex items-center justify-between text-[13px] text-muted">
-        <h2 className="font-text font-medium text-ink">{isBiz ? "Grow & Scale" : "Your earnings"}</h2>
+        <h2 className="font-text flex items-center gap-2 text-[14px] text-ink">
+          <span className="grid h-8 w-8 place-items-center rounded-xl bg-brand-50 text-brand-600"><Wallet className="h-4 w-4" /></span>
+          {isBiz ? "Grow & Scale" : "Your earnings"}
+        </h2>
         <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
       </div>
       <div className="mt-3 flex items-end gap-4">
         <div className="min-w-0 flex-1">
-          <p className="font-display text-[44px] leading-none tabular-nums">{money(summary.total)}</p>
+          <p className="font-display text-[32px] leading-none tabular-nums">{money(summary.total)}</p>
           <p className="mt-2 flex items-center gap-2 text-xs text-muted">
             {label}
             {summary.changePercent !== null && (
@@ -39,7 +42,7 @@ export function GrowthCard() {
           </p>
         </div>
         <div className="text-right">
-          <p className="font-display text-[28px] leading-none tabular-nums">{earned}</p>
+          <p className="font-display text-[22px] leading-none tabular-nums text-brand-600">{earned}</p>
           <p className="mt-2 text-xs text-muted">Badges</p>
         </div>
       </div>
@@ -55,17 +58,20 @@ export function ProgramsCard() {
   const showing = mine.length > 0 ? mine.slice(0, 3) : all.filter((p) => p.sample).slice(0, 3).map((p) => ({ program: p, status: p.status as string }));
   const title = mine.length > 0 ? (session?.role === "business" ? "Your Programs" : "Active Programs") : "Discover Programs";
   return (
-    <section className="border-t border-ink pt-3">
+    <section className="card p-5">
       <Link href="/affiliates" className="group mb-1 flex items-center justify-between text-[13px] text-muted">
-        <h2 className="font-text font-medium text-ink">{title}</h2>
+        <h2 className="font-text flex items-center gap-2 text-[14px] text-ink">
+          <span className="grid h-8 w-8 place-items-center rounded-xl bg-tone-violet text-tone-violet-ink"><Link2 className="h-4 w-4" /></span>
+          {title}
+        </h2>
         <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
       </Link>
-      <ul className="divide-y divide-line">
+      <ul className="mt-1">
         {showing.map(({ program, status }) => {
           const owner = profileByHandle(program.ownerHandle);
           return (
             <li key={program.id}>
-              <Link href={`/affiliates#${program.id}`} className="flex items-center gap-3 py-3 transition-opacity hover:opacity-75">
+              <Link href={`/affiliates#${program.id}`} className="-mx-2 flex items-center gap-3 rounded-2xl px-2 py-3 transition-colors hover:bg-elevated">
                 <Avatar name={program.brand} tone={owner?.tone ?? "violet"} square />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold">{program.name}</span>
@@ -96,11 +102,14 @@ export function TabletQuickCards() {
     { href: "/affiliates", label: "Affiliates", value: `${mine.length} program${mine.length === 1 ? "" : "s"}`, sub: "", icon: Link2 },
     { href: "/badges", label: "Badges", value: `${earned} earned`, sub: "", icon: Star },
   ];
+  const tints = ["bg-brand-50 text-brand-600", "bg-tone-violet text-tone-violet-ink", "bg-tone-amber text-tone-amber-ink"];
   return (
-    <div className="border-t border-ink">
-      {items.map(({ href, label, value, icon: Icon }) => (
-        <Link key={href} href={href} className="flex items-center gap-3 border-b border-line py-3 transition-opacity hover:opacity-75">
-          <Icon className="h-5 w-5 shrink-0" strokeWidth={1.7} />
+    <div className="space-y-3">
+      {items.map(({ href, label, value, icon: Icon }, i) => (
+        <Link key={href} href={href} className="tile lift flex items-center gap-3 p-3">
+          <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-2xl ${tints[i % tints.length]}`}>
+            <Icon className="h-5 w-5" strokeWidth={1.9} />
+          </span>
           <span className="min-w-0 flex-1">
             <span className="block text-sm font-semibold">{label}</span>
             <span className="block truncate text-xs text-muted">{value}</span>
@@ -108,17 +117,23 @@ export function TabletQuickCards() {
           <ChevronRight className="h-4 w-4 text-muted" />
         </Link>
       ))}
-      <Link
-        href={session?.role === "business" ? "/affiliates/new" : "/create"}
-        className="mt-4 block rounded-[var(--radius-card)] bg-signal p-4 text-on-signal transition hover:brightness-105"
-      >
-        <div className="flex items-start justify-between">
-          <p className="font-semibold">{session?.role === "business" ? "Create a program" : "Share a post"}</p>
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-on-signal text-signal">
-            <ArrowRight className="h-4 w-4" />
-          </span>
-        </div>
-      </Link>
+      <CreateCard />
     </div>
+  );
+}
+
+/** The friendly call to action: create a program (brands) or share a post (creators). */
+export function CreateCard() {
+  const { session } = useStore();
+  const isBiz = session?.role === "business";
+  return (
+    <Link href={isBiz ? "/affiliates/new" : "/create"} className="bg-aurora-soft lift group relative block overflow-hidden rounded-[var(--radius-card)] border border-line p-5">
+      <span className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-signal/30 blur-2xl" aria-hidden="true" />
+      <p className="relative font-display text-[17px]">{isBiz ? "Create a program" : "Share a post"}</p>
+      <p className="relative mt-1 text-[13px] text-muted">{isBiz ? "Invite creators to promote your brand and earn commission." : "Show your latest work and get discovered by brands."}</p>
+      <span className="relative mt-4 inline-flex h-9 items-center gap-1.5 rounded-full bg-primary px-4 text-[13px] font-semibold text-on-primary">
+        {isBiz ? "New program" : "New post"} <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+      </span>
+    </Link>
   );
 }

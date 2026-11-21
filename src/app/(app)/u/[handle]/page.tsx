@@ -59,7 +59,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
   return (
     <div className="mx-auto max-w-5xl">
       {/* Cover: the world they work in */}
-      <div className="relative -mx-4 aspect-[16/10] overflow-hidden bg-elevated md:mx-0 md:aspect-[21/8] md:rounded-[16px]">
+      <div className="relative -mx-4 aspect-[16/10] overflow-hidden bg-elevated md:mx-0 md:aspect-[21/8] md:rounded-[22px]">
         <Photo photo={nichePhoto(p.category)} sizes="(min-width: 1024px) 1024px, 100vw" priority decorative />
         <span className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/20" aria-hidden="true" />
         <Link href={peer ? "/friends" : "/explore"} className="press glass absolute left-3 top-3 inline-flex h-9 items-center gap-1 rounded-full pl-2 pr-3.5 text-[13px] font-medium text-ink" aria-label="Back">
@@ -75,7 +75,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
               <Avatar name={p.name} tone={p.tone} size="xl" square={!isCreator} />
             </span>
           </div>
-          <h1 className="mt-4 flex items-center gap-2 text-[clamp(2.8rem,8vw,5.5rem)] leading-[0.88]">
+          <h1 className="mt-4 flex items-center gap-2 text-[clamp(1.75rem,5vw,2.5rem)] leading-[0.88]">
             {p.name}
             {p.verified && <span className="mt-2 self-start [&_svg]:h-6 [&_svg]:w-6"><VerifiedMark /></span>}
           </h1>
@@ -153,9 +153,9 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
 
         {peer ? (
           <aside className="md:col-span-5 md:pt-14" aria-labelledby="peer-title">
-            <div className="border-t border-ink pt-3">
+            <div className="border-t border-line pt-3">
               <h2 id="peer-title" className="font-text text-[14px] font-semibold">{isCreator ? "Fellow creator" : "Fellow business"}</h2>
-              <p className="font-display mt-5 text-[clamp(2rem,4vw,2.75rem)] leading-[0.95]">
+              <p className="font-display mt-5 text-[clamp(1.5rem,3vw,2rem)] leading-[1.1]">
                 {shared.length ? `You both work in ${shared.join(" and ")}.` : `A ${isCreator ? "creator" : "business"} in ${p.niche}.`}
               </p>
               <p className="mt-4 text-[15px] text-muted">
@@ -171,7 +171,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
           </aside>
         ) : (
         <aside className="md:col-span-5 md:pt-14" aria-labelledby="terms-title">
-          <div className="border-t border-ink pt-3">
+          <div className="border-t border-line pt-3">
             <h2 id="terms-title" className="font-text text-[14px] font-semibold">Working together</h2>
             {fit !== null && (
               <div className="mt-5 flex items-end justify-between gap-3 border-b border-line pb-5" role="img" aria-label={`${fit}% match with you, ${matchLabel(fit)}`}>
@@ -210,7 +210,7 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
       </div>
 
       <section className="mt-16" aria-labelledby="posts-title">
-        <h2 id="posts-title" className="flex items-baseline gap-3 border-b border-line pb-3 text-[clamp(2rem,5vw,3rem)]">
+        <h2 id="posts-title" className="flex items-baseline gap-3 border-b border-line pb-3 text-[clamp(1.4rem,3.5vw,1.85rem)]">
           Posts <span className="font-text text-[15px] font-normal text-muted tabular-nums">{posts.length}</span>
         </h2>
         {posts.length ? (

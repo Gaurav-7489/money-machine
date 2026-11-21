@@ -8,7 +8,7 @@ const label = (ym: string) => MONTH.format(new Date(`${ym}-01T00:00:00Z`));
 
 /**
  * Six-month bar chart for money. Bars grow from the baseline once; the current
- * month is marigold, earlier months ink, losses brick below the baseline.
+ * month is bright aqua, earlier months aqua green, losses coral below the baseline.
  * Hover or focus a month to read its exact value. The figures are also given
  * as a visually hidden table for screen readers.
  */
@@ -41,7 +41,7 @@ export function MonthChart({ data, caption, currency }: { data: { month: string;
               className={`relative flex h-full flex-col ${hasNeg ? "justify-center" : "justify-end"}`}
             >
               <span
-                className={`grow-y block w-full rounded-t-[4px] transition-opacity duration-300 ${neg ? "bg-loss" : last ? "bg-signal" : "bg-ink"} ${active !== null && active !== i ? "opacity-35" : ""} ${hasNeg ? (neg ? "translate-y-1/2 rounded-b-[4px] rounded-t-none" : "-translate-y-1/2") : ""}`}
+                className={`grow-y block w-full rounded-t-[4px] transition-opacity duration-300 ${neg ? "bg-loss" : last ? "bg-signal" : "bg-primary"} ${active !== null && active !== i ? "opacity-35" : ""} ${hasNeg ? (neg ? "translate-y-1/2 rounded-b-[4px] rounded-t-none" : "-translate-y-1/2") : ""}`}
                 style={{ height: `${h}%`, ["--i" as string]: i, transformOrigin: neg ? "top" : "bottom" }}
               />
             </button>

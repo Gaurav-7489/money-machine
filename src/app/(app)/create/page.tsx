@@ -51,7 +51,7 @@ export default function Create() {
   return (
     <div className="mx-auto grid max-w-4xl gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
       <form onSubmit={submit} className="card p-5" noValidate>
-        <h1 className="text-[clamp(2.4rem,6vw,3.5rem)] leading-[0.9]">New post</h1>
+        <h1 className="text-[clamp(1.75rem,4vw,2.25rem)] leading-[1.1]">New post</h1>
         {image ? (
           <div className="relative mb-4 overflow-hidden rounded-xl ring-1 ring-line">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -97,13 +97,13 @@ export default function Create() {
       <div className="space-y-3">
         <p className="text-sm font-semibold text-muted">Other things you can create</p>
         {session?.role === "business" && (
-          <Link href="/affiliates/new" className="card lift flex items-center gap-3 p-4 hover:border-ink">
+          <Link href="/affiliates/new" className="card lift flex items-center gap-3 p-4 hover:border-brand-300">
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-violet-50 text-violet-600"><Link2 className="h-5 w-5" /></span>
             <span className="flex-1 text-sm font-semibold">Affiliate program</span>
             <ChevronRight className="h-4 w-4 text-muted" />
           </Link>
         )}
-        <Link href="/money?add=1" className="card lift flex items-center gap-3 p-4 hover:border-ink">
+        <Link href="/money?add=1" className="card lift flex items-center gap-3 p-4 hover:border-brand-300">
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-600"><Wallet className="h-5 w-5" /></span>
           <span className="flex-1 text-sm font-semibold">{session?.role === "business" ? "Spending record" : "Income record"}</span>
           <ChevronRight className="h-4 w-4 text-muted" />

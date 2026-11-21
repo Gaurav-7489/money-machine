@@ -13,7 +13,7 @@ const ICONS: Record<BadgeIcon, typeof Star> = {
   wallet: Wallet,
 };
 
-/** Badges are coins: earned ones are struck in marigold, locked ones are an engraved outline. */
+/** Badges are coins: earned ones are struck in bright aqua, locked ones are an engraved outline. */
 export function BadgeMedal({ icon, earned, size = "md" }: { icon: BadgeIcon; earned: boolean; size?: "md" | "lg" }) {
   const Icon = ICONS[icon];
   const dims = size === "lg" ? "h-28 w-28" : "h-14 w-14";

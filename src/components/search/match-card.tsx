@@ -27,7 +27,7 @@ export function priceText(p: Pick<Profile, "priceFrom" | "priceTo" | "currency">
   return p.priceFrom === p.priceTo ? f(p.priceFrom) : `${f(p.priceFrom)} – ${f(p.priceTo)}`;
 }
 
-/** Circular match meter: a marigold arc that sweeps in once. */
+/** Circular match meter: an aqua arc that sweeps in once. */
 export function MatchRing({ percent, size = 56 }: { percent: number; size?: number }) {
   const [shown, setShown] = useState(0);
   useEffect(() => {
@@ -53,7 +53,7 @@ export function MatchCard({ result, selected, onSelect, starred, onStar, onRemov
   const isCreator = p.kind === "creator";
   const strong = percent !== null && percent >= 90;
   return (
-    <article className={`group/card relative flex h-full flex-col overflow-hidden rounded-[14px] border bg-surface transition-[border-color,box-shadow] duration-300 ${selected ? "border-ink ring-1 ring-ink" : "border-line hover:border-muted/60"}`} aria-label={p.name}>
+    <article className={`group/card relative flex h-full flex-col overflow-hidden rounded-[14px] border bg-surface transition-[border-color,box-shadow] duration-300 ${selected ? "border-brand-500 ring-1 ring-brand-500" : "border-line hover:border-muted/60"}`} aria-label={p.name}>
       {/* Cover: the niche they work in, with the match set large */}
       <div className="relative aspect-[16/10] overflow-hidden bg-elevated">
         <Photo photo={nichePhoto(p.category)} sizes="(min-width: 1280px) 420px, (min-width: 640px) 50vw, 100vw" className="photo-zoom" decorative />
@@ -137,7 +137,7 @@ export function MatchCard({ result, selected, onSelect, starred, onStar, onRemov
         )}
 
         <div className="mt-auto flex gap-2 pt-3">
-          <button onClick={onMessage} className="press inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-ink text-[13px] font-semibold text-canvas hover:opacity-90">
+          <button onClick={onMessage} className="press inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-primary text-[13px] font-semibold text-on-primary hover:opacity-90">
             <MessageCircle className="h-4 w-4" /> DM
           </button>
           <button
@@ -145,7 +145,7 @@ export function MatchCard({ result, selected, onSelect, starred, onStar, onRemov
             aria-pressed={starred}
             aria-label={starred ? `Unstar ${p.name}` : `Star ${p.name}`}
             title={starred ? "Unstar" : "Star"}
-            className={`press grid h-10 w-10 place-items-center rounded-full border ${starred ? "border-signal bg-signal text-on-signal" : "border-line text-muted hover:border-ink hover:text-ink"}`}
+            className={`press grid h-10 w-10 place-items-center rounded-full border ${starred ? "border-signal bg-signal text-on-signal" : "border-line text-muted hover:border-brand-300 hover:text-ink"}`}
           >
             <Star className={`h-[18px] w-[18px] ${starred ? "animate-pop fill-current" : ""}`} />
           </button>

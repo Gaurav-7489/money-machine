@@ -72,13 +72,13 @@ export function ImageSlot({
     <div>
       <p className="mb-1.5 text-[13px] font-medium">{label}</p>
       <div className="flex items-center gap-3">
-        <div className={`relative shrink-0 overflow-hidden border border-line bg-elevated ${round ? "h-20 w-20 rounded-full" : `w-40 rounded-[10px] ${aspect}`}`}>
+        <div className={`relative shrink-0 overflow-hidden border border-line bg-elevated ${round ? "h-20 w-20 rounded-full" : `w-40 rounded-[14px] ${aspect}`}`}>
           <MediaImage id={id} alt="" className="absolute inset-0 h-full w-full" fallback={placeholder} />
           {busy && <span className="absolute inset-0 grid place-items-center bg-canvas/60"><Loader2 className="h-5 w-5 animate-spin" /></span>}
         </div>
         <div className="flex flex-wrap gap-2">
           <input ref={input} type="file" accept="image/*" onChange={pick} className="sr-only" tabIndex={-1} aria-hidden="true" />
-          <button type="button" onClick={() => input.current?.click()} disabled={busy} className="press inline-flex h-9 items-center gap-1.5 rounded-full border border-line px-3.5 text-[13px] font-semibold hover:border-ink disabled:opacity-50">
+          <button type="button" onClick={() => input.current?.click()} disabled={busy} className="press inline-flex h-9 items-center gap-1.5 rounded-full border border-line px-3.5 text-[13px] font-semibold hover:border-brand-300 disabled:opacity-50">
             <ImagePlus className="h-4 w-4" /> {id ? "Change" : "Add photo"}
           </button>
           {id && (

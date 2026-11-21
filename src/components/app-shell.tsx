@@ -29,10 +29,10 @@ function NavLink({ href, label, icon: Icon, active, badge, small }: { href: stri
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`press group relative flex items-center gap-3 rounded-lg px-3 transition-colors ${small ? "py-1.5 text-[14px]" : "py-2 text-[15px]"} ${active ? "font-semibold text-ink" : "text-muted hover:text-ink"}`}
+      className={`press group relative isolate flex items-center gap-3 rounded-2xl px-3 transition-colors ${small ? "py-1.5 text-[14px]" : "py-2.5 text-[15px]"} ${active ? "font-semibold text-brand-700" : "text-ink/75 hover:bg-elevated hover:text-ink"}`}
     >
-      {active && <motion.span layoutId={small ? "side-sub" : "side-main"} className="absolute -left-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-signal" aria-hidden="true" />}
-      <Icon className={small ? "h-4 w-4" : "h-[18px] w-[18px]"} strokeWidth={active ? 2.2 : 1.7} />
+      {active && <motion.span layoutId={small ? "side-sub" : "side-main"} className="absolute inset-0 -z-10 rounded-2xl bg-brand-50" aria-hidden="true" />}
+      <Icon className={small ? "h-4 w-4" : "h-5 w-5"} strokeWidth={active ? 2.3 : 1.8} />
       <span className="flex-1">{label}</span>
       {badge !== undefined && <CountBadge n={badge} />}
     </Link>
@@ -59,7 +59,7 @@ function Sidebar() {
   const MAIN = mainNav(session?.role);
   const TOOLS_NAV = toolsNav(session?.role);
   return (
-    <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col overflow-y-auto border-r border-line bg-canvas px-4 py-6 lg:flex">
+    <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col overflow-y-auto border-r border-line bg-surface px-4 py-6 lg:flex">
       <Link href="/home" className="mb-8 px-3" aria-label="Money Machine home">
         <Logo />
       </Link>
@@ -77,19 +77,19 @@ function Sidebar() {
         {SOCIAL_NAV.map((i) => (
           <NavLink key={i.href} {...i} active={isActive(pathname, i.href)} />
         ))}
-        <p className="mb-1 mt-5 border-t border-line px-3 pt-4 text-[12px] font-medium text-muted">Your tools</p>
+        <p className="mb-1 mt-5 px-3 text-[12px] font-semibold uppercase tracking-wider text-muted">Your tools</p>
         {TOOLS_NAV.map((i) => (
           <NavLink key={i.href} {...i} active={isActive(pathname, i.href)} />
         ))}
         <div className="mt-6 w-full">
-          <Link href="/create" className="press inline-flex h-12 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-signal text-[15px] font-semibold text-on-signal hover:brightness-105">
+          <Link href="/create" className="press btn-glow inline-flex h-12 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-[15px] font-semibold text-on-primary">
             <Plus className="h-5 w-5" strokeWidth={2.4} /> New post
           </Link>
         </div>
       </nav>
       <ThemeToggle withLabel className="mt-4 w-full justify-start" />
       {session && (
-        <Link href="/profile" className="mt-2 flex items-center gap-3 rounded-xl border-t border-line p-2.5 pt-4 hover:bg-elevated">
+        <Link href="/profile" className="mt-3 flex items-center gap-3 rounded-2xl border border-line p-2.5 hover:bg-elevated">
           <Avatar name={session.displayName} tone={session.role === "business" ? "violet" : "rose"} square={session.role === "business"} photoId={session.avatarId} />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-semibold">{session.displayName}</span>
@@ -109,7 +109,7 @@ function Rail() {
   const { session } = useStore();
   const items = [...mainNav(session?.role), { href: "/create", label: "Create", icon: Plus }, ...SOCIAL_NAV.filter((i) => i.href !== "/notifications"), ...toolsNav(session?.role)];
   return (
-    <aside className="sticky top-0 hidden h-dvh w-[88px] shrink-0 flex-col items-center gap-1 overflow-y-auto border-r border-line bg-canvas py-5 md:flex lg:hidden">
+    <aside className="sticky top-0 hidden h-dvh w-[88px] shrink-0 flex-col items-center gap-1 overflow-y-auto border-r border-line bg-surface py-5 md:flex lg:hidden">
       <Link href="/home" className="mb-4" aria-label="Money Machine home">
         <LogoMark className="h-8 w-8" />
       </Link>
@@ -121,9 +121,9 @@ function Rail() {
               key={href}
               href={href}
               aria-current={active ? "page" : undefined}
-              className={`press relative flex w-[72px] flex-col items-center gap-1 rounded-xl py-2 text-center text-[11px] font-medium leading-tight transition-colors ${active ? "text-ink" : "text-muted hover:text-ink"}`}
+              className={`press relative flex w-[72px] flex-col items-center gap-1 rounded-xl py-2 text-center text-[11px] font-medium leading-tight transition-colors ${active ? "text-brand-700" : "text-muted hover:text-ink"}`}
             >
-              <span className={`grid h-8 w-11 place-items-center rounded-full ${active ? "bg-signal text-on-signal" : ""}`}>
+              <span className={`grid h-9 w-12 place-items-center rounded-2xl ${active ? "bg-brand-50" : ""}`}>
                 <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.7} />
               </span>
               {label}
@@ -194,34 +194,34 @@ function MenuOverlay({ open, onClose }: { open: boolean; onClose: () => void }) 
       <div className="flex min-h-full flex-col px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]">
         <div className="flex items-center justify-between py-2">
           <span className="flex items-center gap-2 pl-1"><LogoMark className="h-7 w-7" /><span className="font-display text-[20px]">Money Machine</span></span>
-          <button onClick={onClose} className="press inline-flex h-10 items-center gap-2 rounded-full bg-ink pl-4 pr-3.5 text-[14px] font-semibold text-canvas" aria-label="Close menu">
+          <button onClick={onClose} className="press inline-flex h-10 items-center gap-2 rounded-full bg-primary pl-4 pr-3.5 text-[14px] font-semibold text-on-primary" aria-label="Close menu">
             Close <MenuGlyph open />
           </button>
         </div>
 
         <nav aria-label="All pages" className="mt-6 flex-1">
-          <ul className="border-b border-line">
+          <ul className="space-y-1">
             {main.map(({ href, label }, i) => {
               const active = isActive(pathname, href);
               return (
-                <li key={href} className="menu-item border-t border-line" style={{ ["--i" as string]: i }}>
-                  <Link href={href} aria-current={active ? "page" : undefined} className="flex items-center justify-between py-2.5">
-                    <span className={`font-display text-[clamp(2.6rem,13vw,3.6rem)] leading-[1] ${active ? "" : "text-ink/85"}`}>
+                <li key={href} className="menu-item" style={{ ["--i" as string]: i }}>
+                  <Link href={href} aria-current={active ? "page" : undefined} className={`flex items-center justify-between rounded-2xl px-4 py-3.5 ${active ? "bg-brand-50" : "hover:bg-elevated"}`}>
+                    <span className={`font-display text-[clamp(1.5rem,6.5vw,1.9rem)] leading-[1.1] ${active ? "text-brand-700" : "text-ink/85"}`}>
                       {label}
                     </span>
                     <span className="flex items-center gap-2">
                       {href === "/inbox" && unreadCount > 0 && <span className="grid h-7 min-w-7 place-items-center rounded-full bg-signal px-2 text-[13px] font-bold tabular-nums text-on-signal" aria-label={`${unreadCount} unread`}>{unreadCount}</span>}
-                      {active && <span className="h-2.5 w-2.5 rounded-full bg-signal" aria-hidden="true" />}
+                      {active && <span className="h-2.5 w-2.5 rounded-full bg-brand-500" aria-hidden="true" />}
                     </span>
                   </Link>
                 </li>
               );
             })}
           </ul>
-          <ul className="mt-6 grid grid-cols-2 gap-x-4">
+          <ul className="mt-6 grid grid-cols-2 gap-1">
             {more.map(({ href, label, icon: Icon }, i) => (
               <li key={href} className="menu-item" style={{ ["--i" as string]: main.length + i * 0.5 }}>
-                <Link href={href} aria-current={isActive(pathname, href) ? "page" : undefined} className="flex items-center gap-2.5 border-b border-line py-3 text-[15px] font-medium aria-[current=page]:text-ink aria-[current=page]:underline aria-[current=page]:decoration-signal aria-[current=page]:decoration-2 aria-[current=page]:underline-offset-4">
+                <Link href={href} aria-current={isActive(pathname, href) ? "page" : undefined} className="flex items-center gap-2.5 rounded-2xl px-3 py-3 text-[15px] font-medium hover:bg-elevated aria-[current=page]:bg-brand-50 aria-[current=page]:text-brand-700">
                   <Icon className="h-[18px] w-[18px] text-muted" strokeWidth={1.7} /> {label}
                 </Link>
               </li>
@@ -259,9 +259,9 @@ function TopBar() {
       <ThemeToggle />
       <Link href="/notifications" className="relative grid h-10 w-10 place-items-center rounded-full hover:bg-elevated" aria-label="Notifications" title="Notifications">
         <Bell className={`h-[21px] w-[21px] ${unreadCount > 0 ? "ring-bell" : ""}`} strokeWidth={1.8} />
-        {unreadCount > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-signal ring-2 ring-canvas" aria-hidden="true" />}
+        {unreadCount > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-accent-2 ring-2 ring-canvas" aria-hidden="true" />}
       </Link>
-      <button onClick={() => setMenu(true)} className="press ml-1 inline-flex h-10 items-center gap-2.5 rounded-full border border-line pl-4 pr-3.5 text-[14px] font-semibold hover:border-ink" aria-haspopup="dialog" aria-expanded={menu} aria-label="Menu">
+      <button onClick={() => setMenu(true)} className="press ml-1 inline-flex h-10 items-center gap-2.5 rounded-full bg-elevated pl-4 pr-3.5 text-[14px] font-semibold hover:bg-brand-50" aria-haspopup="dialog" aria-expanded={menu} aria-label="Menu">
         Menu <MenuGlyph open={menu} />
       </button>
       <MenuOverlay open={menu} onClose={() => setMenu(false)} />
@@ -275,7 +275,7 @@ function BottomNav() {
   const { session } = useStore();
   return (
     <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.6rem,env(safe-area-inset-bottom))] md:hidden">
-      <ul className="mx-auto grid max-w-md grid-cols-5 rounded-[22px] bg-ink px-1 text-canvas shadow-[0_16px_40px_-16px_rgb(0_0_0/0.5)]">
+      <ul className="glass mx-auto grid max-w-md grid-cols-5 rounded-[26px] border border-line px-1 text-ink shadow-[0_16px_40px_-18px_rgb(11_128_104/0.35)]">
         {primaryNav(session?.role).map(({ href, label, icon: Icon }) => {
           const active =
             isActive(pathname, href) ||
@@ -287,10 +287,10 @@ function BottomNav() {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`press relative flex h-[62px] flex-col items-center justify-center gap-0.5 text-[11px] font-medium transition-colors ${active ? "text-canvas" : "text-canvas/60"}`}
+                className={`press relative flex h-[62px] flex-col items-center justify-center gap-0.5 text-[11px] font-medium transition-colors ${active ? "text-brand-700" : "text-muted"}`}
               >
                 <span className={`relative grid h-8 w-12 place-items-center rounded-full ${create ? "bg-signal text-on-signal" : ""}`}>
-                  {active && !create && <motion.span layoutId="bottom-nav" className="absolute inset-x-3 -bottom-1 h-[3px] rounded-full bg-signal" aria-hidden="true" />}
+                  {active && !create && <motion.span layoutId="bottom-nav" className="absolute inset-0 rounded-full bg-brand-50" aria-hidden="true" />}
                   <Icon className="relative h-[21px] w-[21px]" strokeWidth={active || create ? 2.2 : 1.7} />
                 </span>
                 {label}
@@ -317,7 +317,7 @@ function DesktopHeader() {
           id="global-search"
           name="q"
           placeholder={session?.role === "business" ? "Search creators: skincare, @handle, a city…" : "Search brands: skincare, @handle, a city…"}
-          className="h-11 w-full max-w-md rounded-full border border-line bg-surface/70 pl-10 pr-4 text-sm outline-none transition hover:border-muted/60 focus:border-ink focus:bg-surface"
+          className="h-11 w-full max-w-md rounded-full border border-transparent bg-elevated pl-10 pr-4 text-sm outline-none transition hover:border-line focus:border-brand-400 focus:bg-surface focus:ring-4 focus:ring-brand-100"
         />
       </form>
       <ThemeToggle className="lg:hidden" />

@@ -74,7 +74,7 @@ export function ThreadList({ list, folders, showFolder, inTrash }: { list: Threa
                 <span className={`block truncate text-sm ${t.unread ? "font-medium text-ink" : "text-muted"}`}>{t.preview}</span>
                 <span className="mt-1 flex flex-wrap items-center gap-1">
                   {f && showFolder && <span className="rounded-full border border-line px-1.5 py-px text-[11px] text-muted">{f.label}</span>}
-                  {t.dealType && <span className="rounded-full bg-ink px-1.5 py-px text-[11px] font-semibold text-canvas">{earningShort(t.dealType)}</span>}
+                  {t.dealType && <span className="rounded-full bg-primary px-1.5 py-px text-[11px] font-semibold text-on-primary">{earningShort(t.dealType)}</span>}
                   {t.sample && <SampleTag />}
                 </span>
               </span>

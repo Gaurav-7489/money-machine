@@ -6,8 +6,8 @@ export default function NotFound() {
     <main className="grid min-h-dvh place-items-center px-6 text-center">
       <div>
         <LogoMark className="mx-auto h-12 w-12" />
-        <h1 className="mt-6 text-[clamp(2.6rem,8vw,4rem)] leading-[0.9]">Page not found</h1>
-        <Link href="/home" className="mt-5 inline-flex h-11 items-center rounded-full bg-ink px-5 text-sm font-semibold text-canvas">Go home</Link>
+        <h1 className="mt-6 text-[clamp(2rem,6vw,2.75rem)] leading-[1.1]">Page not found</h1>
+        <Link href="/home" className="mt-5 inline-flex h-11 items-center rounded-full bg-primary px-5 text-sm font-semibold text-on-primary">Go home</Link>
       </div>
     </main>
   );

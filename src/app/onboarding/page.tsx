@@ -26,7 +26,7 @@ function Chips({ options, value, onChange }: { options: readonly { id: string; l
       {options.map((o) => {
         const on = value.includes(o.id);
         return (
-          <button key={o.id} type="button" aria-pressed={on} title={o.hint} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`press inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold transition-colors ${on ? "bg-aurora text-on-accent " : "border border-line bg-surface hover:border-ink"}`}>
+          <button key={o.id} type="button" aria-pressed={on} title={o.hint} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`press inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold transition-colors ${on ? "bg-aurora text-on-accent " : "border border-line bg-surface hover:border-brand-300"}`}>
             {on && <Check className="h-4 w-4" strokeWidth={3} />} {o.label}
           </button>
         );
@@ -105,26 +105,26 @@ export default function Onboarding() {
 
   return (
     <main className="min-h-dvh md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] xl:grid-cols-2">
-      <aside className="relative hidden h-dvh overflow-hidden bg-ink md:sticky md:top-0 md:block" aria-hidden="true">
+      <aside className="relative hidden h-dvh overflow-hidden bg-primary md:sticky md:top-0 md:block" aria-hidden="true">
         <div key={`${step}-${isBiz}`} className="absolute inset-0 animate-[fade-in_0.7s_ease-out_both]">
           <Photo photo={panel.photo} sizes="50vw" priority={step === 0} decorative />
         </div>
         <span className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/60" />
         <Link href="/" className="pointer-events-auto absolute left-8 top-7 text-white [&_*]:!text-white" tabIndex={-1}><Logo /></Link>
         <div className="absolute inset-x-8 bottom-8 text-white">
-          <p className="font-display text-[clamp(2.4rem,4.5vw,4.25rem)] leading-[0.9]">{panel.line}</p>
+          <p className="font-display text-[clamp(2rem,3.5vw,3rem)] leading-[1.1]">{panel.line}</p>
           <p className="mt-4 text-[14px] tabular-nums opacity-80">Step {step + 1} of {STEPS}</p>
         </div>
       </aside>
       {/* Phones: the same story as a photo band above the form */}
-      <div className="relative h-[34svh] min-h-[220px] overflow-hidden bg-ink text-white md:hidden" aria-hidden="true">
+      <div className="relative h-[34svh] min-h-[220px] overflow-hidden bg-primary text-on-primary md:hidden" aria-hidden="true">
         <div key={`m-${step}-${isBiz}`} className="absolute inset-0 animate-[fade-in_0.7s_ease-out_both]">
           <Photo photo={panel.photo} sizes="100vw" priority={step === 0} decorative />
         </div>
         <span className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/5 to-black/65" />
         <span className="absolute left-5 top-[max(1rem,env(safe-area-inset-top))] [&_*]:!text-white"><Logo /></span>
         <div key={`ml-${step}-${isBiz}`} className="absolute inset-x-5 bottom-9 animate-[fade-up_0.7s_var(--ease-out-expo)_both]">
-          <p className="font-display text-[clamp(1.9rem,8.5vw,2.6rem)] leading-[0.92]">{panel.line}</p>
+          <p className="font-display text-[clamp(1.6rem,7vw,2.1rem)] leading-[1.1]">{panel.line}</p>
           <p className="mt-2 text-[13px] tabular-nums opacity-80">Step {step + 1} of {STEPS}</p>
         </div>
       </div>
@@ -136,20 +136,20 @@ export default function Onboarding() {
             <button type="button" onClick={() => { setErrors({}); setStep((s) => s - 1); }} aria-label="Back" className="press -ml-2 grid h-9 w-9 place-items-center rounded-full text-ink hover:bg-elevated"><ChevronLeft className="h-5 w-5" /></button>
           )}
           <div className="flex flex-1 gap-1.5" aria-label={`Step ${step + 1} of ${STEPS}`}>
-            {Array.from({ length: STEPS }, (_, i) => <span key={i} className={`h-1 flex-1 rounded-full transition-colors duration-500 ${i < step ? "bg-ink" : i === step ? "bg-signal" : "bg-line"}`} />)}
+            {Array.from({ length: STEPS }, (_, i) => <span key={i} className={`h-1 flex-1 rounded-full transition-colors duration-500 ${i < step ? "bg-primary" : i === step ? "bg-signal" : "bg-line"}`} />)}
           </div>
         </div>
 
         <div key={step} className="animate-fade-up">
           {step === 0 && (
             <>
-              <h1 className="mb-6 text-[clamp(2.6rem,7vw,3.75rem)] leading-[0.9]">Who are you?</h1>
+              <h1 className="mb-6 text-[clamp(1.85rem,5vw,2.4rem)] leading-[1.1]">Who are you?</h1>
               <fieldset className="grid grid-cols-2 gap-3">
                 <legend className="sr-only">Account type</legend>
                 {ROLES.map(({ id, title, body, icon: Icon }) => {
                   const selected = role === id;
                   return (
-                    <label key={id} className={`press relative flex cursor-pointer flex-col items-start gap-2 rounded-[14px] border p-4 text-left transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink ${selected ? "border-ink bg-surface" : "border-line hover:border-muted/60"}`}>
+                    <label key={id} className={`press relative flex cursor-pointer flex-col items-start gap-2 rounded-[14px] border p-4 text-left transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink ${selected ? "border-brand-500 bg-brand-50" : "border-line hover:border-muted/60"}`}>
                       <input type="radio" name="role" value={id} checked={selected} onChange={() => setRole(id)} className="sr-only" />
                       <span className={`grid h-10 w-10 place-items-center rounded-full transition-colors ${selected ? "bg-signal text-on-signal" : "bg-elevated text-ink"}`}><Icon className="h-5 w-5" /></span>
                       <span className="mt-4 font-semibold">{title}</span>
@@ -174,7 +174,7 @@ export default function Onboarding() {
 
           {step === 1 && (
             <>
-              <h1 className="mb-6 text-[clamp(2.6rem,7vw,3.75rem)] leading-[0.9]">{isBiz ? "What does your business do?" : "What content do you create?"}</h1>
+              <h1 className="mb-6 text-[clamp(1.85rem,5vw,2.4rem)] leading-[1.1]">{isBiz ? "What does your business do?" : "What content do you create?"}</h1>
               <Chips options={nicheOpts} value={niches} onChange={setNiches} />
               {errors.niches && <p role="alert" className="mt-3 text-[13px] text-danger">{errors.niches}</p>}
             </>
@@ -184,14 +184,14 @@ export default function Onboarding() {
             <>
               {isBiz ? (
                 <>
-                  <h1 className="mb-6 text-[clamp(2.6rem,7vw,3.75rem)] leading-[0.9]">What creators are you looking for?</h1>
+                  <h1 className="mb-6 text-[clamp(1.85rem,5vw,2.4rem)] leading-[1.1]">What creators are you looking for?</h1>
                   <Chips options={nicheOpts} value={lookingFor} onChange={setLookingFor} />
                   <h2 className="font-text mb-2 mt-8 font-semibold">How do you want to work with them?</h2>
                   <Chips options={earnOpts} value={earning} onChange={setEarning} />
                 </>
               ) : (
                 <>
-                  <h1 className="mb-6 text-[clamp(2.6rem,7vw,3.75rem)] leading-[0.9]">How do you want to earn?</h1>
+                  <h1 className="mb-6 text-[clamp(1.85rem,5vw,2.4rem)] leading-[1.1]">How do you want to earn?</h1>
                   <Chips options={earnOpts} value={earning} onChange={setEarning} />
                 </>
               )}
@@ -201,7 +201,7 @@ export default function Onboarding() {
 
           {step === 3 && (
             <>
-              <h1 className="mb-6 text-[clamp(2.6rem,7vw,3.75rem)] leading-[0.9]">Almost there</h1>
+              <h1 className="mb-6 text-[clamp(1.85rem,5vw,2.4rem)] leading-[1.1]">Almost there</h1>
               <div className="space-y-4">
                 <LocationPicker
                   value={{ country, region }}

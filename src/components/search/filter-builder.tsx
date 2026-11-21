@@ -109,7 +109,7 @@ export function FilterBuilder({
             const on = draft.niches.includes(n);
             return (
               <li key={n}>
-                <button type="button" aria-pressed={on} onClick={() => toggle("niches", n)} className={`press group relative block aspect-square w-full overflow-hidden rounded-[10px] bg-elevated text-left transition-shadow ${on ? "ring-2 ring-signal ring-offset-2 ring-offset-surface" : ""}`}>
+                <button type="button" aria-pressed={on} onClick={() => toggle("niches", n)} className={`press group relative block aspect-square w-full overflow-hidden rounded-[14px] bg-elevated text-left transition-shadow ${on ? "ring-2 ring-signal ring-offset-2 ring-offset-surface" : ""}`}>
                   <Photo photo={nichePhoto(n)} sizes="110px" className={`transition duration-500 ${on ? "scale-105" : "photo-zoom grayscale-[35%]"}`} decorative />
                   <span className={`absolute inset-0 transition-colors ${on ? "bg-black/25" : "bg-black/45 group-hover:bg-black/30"}`} aria-hidden="true" />
                   <span className="absolute inset-x-1.5 bottom-1.5 text-[12px] font-semibold leading-tight text-white">{n}</span>
@@ -128,7 +128,7 @@ export function FilterBuilder({
             const Icon = EARN_ICON[m.id] ?? Handshake;
             return (
               <li key={m.id}>
-                <button type="button" aria-pressed={on} title={m.hint} onClick={() => toggle("earningModels", m.id)} className={`press flex w-full items-center gap-2 rounded-[10px] border px-2.5 py-2 text-left text-[13px] font-medium transition-colors ${on ? "border-ink bg-ink text-canvas" : "border-line hover:border-ink"}`}>
+                <button type="button" aria-pressed={on} title={m.hint} onClick={() => toggle("earningModels", m.id)} className={`press flex w-full items-center gap-2 rounded-[14px] border px-2.5 py-2 text-left text-[13px] font-medium transition-colors ${on ? "border-primary bg-primary text-on-primary" : "border-line hover:border-brand-300"}`}>
                   <Icon className={`h-4 w-4 shrink-0 ${on ? "text-signal" : "text-muted"}`} strokeWidth={1.8} />
                   <span className="truncate">{m.short}</span>
                 </button>
@@ -146,7 +146,7 @@ export function FilterBuilder({
               type="button"
               aria-pressed={band === i}
               onClick={() => setDraft((d) => (band === i ? { ...d, priceMin: "", priceMax: "" } : { ...d, priceMin: lo?.toString() ?? "", priceMax: hi?.toString() ?? "" }))}
-              className={`press h-10 rounded-full text-[12px] font-semibold tabular-nums transition-colors ${band === i ? "bg-signal text-on-signal" : "border border-line hover:border-ink"}`}
+              className={`press h-10 rounded-full text-[12px] font-semibold tabular-nums transition-colors ${band === i ? "bg-signal text-on-signal" : "border border-line hover:border-brand-300"}`}
             >
               {lo === null ? `<${short(hi!)}` : hi === null ? `${short(lo)}+` : `${short(lo)}–${short(hi)}`}
             </button>
@@ -193,7 +193,7 @@ export function FilterBuilder({
             {regions.map((r) => {
               const on = draft.cities.includes(r.name);
               return (
-                <button key={r.code + r.name} type="button" aria-pressed={on} onClick={() => toggle("cities", r.name)} className={`press h-8 rounded-full px-3 text-[12px] font-medium transition-colors ${on ? "bg-ink text-canvas" : "border border-line hover:border-ink"}`}>
+                <button key={r.code + r.name} type="button" aria-pressed={on} onClick={() => toggle("cities", r.name)} className={`press h-8 rounded-full px-3 text-[12px] font-medium transition-colors ${on ? "bg-primary text-on-primary" : "border border-line hover:border-brand-300"}`}>
                   {r.name}
                 </button>
               );
@@ -214,10 +214,10 @@ export function FilterBuilder({
       </details>
 
       <div className="sticky bottom-0 -mx-5 grid grid-cols-[auto_1fr] gap-2 border-t border-line bg-surface px-5 py-3 lg:-mx-0 lg:bg-canvas lg:px-0">
-        <button type="button" onClick={onClear} className="press inline-flex h-11 items-center gap-1.5 rounded-full border border-line px-4 text-sm font-semibold hover:border-ink">
+        <button type="button" onClick={onClear} className="press inline-flex h-11 items-center gap-1.5 rounded-full border border-line px-4 text-sm font-semibold hover:border-brand-300">
           <RotateCcw className="h-4 w-4" /> Clear
         </button>
-        <button type="submit" className="press inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-canvas hover:opacity-90">
+        <button type="submit" className="press inline-flex h-11 items-center justify-center gap-2 rounded-full bg-primary text-sm font-semibold text-on-primary hover:opacity-90">
           <Search className="h-4 w-4" /> Show {liveCount} {liveCount === 1 ? who.replace(/s$/, "") : who}
         </button>
       </div>

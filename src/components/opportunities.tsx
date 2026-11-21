@@ -62,7 +62,7 @@ function PostOpportunity({ open, onClose }: { open: boolean; onClose: () => void
             {NICHES.map((n) => {
               const on = niches.includes(n);
               return (
-                <button key={n} type="button" aria-pressed={on} onClick={() => setNiches((x) => (on ? x.filter((y) => y !== n) : [...x, n]))} className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-ink text-canvas" : "border border-line hover:border-ink"}`}>
+                <button key={n} type="button" aria-pressed={on} onClick={() => setNiches((x) => (on ? x.filter((y) => y !== n) : [...x, n]))} className={`press h-9 rounded-full px-3 text-[13px] font-semibold ${on ? "bg-primary text-on-primary" : "border border-line hover:border-brand-300"}`}>
                   {n}
                 </button>
               );
@@ -130,7 +130,7 @@ export function OpportunityCard({ o }: { o: Opportunity }) {
         </div>
         <p className="mt-2 text-[14px]">{o.details}</p>
         <div className="mt-3 flex flex-wrap gap-1.5 text-[12px]">
-          <span className="rounded-full bg-ink px-2.5 py-1 font-semibold text-canvas">{earningLabel(o.type)}</span>
+          <span className="rounded-full bg-primary px-2.5 py-1 font-semibold text-on-primary">{earningLabel(o.type)}</span>
           <span className="rounded-full bg-signal px-2.5 py-1 font-semibold tabular-nums text-on-signal">{budgetText(o.budgetMin, o.budgetMax, o.currency)}</span>
           {o.deliverables.length > 0 && <span className="rounded-full border border-line px-2.5 py-1 font-medium">{deliverablesText(o.deliverables)}</span>}
           {o.niches.map((n) => <span key={n} className="rounded-full bg-elevated px-2.5 py-1 font-medium">{n}</span>)}

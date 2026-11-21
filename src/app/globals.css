@@ -1,176 +1,192 @@
 @import "tailwindcss";
 
 /* ════════════════════════════════════════════════════════════════════════
-   Money Machine — "Ledger" design system
-   Grounded in banknote stock: sage-tinted paper, intaglio green-black ink,
-   one marigold signal colour, ledger green for money in, brick for money out.
-     • Paper (light): #ECEFE7 canvas, #0F1A14 ink
-     • Vault (dark):  #0B120E canvas, #E6EBE2 ink
-   Type: one family (Archivo) used at two widths — condensed + heavy for
-   display, normal width for reading.
+   Money Machine — "Fresh" design system
+   Minimal, light and friendly: clean white surfaces, one aqua-green brand,
+   soft rounded shapes and gentle shadows. Pastel tints add a little fun.
+     • Fresh (light):  #F6FAF9 canvas, #FFFFFF surface, #0F1A17 ink
+     • Lagoon (dark):  #07110F canvas, #0D1A17 surface, #E8F3EF ink
+   Brand: aqua green. primary #0B8068 (buttons, white text),
+          signal #2DE3C8 (bright aqua highlights, deep-green text).
+   Type: Plus Jakarta Sans, one width, bold for headings.
    Components use semantic tokens only (canvas, surface, elevated, ink, muted,
-   line, signal, brand-*, accent-*). Never hard-code hex values in components.
+   line, primary, signal, brand-*, accent-*). Never hard-code hex in components.
    ════════════════════════════════════════════════════════════════════════ */
 
 @theme {
-  /* semantic surfaces & text (Paper values; Vault overrides below) */
-  --color-canvas: #eceee7;
-  --color-surface: #f7f8f4;
-  --color-elevated: #e2e6dc;
-  --color-ink: #0f1a14;
-  --color-muted: #5b675f;
-  --color-line: #d2d8cd;
-  --color-on-accent: #f7f8f4;
-  --color-cream: #e2e6dc;
-  --color-danger: #b4412b;
+  /* semantic surfaces & text (Fresh values; Lagoon overrides below) */
+  --color-canvas: #f6faf9;
+  --color-surface: #ffffff;
+  --color-elevated: #eef6f3;
+  --color-ink: #0f1a17;
+  --color-muted: #5f6f69;
+  --color-line: #e3ebe8;
+  --color-on-accent: #ffffff;
+  --color-cream: #fbf3cc;
+  --color-danger: #d9473a;
   --color-on-danger: #ffffff;
 
-  /* the one signal colour: marigold. Always a fill under ink text. */
-  --color-signal: #f2b705;
-  --color-on-signal: #14110a;
-  --color-gain: #1f7a4a;
-  --color-loss: #b4412b;
+  /* primary action colour: deep aqua green with white text */
+  --color-primary: #0b8068;
+  --color-on-primary: #ffffff;
 
-  /* accent stops (kept for components that colour reactions & charts) */
-  --color-accent-1: #2f6b3c;
-  --color-accent-2: #c2452d;
-  --color-accent-3: #f2b705;
-  --color-accent-4: #b98400;
-  --color-mint: #9fd3b1;
+  /* signal: bright aqua. Always a fill under deep-green text. */
+  --color-signal: #2de3c8;
+  --color-on-signal: #053b30;
+  --color-gain: #0e9f6e;
+  --color-loss: #d9473a;
 
-  /* brand = ledger green. 600+ is safe for text on paper. */
-  --color-brand-50: #e4ebdf;
-  --color-brand-100: #d6e2cf;
-  --color-brand-200: #bccfb3;
-  --color-brand-300: #95b38b;
-  --color-brand-400: #5f8c58;
-  --color-brand-500: #3b6e3c;
-  --color-brand-600: #2a5a2f;
-  --color-brand-700: #1e4a25;
-  --color-brand-800: #16381c;
-  --color-brand-900: #0e2713;
+  /* accent stops (reactions & charts) — a playful pastel set */
+  --color-accent-1: #14b394;
+  --color-accent-2: #ff5c86;
+  --color-accent-3: #ffc94d;
+  --color-accent-4: #8b7cf6;
+  --color-aqua: #2de3c8;
+  --color-lime: #a6e88e;
+  --color-mint: #a6ebd2;
 
-  /* six low-chroma ink tints for avatars & placeholders (fill / ink pairs) */
-  --color-tone-rose: #e6d3c9;
-  --color-tone-rose-ink: #7a3b28;
-  --color-tone-mint: #cfe0d2;
-  --color-tone-mint-ink: #245638;
-  --color-tone-violet: #d9d6e4;
-  --color-tone-violet-ink: #463f70;
-  --color-tone-amber: #ecdcae;
-  --color-tone-amber-ink: #654a00;
-  --color-tone-sky: #cfdde4;
-  --color-tone-sky-ink: #234f67;
-  --color-tone-lime: #dbe3c0;
-  --color-tone-lime-ink: #475614;
+  /* brand = aqua green. 600+ is safe for text on white. */
+  --color-brand-50: #e9fbf5;
+  --color-brand-100: #d2f5e9;
+  --color-brand-200: #a6ebd6;
+  --color-brand-300: #6fdcbf;
+  --color-brand-400: #33c9a6;
+  --color-brand-500: #14ad8e;
+  --color-brand-600: #0b8068;
+  --color-brand-700: #0b7360;
+  --color-brand-800: #0b5a4b;
+  --color-brand-900: #093f35;
+
+  /* six pastel tints for avatars & placeholders (fill / ink pairs) */
+  --color-tone-rose: #ffe3ea;
+  --color-tone-rose-ink: #a3324f;
+  --color-tone-mint: #d2f5e9;
+  --color-tone-mint-ink: #0b6b55;
+  --color-tone-violet: #ece8ff;
+  --color-tone-violet-ink: #5443c4;
+  --color-tone-amber: #fff1cc;
+  --color-tone-amber-ink: #7a5600;
+  --color-tone-sky: #dcf1ff;
+  --color-tone-sky-ink: #1c5f86;
+  --color-tone-lime: #e6f8d4;
+  --color-tone-lime-ink: #3e6b12;
 
   --font-sans: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 0.875rem;
-  --shadow-card: 0 1px 0 rgb(15 26 20 / 0.04);
-  --shadow-lift: 0 1px 0 rgb(15 26 20 / 0.04), 0 18px 40px -24px rgb(15 26 20 / 0.28);
+  --radius-card: 1.5rem;
+  --shadow-card: 0 1px 2px rgb(15 26 23 / 0.04), 0 8px 24px -14px rgb(15 26 23 / 0.1);
+  --shadow-lift: 0 2px 4px rgb(15 26 23 / 0.04), 0 20px 40px -18px rgb(11 128 104 / 0.28);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
-  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   --animate-fade-up: fade-up 0.6s var(--ease-out-expo) both;
   --animate-fade-in: fade-in 0.4s ease-out both;
   --animate-scale-in: scale-in 0.4s var(--ease-out-expo) both;
-  --animate-pop: pop 0.4s var(--ease-spring);
+  --animate-pop: pop 0.45s var(--ease-spring);
+  --animate-float: float 6s ease-in-out infinite;
   --animate-shimmer: shimmer 1.6s linear infinite;
 
   @keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
   @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes scale-in { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: none; } }
-  @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
+  @keyframes scale-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+  @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.3); } 100% { transform: scale(1); } }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
   @keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
 }
 
 :root {
   color-scheme: light;
-  --gradient-chart: linear-gradient(180deg, rgb(31 122 74 / 0.22), rgb(31 122 74 / 0));
-  --glass: rgb(236 238 231 / 0.82);
-  --ring: #0f1a14;
-  --photo-shade: linear-gradient(180deg, transparent 55%, rgb(8 14 10 / 0.55));
+  --gradient-chart: linear-gradient(180deg, rgb(20 173 142 / 0.22), rgb(20 173 142 / 0));
+  --gradient-brand: linear-gradient(135deg, #0b8068 0%, #14ad8e 55%, #2de3c8 100%);
+  --gradient-soft: linear-gradient(135deg, #e9fbf5 0%, #f3fbff 50%, #fff0f4 100%);
+  --glass: rgb(255 255 255 / 0.82);
+  --ring: #14ad8e;
+  --photo-shade: linear-gradient(180deg, transparent 55%, rgb(4 24 20 / 0.5));
 }
 
-/* ── Vault (dark) ─────────────────────────────────────────────────────── */
+/* ── Lagoon (dark) ────────────────────────────────────────────────────── */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --color-canvas: #0b120e;
-  --color-surface: #111a15;
-  --color-elevated: #18231c;
-  --color-ink: #e6ebe2;
-  --color-muted: #8d998f;
-  --color-line: #25322a;
-  --color-on-accent: #0b120e;
-  --color-cream: #18231c;
-  --color-danger: #ef7a5f;
-  --color-on-danger: #0b120e;
+  --color-canvas: #07110f;
+  --color-surface: #0d1a17;
+  --color-elevated: #13241f;
+  --color-ink: #e8f3ef;
+  --color-muted: #8ea59d;
+  --color-line: #1d302a;
+  --color-on-accent: #04201a;
+  --color-cream: #13241f;
+  --color-danger: #ff7a6b;
+  --color-on-danger: #07110f;
 
-  --color-signal: #f5c02e;
-  --color-on-signal: #14110a;
-  --color-gain: #6fd39a;
-  --color-loss: #ef7a5f;
+  --color-primary: #2de3c8;
+  --color-on-primary: #04201a;
 
-  --color-accent-1: #79c08e;
-  --color-accent-2: #ef7a5f;
-  --color-accent-3: #f5c02e;
-  --color-accent-4: #e0a92a;
-  --color-mint: #2f6b48;
+  --color-signal: #2de3c8;
+  --color-on-signal: #04201a;
+  --color-gain: #4ee0a8;
+  --color-loss: #ff7a6b;
 
-  --color-brand-50: #142019;
-  --color-brand-100: #1a291f;
-  --color-brand-200: #213427;
-  --color-brand-300: #2d4835;
-  --color-brand-400: #4c7a58;
-  --color-brand-500: #78a885;
-  --color-brand-600: #9cc6a6;
-  --color-brand-700: #b9dcc1;
-  --color-brand-800: #d4eed9;
-  --color-brand-900: #e9f7ec;
+  --color-accent-1: #4ee0c4;
+  --color-accent-2: #ff7a9c;
+  --color-accent-3: #ffd36b;
+  --color-accent-4: #a99cff;
+  --color-mint: #1a4a3e;
 
-  --color-tone-rose: #33231d;
-  --color-tone-rose-ink: #f0bca8;
-  --color-tone-mint: #1c3326;
-  --color-tone-mint-ink: #a9dcb9;
-  --color-tone-violet: #26253a;
-  --color-tone-violet-ink: #c5c0ef;
-  --color-tone-amber: #352b10;
-  --color-tone-amber-ink: #f3d27a;
-  --color-tone-sky: #18303b;
-  --color-tone-sky-ink: #a3d4ea;
-  --color-tone-lime: #273015;
-  --color-tone-lime-ink: #cde596;
+  --color-brand-50: #0c1f1a;
+  --color-brand-100: #102a23;
+  --color-brand-200: #16392f;
+  --color-brand-300: #1f5244;
+  --color-brand-400: #2a8a72;
+  --color-brand-500: #2fc4a4;
+  --color-brand-600: #5eead4;
+  --color-brand-700: #8ff3e1;
+  --color-brand-800: #bff8ee;
+  --color-brand-900: #e2fcf7;
 
-  --gradient-chart: linear-gradient(180deg, rgb(111 211 154 / 0.22), rgb(111 211 154 / 0));
-  --glass: rgb(11 18 14 / 0.8);
-  --ring: #f5c02e;
+  --color-tone-rose: #3a1a24;
+  --color-tone-rose-ink: #ffb3c6;
+  --color-tone-mint: #0f2e26;
+  --color-tone-mint-ink: #8ff3d6;
+  --color-tone-violet: #242043;
+  --color-tone-violet-ink: #c9c0ff;
+  --color-tone-amber: #33280c;
+  --color-tone-amber-ink: #ffd97a;
+  --color-tone-sky: #0f2a3a;
+  --color-tone-sky-ink: #9cd8fb;
+  --color-tone-lime: #1c2e10;
+  --color-tone-lime-ink: #c6ee9a;
+
+  --gradient-chart: linear-gradient(180deg, rgb(45 227 200 / 0.22), rgb(45 227 200 / 0));
+  --gradient-brand: linear-gradient(135deg, #14ad8e 0%, #2de3c8 100%);
+  --gradient-soft: linear-gradient(135deg, #0c1f1a 0%, #0f1c26 50%, #231420 100%);
+  --glass: rgb(7 17 15 / 0.8);
+  --ring: #2de3c8;
   --photo-shade: linear-gradient(180deg, transparent 50%, rgb(0 0 0 / 0.6));
 
   --shadow-card: 0 0 0 0 transparent;
   --shadow-lift: 0 22px 44px -26px rgb(0 0 0 / 0.9);
 
   /* soft tint shades used for chips and status pills */
-  --color-emerald-50: #12261b;
-  --color-emerald-600: #5fcf8f;
-  --color-emerald-700: #8fe0b0;
-  --color-rose-50: #2a1712;
-  --color-rose-100: #351c15;
-  --color-rose-200: #47241a;
-  --color-rose-400: #d9694f;
-  --color-rose-600: #ef8a70;
-  --color-rose-700: #f6ad98;
-  --color-pink-100: #33191a;
+  --color-emerald-50: #0f2620;
+  --color-emerald-600: #4ee0a8;
+  --color-emerald-700: #8ff0c6;
+  --color-rose-50: #2a1218;
+  --color-rose-100: #35161e;
+  --color-rose-200: #471c27;
+  --color-rose-400: #e0607d;
+  --color-rose-600: #ff8aa5;
+  --color-rose-700: #ffb0c2;
+  --color-pink-100: #33181f;
   --color-orange-50: #2a1c10;
   --color-orange-100: #33220f;
-  --color-violet-50: #1d1d29;
-  --color-violet-100: #242436;
-  --color-violet-200: #2e2e45;
-  --color-violet-600: #aaa6e8;
-  --color-violet-700: #c6c3f2;
+  --color-violet-50: #1d1b2e;
+  --color-violet-100: #24223a;
+  --color-violet-200: #2e2b4a;
+  --color-violet-600: #b3a8ff;
+  --color-violet-700: #cdc5ff;
   --color-fuchsia-100: #2c1a2c;
   --color-amber-50: #2a210c;
   --color-amber-200: #4a3a12;
@@ -178,20 +194,20 @@
   --color-amber-700: #f5c862;
   --color-amber-900: #fde3a0;
   --color-yellow-100: #2e290e;
-  --color-sky-50: #10202a;
-  --color-sky-200: #173444;
+  --color-sky-50: #0d202a;
+  --color-sky-200: #143444;
   --color-sky-600: #6cc4e8;
   --color-sky-700: #93d6f2;
-  --color-cyan-100: #0f2b2e;
-  --color-teal-50: #0f2623;
-  --color-teal-100: #12312c;
-  --color-lime-50: #19240f;
-  --color-lime-100: #202f12;
-  --color-lime-200: #293c16;
+  --color-cyan-100: #0c2b2b;
+  --color-teal-50: #0b2622;
+  --color-teal-100: #0f312c;
+  --color-lime-50: #16240f;
+  --color-lime-100: #1d2f12;
+  --color-lime-200: #263c16;
   --color-lime-700: #c3e88a;
-  --color-slate-100: #1c2620;
-  --color-slate-300: #3a483f;
-  --color-slate-600: #b5c0b8;
+  --color-slate-100: #15231f;
+  --color-slate-300: #2f443d;
+  --color-slate-600: #b2c4bd;
 }
 
 /* ── Base ─────────────────────────────────────────────────────────────── */
@@ -201,38 +217,35 @@ body {
   background: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-feature-settings: "ss01", "cv11";
-  -webkit-font-smoothing: antialiased;
+    -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-/* Display: Archivo pulled narrow and heavy, like the numerals on a note. */
+/* Display: the same friendly sans, bold and slightly tight. No condensing. */
 h1, h2, .font-display {
   font-family: var(--font-display);
-  font-stretch: 72%;
   font-weight: 800;
-  letter-spacing: -0.012em;
-  word-spacing: 0.08em;
-  line-height: 0.95;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
 }
-h3 { letter-spacing: -0.01em; }
+h3 { letter-spacing: -0.015em; }
 .font-wide { font-stretch: 112%; }
 .tabular, .tabular-nums { font-variant-numeric: tabular-nums; }
 ::selection { background: var(--color-signal); color: var(--color-on-signal); }
 }
 
 /* ── Signal & legacy-named utilities (names kept so every screen re-skins) ── */
-/* bg-aurora = the primary fill: ink on paper, paper on vault. */
-@utility bg-aurora { background-color: var(--color-ink); background-image: none; }
-@utility bg-aurora-flow { background-color: var(--color-ink); background-image: none; }
-@utility bg-aurora-soft { background-color: var(--color-elevated); }
+/* bg-aurora = the brand gradient fill (aqua green). bg-aurora-soft = the pastel wash. */
+@utility bg-aurora { background-color: var(--color-primary); background-image: var(--gradient-brand); }
+@utility bg-aurora-flow { background-color: var(--color-primary); background-image: var(--gradient-brand); background-size: 200% 200%; }
+@utility bg-aurora-soft { background-color: var(--color-elevated); background-image: var(--gradient-soft); }
 @utility bg-signal { background-color: var(--color-signal); }
 @utility text-on-signal { color: var(--color-on-signal); }
-@utility text-aurora { color: inherit; }
+@utility text-aurora { color: var(--color-brand-600); }
 @utility bg-money { background-color: var(--color-gain); }
 @utility ring-aurora { box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--ring); }
 @utility glass { background: var(--glass); -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2); }
 /* Small headings that should read as interface text, not display type */
-@utility font-text { font-stretch: 100%; letter-spacing: normal; word-spacing: normal; line-height: 1.3; }
+@utility font-text { font-weight: 600; letter-spacing: -0.005em; line-height: 1.3; }
 @utility bg-chart { background-image: var(--gradient-chart); }
 
 @utility card {
@@ -242,14 +255,22 @@ h3 { letter-spacing: -0.01em; }
   box-shadow: var(--shadow-card);
 }
 
-/* Hairline rule used for ledger rows */
+/* Soft tinted tile: used for quick links and stat blocks */
+@utility tile {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-card);
+}
+
+/* Hairline rule used for list rows */
 @utility rule { border-top: 1px solid var(--color-line); }
 
 @layer components {
-/* Cards that are links: a quiet lift and an ink border on hover. */
+/* Cards that are links: a soft lift with an aqua-tinted shadow on hover. */
 .lift { position: relative; transition: transform 0.45s var(--ease-out-expo), box-shadow 0.45s var(--ease-out-expo), border-color 0.25s; }
 @media (hover: hover) {
-  .lift:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); border-color: color-mix(in srgb, var(--color-ink) 28%, var(--color-line)); }
+  .lift:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); border-color: var(--color-brand-200); }
 }
 .lift:active { transform: scale(0.99); }
 
@@ -266,8 +287,8 @@ h3 { letter-spacing: -0.01em; }
 .press:active { transform: scale(0.97); }
 
 /* Buttons that carry a trailing arrow nudge it on hover */
-.btn-glow { box-shadow: none; }
-@media (hover: hover) { .btn-glow:hover { opacity: 0.92; } }
+.btn-glow { box-shadow: 0 8px 20px -10px rgb(11 128 104 / 0.55); }
+@media (hover: hover) { .btn-glow:hover { filter: brightness(1.05); } }
 
 /* Underline that draws in from the left on hover */
 .link-draw { background-image: linear-gradient(currentColor, currentColor); background-size: 0% 1px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size 0.45s var(--ease-out-expo); }
@@ -299,7 +320,7 @@ dialog[data-closing]::backdrop { animation: fade-out 0.18s ease-in both; }
 @keyframes bell { 0%, 50%, 100% { transform: rotate(0); } 10%, 30% { transform: rotate(12deg); } 20%, 40% { transform: rotate(-10deg); } }
 
 /* Skeleton shimmer */
-.skeleton { background: linear-gradient(90deg, var(--color-elevated) 25%, var(--color-surface) 50%, var(--color-elevated) 75%); background-size: 200% 100%; animation: var(--animate-shimmer); border-radius: 0.5rem; }
+.skeleton { background: linear-gradient(90deg, var(--color-elevated) 25%, var(--color-surface) 50%, var(--color-elevated) 75%); background-size: 200% 100%; animation: var(--animate-shimmer); border-radius: 0.75rem; }
 
 /* Bars that grow from the baseline (charts) */
 .grow-y { transform-origin: bottom; animation: grow-y 0.7s var(--ease-out-expo) both; animation-delay: calc(var(--i, 0) * 30ms); }
@@ -323,7 +344,8 @@ dialog.menu-overlay[open] .menu-item { animation: fade-up 0.6s var(--ease-out-ex
 .no-scrollbar { scrollbar-width: none; }
 .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
 .pt-safe { padding-top: env(safe-area-inset-top); }
-:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 0.375rem; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 0.5rem; }
+.float { animation: var(--animate-float); }
 
 /* Built-in reaction GIFs */
 @keyframes gif-bounce { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-12%) scale(1.08); } }
@@ -358,7 +380,7 @@ dialog.menu-overlay[open] .menu-item { animation: fade-up 0.6s var(--ease-out-ex
 }
 .fade-late { animation: fade-in 0.8s ease-out both; animation-delay: 0.9s; }
 
-/* Ledger rows: preview photo that follows the pointer (desktop) */
+/* List rows: preview photo that follows the pointer (desktop) */
 .follow-photo { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 30; transform: translate3d(var(--fx, -999px), var(--fy, -999px), 0); }
 .follow-photo > * { transition: opacity 0.3s, transform 0.5s var(--ease-out-expo); }
 

@@ -115,7 +115,7 @@ function ExploreInner() {
   return (
     <div className="mx-auto max-w-6xl pb-24">
       <header className="mb-6">
-        <h1 className="text-[clamp(2.6rem,7vw,4.25rem)] leading-[0.9]">Find {who}</h1>
+        <h1 className="text-[clamp(1.75rem,4vw,2.25rem)] leading-[1.1]">Find {who}</h1>
       </header>
 
       <form onSubmit={(e) => { e.preventDefault(); go({ ...applied, q }, {}, custom); }} className="relative" role="search">
@@ -126,14 +126,14 @@ function ExploreInner() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder={`Search ${who} or #tags`}
-          className="h-14 w-full rounded-full border border-line bg-surface pl-13 pr-24 text-[17px] outline-none transition-colors placeholder:text-muted/80 hover:border-muted/60 focus:border-ink"
+          className="h-14 w-full rounded-full border border-line bg-surface pl-13 pr-24 text-[17px] outline-none transition-colors placeholder:text-muted/80 hover:border-muted/60 focus:border-brand-400"
         />
         {q && (
           <button type="button" onClick={() => { setQ(""); go({ ...applied, q: "" }, {}, custom); }} className="absolute right-[58px] top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-muted hover:bg-elevated" aria-label="Clear search text">
             <X className="h-4 w-4" />
           </button>
         )}
-        <button type="button" onClick={() => setSheet(true)} className="press absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-ink text-canvas lg:hidden" aria-label={`Filters${count ? `, ${count} on` : ""}`}>
+        <button type="button" onClick={() => setSheet(true)} className="press absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-primary text-on-primary lg:hidden" aria-label={`Filters${count ? `, ${count} on` : ""}`}>
           <SlidersHorizontal className="h-[18px] w-[18px]" />
           {count > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-signal px-1 text-[10px] font-bold text-on-signal">{count}</span>}
         </button>
@@ -143,11 +143,11 @@ function ExploreInner() {
         <button
           onClick={() => router.replace(`/explore${kind !== defaultKind ? `?type=${kind}` : ""}`, { scroll: false })}
           aria-pressed={!custom}
-          className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold ${!custom ? "bg-ink text-canvas" : "border border-line hover:border-ink"}`}
+          className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold ${!custom ? "bg-primary text-on-primary" : "border border-line hover:border-brand-300"}`}
         >
           <Sparkles className="h-4 w-4" /> Matched to you
         </button>
-        <button onClick={() => setSheet(true)} aria-pressed={custom} className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold lg:hidden ${custom ? "bg-ink text-canvas" : "border border-line hover:border-ink"}`}>
+        <button onClick={() => setSheet(true)} aria-pressed={custom} className={`press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold lg:hidden ${custom ? "bg-primary text-on-primary" : "border border-line hover:border-brand-300"}`}>
           <SlidersHorizontal className="h-4 w-4" /> Custom search{custom && count ? ` · ${count}` : ""}
         </button>
       </div>
@@ -165,7 +165,7 @@ function ExploreInner() {
                   const base = custom ? applied : { ...EMPTY_FILTERS, kind, currency };
                   go({ ...base, q, kind, niches: on ? base.niches.filter((x) => x !== n) : [...base.niches.filter((x) => custom || x !== n), n] });
                 }}
-                className={`press relative block h-[88px] w-[88px] overflow-hidden rounded-[12px] bg-elevated text-left ${on ? "ring-2 ring-signal ring-offset-2 ring-offset-canvas" : ""}`}
+                className={`press relative block h-[88px] w-[88px] overflow-hidden rounded-[18px] bg-elevated text-left ${on ? "ring-2 ring-signal ring-offset-2 ring-offset-canvas" : ""}`}
               >
                 <Photo photo={nichePhoto(n)} sizes="88px" className={on ? "scale-105" : "grayscale-[30%]"} decorative />
                 <span className={`absolute inset-0 ${on ? "bg-black/25" : "bg-black/45"}`} aria-hidden="true" />
@@ -189,7 +189,7 @@ function ExploreInner() {
 
       <div className="mt-8 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[300px_minmax(0,1fr)]">
         <aside className="hidden lg:block" aria-label="Filters">
-          <div className="no-scrollbar sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto border-t border-ink pt-3">
+          <div className="no-scrollbar sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto border-t border-line pt-3">
             <h2 className="sr-only">Custom search</h2>
             <FilterBuilder draft={draft} setDraft={setDraft} who={who} lookingForCreators={kind === "creator"} currency={currency} error={error} liveCount={liveCount} onSubmit={apply} onClear={clearAll} />
           </div>
@@ -208,7 +208,7 @@ function ExploreInner() {
                   aria-checked={on}
                   disabled={disabled}
                   onClick={() => setLevel(v)}
-                  className={`press relative isolate flex h-12 shrink-0 flex-col items-center justify-center rounded-full px-5 leading-tight disabled:opacity-40 ${on ? "text-canvas" : "border border-line hover:border-ink"}`}
+                  className={`press relative isolate flex h-12 shrink-0 flex-col items-center justify-center rounded-full px-5 leading-tight disabled:opacity-40 ${on ? "text-on-primary" : "border border-line hover:border-brand-300"}`}
                 >
                   {on && <TabIndicator group="match" variant="pill" />}
                   <span className="text-[14px] font-semibold tabular-nums">{v === 0 ? "All" : `${v}%+`}</span>
@@ -219,7 +219,7 @@ function ExploreInner() {
           </div>
 
           <div className="mb-3 flex items-center gap-3">
-            <button type="button" onClick={() => setSelected(allSelected ? [] : handles)} disabled={!handles.length} className="press inline-flex h-10 items-center gap-2 rounded-full border border-line px-3.5 text-[13px] font-semibold hover:border-ink disabled:opacity-40">
+            <button type="button" onClick={() => setSelected(allSelected ? [] : handles)} disabled={!handles.length} className="press inline-flex h-10 items-center gap-2 rounded-full border border-line px-3.5 text-[13px] font-semibold hover:border-brand-300 disabled:opacity-40">
               {allSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
               {allSelected ? "Deselect all" : `Select all${level ? ` ${level}%+` : ""} (${handles.length})`}
             </button>
@@ -271,7 +271,7 @@ function ExploreInner() {
       </div>
 
       {selected.length > 0 && (
-        <div className="animate-fade-up fixed inset-x-3 bottom-24 z-40 mx-auto flex max-w-xl items-center gap-2 rounded-full bg-ink p-1.5 pl-5 text-canvas shadow-2xl md:bottom-6">
+        <div className="animate-fade-up fixed inset-x-3 bottom-24 z-40 mx-auto flex max-w-xl items-center gap-2 rounded-full bg-primary p-1.5 pl-5 text-on-primary shadow-2xl md:bottom-6">
           <span className="mr-auto text-sm font-bold">{selected.length} selected</span>
           <button onClick={() => { setMany("starredProfiles", selected, true); toast(`${selected.length} starred ⭐`); }} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-canvas/10" aria-label="Star selected" title="Star selected">
             <Star className="h-5 w-5" />

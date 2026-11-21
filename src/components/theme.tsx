@@ -3,11 +3,11 @@
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
-/** Two themes: White ("Paper") and Dark ("Vault"). */
+/** Two themes: White ("Fresh") and Dark ("Lagoon"). */
 export type ThemeChoice = "light" | "dark";
 const KEY = "mm.theme";
 const EVENT = "mm-theme";
-const COLORS = { light: "#ECEEE7", dark: "#0B120E" };
+const COLORS = { light: "#F6FAF9", dark: "#07110F" };
 
 /** Runs before first paint (inlined in <head>) so there is no flash. First visit follows the device. */
 export const THEME_INIT_SCRIPT = `(function(){try{var c=localStorage.getItem("${KEY}");var d=c?c==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=d?"dark":"light";}catch(e){}})();`;
@@ -105,8 +105,8 @@ export function ThemeToggle({ withLabel = false, className = "" }: { withLabel?:
 export function ThemePicker() {
   const { choice, set } = useTheme();
   const opts = [
-    { id: "light", label: "White", sub: "Paper", swatch: "bg-[#ECEEE7] ring-1 ring-black/10", dot: "#0F1A14" },
-    { id: "dark", label: "Dark", sub: "Vault", swatch: "bg-[#0B120E] ring-1 ring-white/15", dot: "#F5C02E" },
+    { id: "light", label: "White", sub: "Fresh", swatch: "bg-[#F6FAF9] ring-1 ring-black/10", dot: "#2DE3C8" },
+    { id: "dark", label: "Dark", sub: "Lagoon", swatch: "bg-[#07110F] ring-1 ring-white/15", dot: "#2DE3C8" },
   ] as const;
   return (
     <div role="radiogroup" aria-label="Theme" className="grid grid-cols-2 gap-2">
@@ -117,7 +117,7 @@ export function ThemePicker() {
           role="radio"
           aria-checked={choice === id}
           onClick={(e) => set(id, e)}
-          className={`press flex items-center gap-3 rounded-xl border p-3 text-left ${choice === id ? "border-ink bg-surface" : "border-line hover:bg-elevated"}`}
+          className={`press flex items-center gap-3 rounded-xl border p-3 text-left ${choice === id ? "border-brand-500 bg-brand-50" : "border-line hover:bg-elevated"}`}
         >
           <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${swatch}`}>
             <span className="h-4 w-4 rounded-full" style={{ background: dot }} />

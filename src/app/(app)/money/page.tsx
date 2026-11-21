@@ -124,7 +124,7 @@ function StripeCard({ purpose }: { purpose: "payouts" | "revenue" }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button onClick={() => setOpen(true)} className="press flex w-full items-center gap-3 rounded-[12px] border border-dashed border-muted/50 p-4 text-left transition-colors hover:border-ink">
+      <button onClick={() => setOpen(true)} className="press flex w-full items-center gap-3 rounded-[18px] border border-dashed border-muted/50 p-4 text-left transition-colors hover:border-brand-300">
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-elevated"><CreditCard className="h-5 w-5" strokeWidth={1.7} /></span>
         <span className="min-w-0 flex-1">
           <span className="block font-semibold">Connect Stripe</span>
@@ -160,7 +160,7 @@ function CreatorEarnings() {
       <section className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-12" aria-label="Summary">
         <div>
           <p className="text-[14px] text-muted">Total earned</p>
-          <p className="font-display mt-2 text-[clamp(3.6rem,11vw,6.5rem)] leading-[0.85] tabular-nums">{money(summary.total)}</p>
+          <p className="font-display mt-2 text-[clamp(2.5rem,8vw,3.75rem)] leading-[0.85] tabular-nums">{money(summary.total)}</p>
           <p className="mt-3 text-[14px]">
             {summary.changePercent !== null ? (
               <span className={`font-semibold tabular-nums ${summary.changePercent >= 0 ? "text-gain" : "text-loss"}`}>{summary.changePercent >= 0 ? "▲" : "▼"} {Math.abs(summary.changePercent)}% vs last month</span>
@@ -177,13 +177,13 @@ function CreatorEarnings() {
       </section>
 
       {bySource.length > 0 && (
-        <section className="mt-12 border-t border-ink pt-3">
+        <section className="mt-12 border-t border-line pt-3">
           <h2 className="font-text mb-4 text-[14px] font-semibold">Where your money comes from</h2>
           <ul className="space-y-4">
             {bySource.map((s, i) => (
               <li key={s.id}>
                 <div className="mb-1.5 flex justify-between text-[14px]"><span>{s.label}</span><span className="font-semibold tabular-nums">{money(s.total)}</span></div>
-                <div className="h-1.5 overflow-hidden rounded-full bg-elevated"><div className={`h-full origin-left rounded-full ${i === 0 ? "bg-signal" : "bg-ink"} animate-[grow-x_0.9s_var(--ease-out-expo)_both]`} style={{ width: `${Math.max(4, (s.total / summary.total) * 100)}%` }} /></div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-elevated"><div className={`h-full origin-left rounded-full ${i === 0 ? "bg-signal" : "bg-primary"} animate-[grow-x_0.9s_var(--ease-out-expo)_both]`} style={{ width: `${Math.max(4, (s.total / summary.total) * 100)}%` }} /></div>
               </li>
             ))}
           </ul>
@@ -192,7 +192,7 @@ function CreatorEarnings() {
 
       <section className="mt-12" aria-labelledby="records-title">
         <div className="mb-3 flex items-end justify-between gap-3">
-          <h2 id="records-title" className="text-[clamp(2rem,5vw,3rem)]">Records</h2>
+          <h2 id="records-title" className="text-[clamp(1.4rem,3.5vw,1.85rem)]">Records</h2>
           <Button onClick={() => setOpen(true)}><PlusCircle className="h-4 w-4" /> Add earning</Button>
         </div>
         <RecordList kind="income" />
@@ -221,7 +221,7 @@ function BusinessGrowth() {
       <section className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-12" aria-label="Summary">
         <div>
           <p className="flex items-center gap-1.5 text-[14px] text-muted"><Rocket className="h-4 w-4" /> Profit</p>
-          <p className={`font-display mt-2 text-[clamp(3.6rem,11vw,6.5rem)] leading-[0.85] tabular-nums ${up ? "" : "text-loss"}`}>{up ? "" : "−"}{money(Math.abs(g.profit))}</p>
+          <p className={`font-display mt-2 text-[clamp(2.5rem,8vw,3.75rem)] leading-[0.85] tabular-nums ${up ? "" : "text-loss"}`}>{up ? "" : "−"}{money(Math.abs(g.profit))}</p>
           <p className="mt-3 text-[14px]">
             {g.roi !== null ? <span className={`font-semibold tabular-nums ${g.roi >= 0 ? "text-gain" : "text-loss"}`}>{g.roi >= 0 ? "▲" : "▼"} {Math.abs(g.roi)}% return on investment</span> : <span className="text-muted">Add investments and revenue to see your return.</span>}
           </p>
@@ -235,7 +235,7 @@ function BusinessGrowth() {
 
       <div role="tablist" aria-label="Show" className="mt-12 grid grid-cols-2 gap-1 rounded-full border border-line p-1">
         {([["spending", "Invest", TrendingDown], ["revenue", "Scaling", TrendingUp]] as const).map(([id, label, Icon]) => (
-          <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`press relative isolate flex h-10 items-center justify-center gap-1.5 rounded-full text-sm font-semibold ${tab === id ? "text-canvas" : "text-muted hover:text-ink"}`}>
+          <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`press relative isolate flex h-10 items-center justify-center gap-1.5 rounded-full text-sm font-semibold ${tab === id ? "text-on-primary" : "text-muted hover:text-ink"}`}>
             {tab === id && <TabIndicator group="money" variant="pill" />}
             <Icon className="h-4 w-4" /> {label}
           </button>
