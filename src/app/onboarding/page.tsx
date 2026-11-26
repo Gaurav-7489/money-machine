@@ -140,29 +140,23 @@ export default function Onboarding() {
         <div key={step} className="animate-fade-up">
           {step === 0 && (
             <>
-              <h1 className="text-2xl font-bold tracking-tight">Who are you?</h1>
-              <p className="mt-1 text-sm text-muted">Choose what best describes you.</p>
-              <fieldset className="mt-6 space-y-3">
+              <h1 className="text-xl font-bold tracking-tight">Who are you?</h1>
+              <fieldset className="mt-5 grid grid-cols-2 gap-3">
                 <legend className="sr-only">Account type</legend>
-                {ROLES.map(({ id, title, body, icon: Icon }) => {
+                {ROLES.map(({ id, title, icon: Icon }) => {
                   const selected = role === id;
                   const tone = id === "creator" ? "bg-brand-50 text-brand-600" : "bg-violet-50 text-violet-600";
                   return (
-                    <label key={id} className={`press flex cursor-pointer items-center gap-4 rounded-2xl border p-4 transition-all duration-300 [transition-timing-function:var(--ease-spring)] ${selected ? "-translate-y-0.5 scale-[1.02] border-brand-400 bg-brand-50/50 shadow-[0_10px_24px_-12px_rgb(14_122_92/0.45)] ring-4 ring-brand-100" : "border-line hover:-translate-y-0.5 hover:bg-canvas hover:shadow-sm"}`}>
+                    <label key={id} className={`press relative flex cursor-pointer flex-col items-center gap-2.5 rounded-2xl border px-3 py-5 transition-all duration-300 [transition-timing-function:var(--ease-spring)] ${selected ? "-translate-y-0.5 scale-[1.03] border-brand-400 bg-brand-50/40 shadow-[0_10px_24px_-12px_rgb(14_122_92/0.45)] ring-4 ring-brand-100" : "border-line hover:-translate-y-0.5 hover:shadow-sm"}`}>
                       <input type="radio" name="role" value={id} checked={selected} onChange={() => setRole(id)} className="sr-only" />
-                      <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl transition-transform duration-300 [transition-timing-function:var(--ease-spring)] ${tone} ${selected ? "scale-110 rotate-[-4deg]" : ""}`}><Icon className="h-5 w-5" /></span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-semibold leading-tight">{title}</span>
-                        <span className="mt-0.5 block text-sm leading-snug text-muted">{body}</span>
-                      </span>
-                      <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 transition-all duration-300 [transition-timing-function:var(--ease-spring)] ${selected ? "scale-110 border-brand-600 bg-brand-600 text-white" : "border-line"}`}>
-                        {selected && <Check className="animate-pop h-3 w-3" strokeWidth={3} />}
-                      </span>
+                      <span className={`grid h-14 w-14 place-items-center rounded-2xl transition-transform duration-300 [transition-timing-function:var(--ease-spring)] ${tone} ${selected ? "scale-110 rotate-[-6deg]" : ""}`}><Icon className="h-6 w-6" /></span>
+                      <span className="text-[13px] font-semibold">{title}</span>
+                      {selected && <span className="animate-pop absolute right-2 top-2 grid h-5 w-5 place-items-center rounded-full bg-brand-600 text-white"><Check className="h-3 w-3" strokeWidth={3} /></span>}
                     </label>
                   );
                 })}
               </fieldset>
-              <div className="mt-6 space-y-4">
+              <div className="mt-5 space-y-3">
                 <Field label={isBiz ? "Brand name" : "Your name"} error={errors.displayName}>
                   <input className={inputCls} value={displayName} onChange={(e) => setDisplayName(e.target.value)} aria-invalid={!!errors.displayName} autoComplete="name" />
                 </Field>
