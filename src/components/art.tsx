@@ -3,6 +3,16 @@ import type { Tone } from "@/lib/sample-data";
 import { initials } from "@/lib/format";
 import { MediaImage } from "./image-slot";
 
+/** Dark theme: avatars are solid pastel tiles with dark letters, like the landing page. */
+const DARK_AVATAR: Record<Tone, string> = {
+  rose: "dark:bg-pastel-rose",
+  mint: "dark:bg-pastel-mint",
+  violet: "dark:bg-pastel-lilac",
+  amber: "dark:bg-pastel-amber",
+  sky: "dark:bg-pastel-sky",
+  lime: "dark:bg-pastel-lime",
+};
+
 export const TONES: Record<Tone, { bg: string; fg: string; soft: string }> = {
   rose: { bg: "from-rose-200 via-pink-100 to-orange-100", fg: "text-rose-500", soft: "bg-rose-50 text-rose-600" },
   mint: { bg: "from-emerald-200 via-teal-100 to-lime-100", fg: "text-emerald-600", soft: "bg-emerald-50 text-emerald-700" },
@@ -32,7 +42,7 @@ export function Avatar({
 }) {
   return (
     <span
-      className={`inline-grid shrink-0 place-items-center bg-gradient-to-br font-semibold ${TONES[tone].bg} ${TONES[tone].fg} ${SIZES[size]} ${square ? "rounded-xl" : "rounded-full"} ${ring ? "ring-2 ring-surface outline-2 outline-offset-1 outline-brand-400" : ""}`}
+      className={`inline-grid shrink-0 place-items-center bg-gradient-to-br font-semibold ${TONES[tone].bg} ${TONES[tone].fg} ${DARK_AVATAR[tone]} dark:bg-none dark:text-canvas ${SIZES[size]} ${square ? "rounded-xl" : "rounded-full"} ${ring ? "ring-2 ring-surface outline-2 outline-offset-1 outline-brand-400" : ""}`}
       aria-hidden="true"
     >
       {photoId ? (

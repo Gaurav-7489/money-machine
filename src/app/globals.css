@@ -7,7 +7,8 @@
    Minimal: white cards on a cool off-white canvas, soft shadows, rounded
    shapes, pastel gradients for avatars and placeholder media.
      • Light: #F5F8F7 canvas, #FFFFFF surface, #0F1A17 ink
-     • Dark (Lagoon): #090B0E canvas, #11151A surface, #EDF4F8 ink
+     • Dark (Midnight): #0B0F17 canvas, #141922 surface, #F3F5F8 ink,
+       mint green #3EE39B accent, pastel mint / lilac tiles
    Type: Inter / system sans, bold + tracking-tight for headings.
    Components use semantic tokens only (canvas, surface, elevated, ink, muted,
    line, primary, signal, brand-*, accent-*). Never hard-code hex in components.
@@ -58,6 +59,13 @@
   --color-brand-900: #093f32;
 
   /* six pastel tints for avatars & placeholders (fill / ink pairs) */
+  --color-pastel-mint: #9ef0c9;
+  --color-pastel-lilac: #d8c8ff;
+  --color-pastel-rose: #ffc6d3;
+  --color-pastel-amber: #ffe1a3;
+  --color-pastel-sky: #b8e3ff;
+  --color-pastel-lime: #d6f5a8;
+  --color-lilac-ink: #7c4dff;
   --color-tone-rose: #fecdd3;
   --color-tone-rose-ink: #f43f5e;
   --color-tone-mint: #a7f3d0;
@@ -107,45 +115,45 @@
   --photo-shade: linear-gradient(180deg, transparent 55%, rgb(4 24 20 / 0.5));
 }
 
-/* ── Lagoon (dark) ────────────────────────────────────────────────────── */
+/* ── Midnight (dark) ────────────────────────────────────────────────────── */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --color-canvas: #090b0e;
-  --color-surface: #11151a;
-  --color-elevated: #1a2027;
-  --color-ink: #edf4f8;
-  --color-muted: #a0adb8;
-  --color-line: #303943;
-  --color-on-accent: #06212a;
-  --color-cream: #1a2027;
+  --color-canvas: #0b0f17;
+  --color-surface: #141922;
+  --color-elevated: #1c222d;
+  --color-ink: #f3f5f8;
+  --color-muted: #a3abb8;
+  --color-line: #2a313c;
+  --color-on-accent: #052a1a;
+  --color-cream: #1c222d;
   --color-danger: #ff7a6b;
-  --color-on-danger: #090b0e;
+  --color-on-danger: #0b0f17;
 
-  --color-primary: #55dff5;
-  --color-on-primary: #06212a;
+  --color-primary: #3ee39b;
+  --color-on-primary: #052a1a;
 
-  --color-signal: #55dff5;
-  --color-on-signal: #06212a;
-  --color-gain: #4ee0a8;
+  --color-signal: #3ee39b;
+  --color-on-signal: #052a1a;
+  --color-gain: #3ee39b;
   --color-loss: #ff7a6b;
 
-  --color-accent-1: #4ee0c4;
+  --color-accent-1: #3ee39b;
   --color-accent-2: #ff7a9c;
   --color-accent-3: #ffd36b;
-  --color-accent-4: #a99cff;
-  --color-aqua: #55dff5;
-  --color-mint: #1a4a3e;
+  --color-accent-4: #c9b8ff;
+  --color-aqua: #3ee39b;
+  --color-mint: #174532;
 
-  --color-brand-50: #10232c;
-  --color-brand-100: #15313d;
-  --color-brand-200: #1c4351;
-  --color-brand-300: #286074;
-  --color-brand-400: #3895ab;
-  --color-brand-500: #46c8e0;
-  --color-brand-600: #67e8f9;
-  --color-brand-700: #a5f3fc;
-  --color-brand-800: #cffafe;
-  --color-brand-900: #ecfeff;
+  --color-brand-50: #0f2a20;
+  --color-brand-100: #123426;
+  --color-brand-200: #174532;
+  --color-brand-300: #1f6147;
+  --color-brand-400: #2ea872;
+  --color-brand-500: #36cf8a;
+  --color-brand-600: #3ee39b;
+  --color-brand-700: #7beebc;
+  --color-brand-800: #b4f6d8;
+  --color-brand-900: #e6fdf2;
 
   --color-tone-rose: #3a1a24;
   --color-tone-rose-ink: #ffb3c6;
@@ -160,11 +168,11 @@
   --color-tone-lime: #1c2e10;
   --color-tone-lime-ink: #c6ee9a;
 
-  --gradient-chart: linear-gradient(180deg, rgb(85 223 245 / 0.22), rgb(85 223 245 / 0));
-  --gradient-brand: linear-gradient(135deg, #24b6d1 0%, #55dff5 100%);
-  --gradient-soft: linear-gradient(135deg, #10232c 0%, #0f1c26 50%, #231420 100%);
-  --glass: rgb(9 11 14 / 0.8);
-  --ring: #55dff5;
+  --gradient-chart: linear-gradient(180deg, rgb(62 227 155 / 0.22), rgb(62 227 155 / 0));
+  --gradient-brand: linear-gradient(135deg, #2ccf86 0%, #4ff0a8 100%);
+  --gradient-soft: linear-gradient(135deg, #0f2a20 0%, #141922 50%, #221c38 100%);
+  --glass: rgb(11 15 23 / 0.8);
+  --ring: #3ee39b;
   --photo-shade: linear-gradient(180deg, transparent 50%, rgb(0 0 0 / 0.6));
 
   --shadow-card: 0 0 0 0 transparent;
@@ -186,8 +194,8 @@
   --color-violet-50: #1d1b2e;
   --color-violet-100: #24223a;
   --color-violet-200: #2e2b4a;
-  --color-violet-600: #b3a8ff;
-  --color-violet-700: #cdc5ff;
+  --color-violet-600: #c9b8ff;
+  --color-violet-700: #ddd0ff;
   --color-fuchsia-100: #2c1a2c;
   --color-amber-50: #2a210c;
   --color-amber-200: #4a3a12;
@@ -212,7 +220,7 @@
   --color-emerald-100: #12302a;
   --color-emerald-200: #164036;
   --color-rose-500: #ff8aa5;
-  --color-violet-500: #b3a8ff;
+  --color-violet-500: #c9b8ff;
   --color-amber-300: #a17a1a;
   --color-amber-400: #f0b43c;
   --color-amber-500: #f5c862;

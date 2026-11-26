@@ -10,18 +10,18 @@ import { useStore } from "@/lib/store";
 function Hero() {
   return (
     <div className="animate-scale-in relative mx-auto aspect-square w-full max-w-sm [animation-delay:150ms]">
-      <div className="absolute inset-6 rounded-[3rem] bg-gradient-to-br from-brand-100 via-aqua/30 to-lime/40" />
-      <div className="animate-float absolute left-4 top-14 grid h-40 w-40 place-items-center rounded-[2.5rem] bg-gradient-to-br from-rose-200 to-orange-100 shadow-xl shadow-rose-900/10">
-        <span className="text-4xl font-bold text-rose-500">Cr</span>
+      <div className="absolute inset-6 rounded-[3rem] bg-gradient-to-br from-brand-100 via-aqua/30 to-lime/40 dark:border dark:border-line dark:bg-surface dark:bg-none" />
+      <div className="animate-float absolute left-4 top-14 grid h-40 w-40 place-items-center rounded-[2.5rem] bg-gradient-to-br from-rose-200 to-orange-100 shadow-xl shadow-rose-900/10 dark:bg-pastel-mint dark:bg-none dark:shadow-black/40">
+        <span className="text-4xl font-bold text-rose-500 dark:text-canvas">Cr</span>
       </div>
-      <div className="animate-[float_7s_ease-in-out_infinite_1s] absolute bottom-12 right-4 grid h-40 w-40 place-items-center rounded-[2.5rem] bg-gradient-to-br from-violet-200 to-sky-100 shadow-xl shadow-violet-900/10">
-        <span className="text-4xl font-bold text-violet-500">Br</span>
+      <div className="animate-[float_7s_ease-in-out_infinite_1s] absolute bottom-12 right-4 grid h-40 w-40 place-items-center rounded-[2.5rem] bg-gradient-to-br from-violet-200 to-sky-100 shadow-xl shadow-violet-900/10 dark:bg-pastel-lilac dark:bg-none dark:shadow-black/40">
+        <span className="text-4xl font-bold text-violet-500 dark:text-canvas">Br</span>
       </div>
       <div className="absolute left-1/2 top-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-2xl bg-white shadow-lg">
-        <Handshake className="h-8 w-8 text-brand-600" />
+        <Handshake className="h-8 w-8 text-brand-600 dark:text-canvas" />
       </div>
-      <span className="animate-fade-up absolute right-10 top-10 rounded-full [animation-delay:500ms] bg-white px-3 py-1.5 text-xs font-semibold text-brand-700 shadow">Collab</span>
-      <span className="animate-fade-up absolute bottom-6 left-10 rounded-full [animation-delay:650ms] bg-white px-3 py-1.5 text-xs font-semibold text-violet-600 shadow">Affiliate</span>
+      <span className="animate-fade-up absolute right-10 top-10 rounded-full [animation-delay:500ms] bg-white px-3 py-1.5 text-xs font-semibold text-brand-700 shadow dark:text-canvas">Collab</span>
+      <span className="animate-fade-up absolute bottom-6 left-10 rounded-full [animation-delay:650ms] bg-white px-3 py-1.5 text-xs font-semibold text-violet-600 shadow dark:text-lilac-ink">Affiliate</span>
     </div>
   );
 }
@@ -35,7 +35,7 @@ export function Welcome() {
   }, [ready, session, router]);
 
   return (
-    <main className="min-h-dvh bg-gradient-to-b from-white to-brand-50/60">
+    <main className="min-h-dvh bg-gradient-to-b from-white to-brand-50/60 dark:bg-canvas dark:bg-none">
       <div className="mx-auto grid min-h-dvh max-w-6xl items-center gap-10 px-6 py-10 lg:grid-cols-2 lg:gap-16">
         <div className="text-center lg:text-left">
           <div className="animate-scale-in"><LogoMark className="mx-auto h-14 w-14 lg:mx-0" /></div>

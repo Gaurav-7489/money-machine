@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 export type ThemeChoice = "light" | "dark";
 const KEY = "mm.theme";
 const EVENT = "mm-theme";
-const COLORS = { light: "#F5F8F7", dark: "#090B0E" };
+const COLORS = { light: "#F5F8F7", dark: "#0B0F17" };
 
 /** Runs before first paint (inlined in <head>) so there is no flash. First visit follows the device. */
 export const THEME_INIT_SCRIPT = `(function(){try{var c=localStorage.getItem("${KEY}");var d=c?c==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=d?"dark":"light";}catch(e){}})();`;
@@ -108,7 +108,7 @@ export function ThemePicker() {
   const { choice, set } = useTheme();
   const opts = [
     { id: "light", label: "White", sub: "Fresh", swatch: "bg-[#F5F8F7] ring-1 ring-black/10", dot: "#2DE3C8" },
-    { id: "dark", label: "Dark", sub: "Lagoon", swatch: "bg-[#090B0E] ring-1 ring-white/15", dot: "#55DFF5" },
+    { id: "dark", label: "Dark", sub: "Midnight", swatch: "bg-[#0B0F17] ring-1 ring-white/15", dot: "#3EE39B" },
   ] as const;
   return (
     <div role="radiogroup" aria-label="Theme" className="grid grid-cols-2 gap-2">
