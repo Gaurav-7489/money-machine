@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { BadgeIndianRupee, Briefcase, Check, ChevronLeft, MapPin, Sparkles, UserRound } from "lucide-react";
+import { BadgeIndianRupee, Briefcase, Check, ChevronLeft, MapPin, Search, Sparkles, UserRound } from "lucide-react";
 import Link from "next/link";
 import { Button, Field, inputCls, selectCls } from "@/components/ui";
 import { EARNING_MODELS, NICHES } from "@/lib/catalog";
-import { LocationPicker } from "@/components/location-picker";
 import { DEFAULT_CURRENCY } from "@/lib/format";
 import { EMPTY_PRICES, PriceFields, type PriceValues } from "@/components/price-fields";
 import { PaymentGatewayConnect, SocialApiFields } from "@/components/connect-accounts";
@@ -94,6 +93,57 @@ const EARN_PHOTO: Record<string, Photo> = {
 
 function EarnPicker({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
   return <PhotoPicker items={EARNING_MODELS.map((m) => ({ id: m.id, label: m.label, photo: EARN_PHOTO[m.id] ?? STORY.deal }))} value={value} onChange={onChange} cols="grid-cols-2" wide="sm:grid-cols-3 lg:grid-cols-4" />;
+}
+
+/** Country and state as horizontal sliders, with a search box for countries. */
+function LocationSlider({ value, onChange }: { value: { country: string; region: string }; onChange: (v: { country: string; region: string; currency: string }) => void }) {
+  const geo = useGeo();
+  const [q, setQ] = useState("");
+  const needle = q.trim().toLowerCase();
+  const countries = (geo?.countries ?? []).filter((c) => !needle || c.name.toLowerCase().includes(needle));
+  const regions = geo && value.country ? geo.regionsOf(value.country) : [];
+  const chip = (on: boolean) =>
+    `press flex shrink-0 snap-start items-center gap-2 rounded-2xl border px-4 py-2.5 text-[14px] font-semibold transition-all duration-300 [transition-timing-function:var(--ease-spring)] active:scale-95 ${on ? "scale-[1.03] border-brand-400 bg-brand-50 text-brand-700 shadow-[0_6px_16px_-6px_rgb(14_122_92/0.45)] ring-4 ring-brand-100" : "border-line bg-surface hover:-translate-y-0.5 hover:border-brand-300"}`;
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2.5">
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+          <label htmlFor="country-q" className="sr-only">Search country</label>
+          <input id="country-q" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search your country" autoComplete="off" className="h-11 w-full rounded-full border border-line bg-surface pl-10 pr-4 text-[15px] outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100" />
+        </div>
+        <div className="no-scrollbar -mx-5 flex snap-x gap-2 overflow-x-auto px-5 pb-1" role="radiogroup" aria-label="Country">
+          {countries.map((c) => {
+            const on = value.country === c.name;
+            return (
+              <button key={c.code} type="button" role="radio" aria-checked={on} onClick={() => { onChange({ country: c.name, region: "", currency: c.currency }); setQ(""); }} className={chip(on)}>
+                <span className={`text-[18px] leading-none transition-transform duration-300 ${on ? "scale-110" : ""}`} aria-hidden="true">{c.flag}</span>
+                {c.name}
+                {on && <Check className="animate-pop h-4 w-4 text-brand-600" strokeWidth={3} />}
+              </button>
+            );
+          })}
+          {countries.length === 0 && <p className="py-2 text-[13px] text-muted">No country matches “{q.trim()}”.</p>}
+        </div>
+      </div>
+      {regions.length > 0 && (
+        <div className="animate-fade-up space-y-2.5">
+          <p className="text-[13px] font-medium text-muted">State / region</p>
+          <div className="no-scrollbar -mx-5 flex snap-x gap-2 overflow-x-auto px-5 pb-1" role="radiogroup" aria-label="State or region">
+            {regions.map((r) => {
+              const on = value.region === r.name;
+              return (
+                <button key={r.code + r.name} type="button" role="radio" aria-checked={on} onClick={() => onChange({ country: value.country, region: r.name, currency: geo?.byName(value.country)?.currency ?? "" })} className={chip(on)}>
+                  {r.name}
+                  {on && <Check className="animate-pop h-4 w-4 text-brand-600" strokeWidth={3} />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function Onboarding() {
@@ -262,8 +312,7 @@ export default function Onboarding() {
                 <section className="space-y-3">
                   <p className="flex items-center gap-2 text-[14px] font-semibold"><span className="grid h-7 w-7 place-items-center rounded-full bg-brand-50 text-brand-600"><MapPin className="h-4 w-4" /></span> Where are you based?</p>
                 <div>
-                  <LocationPicker
-                    optional={false}
+                  <LocationSlider
                     value={{ country, region }}
                     onChange={(v) => {
                       setCountry(v.country);
