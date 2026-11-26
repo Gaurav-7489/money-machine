@@ -13,7 +13,7 @@ import { PaymentGatewayConnect, SocialApiFields } from "@/components/connect-acc
 import { priceKindsFor, type PriceKind } from "@/lib/pricing";
 import { useGeo } from "@/lib/geo";
 import Image from "next/image";
-import { nichePhoto, photoSrc } from "@/lib/photos";
+import { NICHE_PHOTOS, STORY, nichePhoto, photoSrc, type Photo } from "@/lib/photos";
 import { useStore } from "@/lib/store";
 import { apiLink, fieldErrors, onboardingInput, type FieldErrors } from "@/lib/validation";
 import type { Role, Session } from "@/lib/types";
@@ -44,23 +44,23 @@ function Chips({ options, value, onChange }: { options: readonly { id: string; l
 const nicheOpts = NICHES.map((n) => ({ id: n, label: n }));
 const earnOpts = EARNING_MODELS.map((m) => ({ id: m.id, label: m.label, hint: m.hint }));
 
-/** Niches as photo tiles. Every tile is the same size; the grid reflows with the screen. */
-function NichePicker({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+/** Photo tiles of one size. The grid reflows with the screen; the chosen tile zooms and ticks. */
+function PhotoPicker<T extends string>({ items, value, onChange }: { items: { id: T; label: string; photo: Photo }[]; value: string[]; onChange: (v: T[]) => void }) {
   return (
     <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-      {NICHES.map((n) => {
-        const on = value.includes(n);
+      {items.map(({ id, label, photo }) => {
+        const on = value.includes(id);
         return (
-          <li key={n}>
+          <li key={id}>
             <button
               type="button"
               aria-pressed={on}
-              onClick={() => onChange(on ? value.filter((x) => x !== n) : [...value, n])}
+              onClick={() => onChange(on ? (value.filter((x) => x !== id) as T[]) : ([...value, id] as T[]))}
               className={`press group relative block aspect-[4/3] w-full origin-center overflow-hidden rounded-2xl bg-elevated text-left transition-all duration-300 [transition-timing-function:var(--ease-spring)] active:scale-95 ${on ? "scale-[1.03] ring-2 ring-signal ring-offset-2 ring-offset-surface" : "hover:-translate-y-0.5"}`}
             >
-              <Image src={photoSrc(nichePhoto(n), 640)} alt="" fill sizes="(min-width: 640px) 200px, 45vw" className={`object-cover transition duration-500 ${on ? "scale-110" : "grayscale-[25%] group-hover:scale-105"}`} />
+              <Image src={photoSrc(photo, 640)} alt="" fill sizes="(min-width: 640px) 200px, 45vw" className={`object-cover transition duration-500 ${on ? "scale-110" : "grayscale-[25%] group-hover:scale-105"}`} />
               <span className={`absolute inset-0 transition-colors duration-300 ${on ? "bg-black/20" : "bg-black/45 group-hover:bg-black/30"}`} aria-hidden="true" />
-              <span className="absolute inset-x-2.5 bottom-2 text-[14px] font-semibold leading-tight text-white">{n}</span>
+              <span className="absolute inset-x-2.5 bottom-2 text-[14px] font-semibold leading-tight text-white">{label}</span>
               <span className={`absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-signal text-on-signal transition-all duration-300 [transition-timing-function:var(--ease-spring)] ${on ? "scale-100 opacity-100" : "scale-50 opacity-0"}`} aria-hidden="true">
                 {on && <Check className="animate-pop h-3.5 w-3.5" strokeWidth={3} />}
               </span>
@@ -70,6 +70,30 @@ function NichePicker({ value, onChange }: { value: string[]; onChange: (v: strin
       })}
     </ul>
   );
+}
+
+/** Niches: each one's own photo. */
+function NichePicker({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  return <PhotoPicker items={NICHES.map((n) => ({ id: n, label: n, photo: nichePhoto(n) }))} value={value} onChange={onChange} />;
+}
+
+/** How you work: a photo for each way of earning. */
+const EARN_PHOTO: Record<string, Photo> = {
+  brand_deal: STORY.deal,
+  affiliate: STORY.shop,
+  ugc: STORY.camera,
+  pr_package: STORY.rack,
+  sponsored: STORY.filming,
+  review: NICHE_PHOTOS.Tech!,
+  shoutout: STORY.creatorRed,
+  ambassador: STORY.creatorPortrait,
+  partnership: STORY.team,
+  seeding: NICHE_PHOTOS.Skincare!,
+  event: STORY.studio,
+};
+
+function EarnPicker({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  return <PhotoPicker items={EARNING_MODELS.map((m) => ({ id: m.id, label: m.label, photo: EARN_PHOTO[m.id] ?? STORY.deal }))} value={value} onChange={onChange} />;
 }
 
 export default function Onboarding() {
@@ -215,12 +239,12 @@ export default function Onboarding() {
                   <h1 className="mb-6 text-2xl font-bold tracking-tight">What creators are you looking for?</h1>
                   <NichePicker value={lookingFor} onChange={setLookingFor} />
                   <h2 className="font-text mb-2 mt-8 font-semibold">How do you want to work with them?</h2>
-                  <Chips options={earnOpts} value={earning} onChange={setEarning} />
+                  <EarnPicker value={earning} onChange={setEarning} />
                 </>
               ) : (
                 <>
                   <h1 className="mb-6 text-2xl font-bold tracking-tight">How do you want to earn?</h1>
-                  <Chips options={earnOpts} value={earning} onChange={setEarning} />
+                  <EarnPicker value={earning} onChange={setEarning} />
                 </>
               )}
               {errors.step2 && <p role="alert" className="mt-3 text-[13px] text-danger">{errors.step2}</p>}
