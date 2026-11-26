@@ -26,8 +26,11 @@ function Chips({ options, value, onChange }: { options: readonly { id: string; l
       {options.map((o) => {
         const on = value.includes(o.id);
         return (
-          <button key={o.id} type="button" aria-pressed={on} title={o.hint} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`press inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold transition-colors ${on ? "border border-brand-400 bg-brand-50 text-brand-700 ring-4 ring-brand-100" : "border border-line bg-surface hover:bg-canvas"}`}>
-            {on && <Check className="h-4 w-4" strokeWidth={3} />} {o.label}
+          <button key={o.id} type="button" aria-pressed={on} title={o.hint} onClick={() => onChange(on ? value.filter((x) => x !== o.id) : [...value, o.id])} className={`group inline-flex h-10 origin-center items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold transition-all duration-300 [transition-timing-function:var(--ease-spring)] active:scale-90 ${on ? "-translate-y-0.5 scale-105 border border-brand-400 bg-brand-50 text-brand-700 shadow-[0_6px_16px_-6px_rgb(14_122_92/0.45)] ring-4 ring-brand-100" : "border border-line bg-surface hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-sm"}`}>
+            <span className={`grid h-4 overflow-hidden transition-[width,opacity] duration-300 ${on ? "w-4 opacity-100" : "w-0 opacity-0"}`} aria-hidden="true">
+              {on && <Check className="animate-pop h-4 w-4" strokeWidth={3} />}
+            </span>
+            {o.label}
           </button>
         );
       })}
@@ -140,14 +143,14 @@ export default function Onboarding() {
                   const selected = role === id;
                   const tone = id === "creator" ? "bg-brand-50 text-brand-600" : "bg-violet-50 text-violet-600";
                   return (
-                    <label key={id} className={`press flex cursor-pointer items-center gap-4 rounded-2xl border p-4 transition ${selected ? "border-brand-400 bg-brand-50/50 ring-4 ring-brand-100" : "border-line hover:bg-canvas"}`}>
+                    <label key={id} className={`press flex cursor-pointer items-center gap-4 rounded-2xl border p-4 transition-all duration-300 [transition-timing-function:var(--ease-spring)] ${selected ? "-translate-y-0.5 scale-[1.02] border-brand-400 bg-brand-50/50 shadow-[0_10px_24px_-12px_rgb(14_122_92/0.45)] ring-4 ring-brand-100" : "border-line hover:-translate-y-0.5 hover:bg-canvas hover:shadow-sm"}`}>
                       <input type="radio" name="role" value={id} checked={selected} onChange={() => setRole(id)} className="sr-only" />
-                      <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${tone}`}><Icon className="h-5 w-5" /></span>
+                      <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl transition-transform duration-300 [transition-timing-function:var(--ease-spring)] ${tone} ${selected ? "scale-110 rotate-[-4deg]" : ""}`}><Icon className="h-5 w-5" /></span>
                       <span className="min-w-0 flex-1">
                         <span className="block font-semibold leading-tight">{title}</span>
                         <span className="mt-0.5 block text-sm leading-snug text-muted">{body}</span>
                       </span>
-                      <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 transition-colors ${selected ? "border-brand-600 bg-brand-600 text-white" : "border-line"}`}>
+                      <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 transition-all duration-300 [transition-timing-function:var(--ease-spring)] ${selected ? "scale-110 border-brand-600 bg-brand-600 text-white" : "border-line"}`}>
                         {selected && <Check className="animate-pop h-3 w-3" strokeWidth={3} />}
                       </span>
                     </label>
