@@ -12,6 +12,8 @@ import { EMPTY_PRICES, PriceFields, type PriceValues } from "@/components/price-
 import { PaymentGatewayConnect, SocialApiFields } from "@/components/connect-accounts";
 import { priceKindsFor, type PriceKind } from "@/lib/pricing";
 import { useGeo } from "@/lib/geo";
+import Image from "next/image";
+import { nichePhoto, photoSrc } from "@/lib/photos";
 import { useStore } from "@/lib/store";
 import { apiLink, fieldErrors, onboardingInput, type FieldErrors } from "@/lib/validation";
 import type { Role, Session } from "@/lib/types";
@@ -41,6 +43,34 @@ function Chips({ options, value, onChange }: { options: readonly { id: string; l
 
 const nicheOpts = NICHES.map((n) => ({ id: n, label: n }));
 const earnOpts = EARNING_MODELS.map((m) => ({ id: m.id, label: m.label, hint: m.hint }));
+
+/** Niches as photo tiles. Every tile is the same size; the grid reflows with the screen. */
+function NichePicker({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  return (
+    <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+      {NICHES.map((n) => {
+        const on = value.includes(n);
+        return (
+          <li key={n}>
+            <button
+              type="button"
+              aria-pressed={on}
+              onClick={() => onChange(on ? value.filter((x) => x !== n) : [...value, n])}
+              className={`press group relative block aspect-[4/3] w-full origin-center overflow-hidden rounded-2xl bg-elevated text-left transition-all duration-300 [transition-timing-function:var(--ease-spring)] active:scale-95 ${on ? "scale-[1.03] ring-2 ring-signal ring-offset-2 ring-offset-surface" : "hover:-translate-y-0.5"}`}
+            >
+              <Image src={photoSrc(nichePhoto(n), 640)} alt="" fill sizes="(min-width: 640px) 200px, 45vw" className={`object-cover transition duration-500 ${on ? "scale-110" : "grayscale-[25%] group-hover:scale-105"}`} />
+              <span className={`absolute inset-0 transition-colors duration-300 ${on ? "bg-black/20" : "bg-black/45 group-hover:bg-black/30"}`} aria-hidden="true" />
+              <span className="absolute inset-x-2.5 bottom-2 text-[14px] font-semibold leading-tight text-white">{n}</span>
+              <span className={`absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-signal text-on-signal transition-all duration-300 [transition-timing-function:var(--ease-spring)] ${on ? "scale-100 opacity-100" : "scale-50 opacity-0"}`} aria-hidden="true">
+                {on && <Check className="animate-pop h-3.5 w-3.5" strokeWidth={3} />}
+              </span>
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 export default function Onboarding() {
   const router = useRouter();
@@ -173,7 +203,7 @@ export default function Onboarding() {
           {step === 1 && (
             <>
               <h1 className="mb-6 text-2xl font-bold tracking-tight">{isBiz ? "What does your business do?" : "What content do you create?"}</h1>
-              <Chips options={nicheOpts} value={niches} onChange={setNiches} />
+              <NichePicker value={niches} onChange={setNiches} />
               {errors.niches && <p role="alert" className="mt-3 text-[13px] text-danger">{errors.niches}</p>}
             </>
           )}
@@ -183,7 +213,7 @@ export default function Onboarding() {
               {isBiz ? (
                 <>
                   <h1 className="mb-6 text-2xl font-bold tracking-tight">What creators are you looking for?</h1>
-                  <Chips options={nicheOpts} value={lookingFor} onChange={setLookingFor} />
+                  <NichePicker value={lookingFor} onChange={setLookingFor} />
                   <h2 className="font-text mb-2 mt-8 font-semibold">How do you want to work with them?</h2>
                   <Chips options={earnOpts} value={earning} onChange={setEarning} />
                 </>
