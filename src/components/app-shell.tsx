@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, type ReactNode } from "react";
-import { Bell, ChevronRight, Plus } from "lucide-react";
+import { Bell, ChevronRight } from "lucide-react";
 import { Logo, LogoMark } from "./logo";
 import { Avatar } from "./art";
 import { MESSAGE_FOLDERS, SOCIAL_NAV, isActive, primaryNav, toolsNav } from "./nav";
@@ -79,12 +79,6 @@ function Sidebar() {
         {TOOLS_NAV.map((i) => (
           <NavLink key={i.href} {...i} active={isActive(pathname, i.href)} />
         ))}
-        <Link
-          href="/create"
-          className="press mt-5 inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-brand-600 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 dark:bg-primary dark:text-on-primary"
-        >
-          <Plus className="h-4 w-4" /> New Post
-        </Link>
       </nav>
       <ThemeToggle withLabel className="mt-4 w-full justify-start" />
       {session && (
