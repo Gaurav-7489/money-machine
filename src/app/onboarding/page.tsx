@@ -260,13 +260,13 @@ export default function Onboarding() {
           {step === 4 && (
             <>
               <h1 className="text-2xl font-bold tracking-tight">{isBiz ? "Connect your payments" : "Connect your social media"}</h1>
-              <p className="mb-6 mt-1 text-sm text-muted">{isBiz ? "So we can track your sales and give you real badges." : "So brands can see your monthly views on your profile."}</p>
+              <p className="animate-fade-up mb-6 mt-1 text-sm text-muted [animation-delay:80ms]">{isBiz ? "Track sales and earn real badges." : "Show your monthly views to brands."}</p>
               {isBiz ? (
                 <PaymentGatewayConnect value={gateway} onChange={setGateway} />
               ) : (
                 <SocialApiFields value={api} onChange={(v) => { setApi(v); setErrors({}); }} errors={{ instagram: errors.apiInstagram || undefined, youtube: errors.apiYoutube || undefined }} />
               )}
-              <p className="mt-4 text-[12px] text-muted">You can skip this and do it later from Edit Profile.</p>
+              <p className="mt-4 text-[12px] text-muted">Optional. You can add this later.</p>
             </>
           )}
         </div>
