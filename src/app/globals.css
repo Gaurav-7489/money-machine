@@ -7,7 +7,7 @@
    Minimal: white cards on a cool off-white canvas, soft shadows, rounded
    shapes, pastel gradients for avatars and placeholder media.
      • Light: #F5F8F7 canvas, #FFFFFF surface, #0F1A17 ink
-     • Dark (Lagoon): #07110F canvas, #0D1A17 surface, #E8F3EF ink
+     • Dark (Lagoon): #090B0E canvas, #11151A surface, #EDF4F8 ink
    Type: Inter / system sans, bold + tracking-tight for headings.
    Components use semantic tokens only (canvas, surface, elevated, ink, muted,
    line, primary, signal, brand-*, accent-*). Never hard-code hex in components.
@@ -110,22 +110,22 @@
 /* ── Lagoon (dark) ────────────────────────────────────────────────────── */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --color-canvas: #07110f;
-  --color-surface: #0d1a17;
-  --color-elevated: #13241f;
-  --color-ink: #e8f3ef;
-  --color-muted: #8ea59d;
-  --color-line: #1d302a;
-  --color-on-accent: #04201a;
-  --color-cream: #13241f;
+  --color-canvas: #090b0e;
+  --color-surface: #11151a;
+  --color-elevated: #1a2027;
+  --color-ink: #edf4f8;
+  --color-muted: #a0adb8;
+  --color-line: #303943;
+  --color-on-accent: #06212a;
+  --color-cream: #1a2027;
   --color-danger: #ff7a6b;
-  --color-on-danger: #07110f;
+  --color-on-danger: #090b0e;
 
-  --color-primary: #2de3c8;
-  --color-on-primary: #04201a;
+  --color-primary: #55dff5;
+  --color-on-primary: #06212a;
 
-  --color-signal: #2de3c8;
-  --color-on-signal: #04201a;
+  --color-signal: #55dff5;
+  --color-on-signal: #06212a;
   --color-gain: #4ee0a8;
   --color-loss: #ff7a6b;
 
@@ -133,18 +133,19 @@
   --color-accent-2: #ff7a9c;
   --color-accent-3: #ffd36b;
   --color-accent-4: #a99cff;
+  --color-aqua: #55dff5;
   --color-mint: #1a4a3e;
 
-  --color-brand-50: #0c1f1a;
-  --color-brand-100: #102a23;
-  --color-brand-200: #16392f;
-  --color-brand-300: #1f5244;
-  --color-brand-400: #2a8a72;
-  --color-brand-500: #2fc4a4;
-  --color-brand-600: #5eead4;
-  --color-brand-700: #8ff3e1;
-  --color-brand-800: #bff8ee;
-  --color-brand-900: #e2fcf7;
+  --color-brand-50: #10232c;
+  --color-brand-100: #15313d;
+  --color-brand-200: #1c4351;
+  --color-brand-300: #286074;
+  --color-brand-400: #3895ab;
+  --color-brand-500: #46c8e0;
+  --color-brand-600: #67e8f9;
+  --color-brand-700: #a5f3fc;
+  --color-brand-800: #cffafe;
+  --color-brand-900: #ecfeff;
 
   --color-tone-rose: #3a1a24;
   --color-tone-rose-ink: #ffb3c6;
@@ -159,11 +160,11 @@
   --color-tone-lime: #1c2e10;
   --color-tone-lime-ink: #c6ee9a;
 
-  --gradient-chart: linear-gradient(180deg, rgb(45 227 200 / 0.22), rgb(45 227 200 / 0));
-  --gradient-brand: linear-gradient(135deg, #14ad8e 0%, #2de3c8 100%);
-  --gradient-soft: linear-gradient(135deg, #0c1f1a 0%, #0f1c26 50%, #231420 100%);
-  --glass: rgb(7 17 15 / 0.8);
-  --ring: #2de3c8;
+  --gradient-chart: linear-gradient(180deg, rgb(85 223 245 / 0.22), rgb(85 223 245 / 0));
+  --gradient-brand: linear-gradient(135deg, #24b6d1 0%, #55dff5 100%);
+  --gradient-soft: linear-gradient(135deg, #10232c 0%, #0f1c26 50%, #231420 100%);
+  --glass: rgb(9 11 14 / 0.8);
+  --ring: #55dff5;
   --photo-shade: linear-gradient(180deg, transparent 50%, rgb(0 0 0 / 0.6));
 
   --shadow-card: 0 0 0 0 transparent;
@@ -399,4 +400,9 @@ dialog.menu-overlay[open] .menu-item { animation: fade-up 0.6s var(--ease-out-ex
 /* Respect reduced motion everywhere */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after, dialog[open], dialog[open]::backdrop { animation: none !important; transition: none !important; }
+}
+
+/* Dark brand fills need dark foregrounds; preserve white text on photos and overlays. */
+:root[data-theme="dark"] :is(.bg-brand-500, .bg-brand-600, .bg-brand-700, .bg-aurora, .bg-aurora-flow).text-white {
+  color: var(--color-on-primary);
 }
