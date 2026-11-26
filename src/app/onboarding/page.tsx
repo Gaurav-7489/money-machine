@@ -11,6 +11,7 @@ import { DEFAULT_CURRENCY } from "@/lib/format";
 import { EMPTY_PRICES, PriceFields, type PriceValues } from "@/components/price-fields";
 import { PaymentGatewayConnect, SocialApiFields } from "@/components/connect-accounts";
 import { priceKindsFor, type PriceKind } from "@/lib/pricing";
+import { useGeo } from "@/lib/geo";
 import { useStore } from "@/lib/store";
 import { apiLink, fieldErrors, onboardingInput, type FieldErrors } from "@/lib/validation";
 import type { Role, Session } from "@/lib/types";
@@ -60,9 +61,11 @@ export default function Onboarding() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const isBiz = role === "business";
   const STEPS = 5;
+  const [pricesLater, setPricesLater] = useState(false);
+  const geo = useGeo();
   const kinds = priceKindsFor(earning);
   const num = (v: string) => (v ? Number(v) : undefined);
-  const priced = (k: PriceKind) => (kinds.includes(k) ? [num(prices[k].min), num(prices[k].max)] : [undefined, undefined]);
+  const priced = (k: PriceKind) => (kinds.includes(k) && !pricesLater ? [num(prices[k].min), num(prices[k].max)] : [undefined, undefined]);
 
   function next(e: React.FormEvent) {
     e.preventDefault();
@@ -74,7 +77,9 @@ export default function Onboarding() {
     if (step === 1 && niches.length === 0) return setErrors({ niches: isBiz ? "Pick at least one so creators can find you." : "Pick at least one so brands can find you." });
     if (step === 2 && (isBiz ? lookingFor.length === 0 : earning.length === 0)) return setErrors({ step2: isBiz ? "Pick at least one type of creator." : "Pick at least one way to earn." });
     if (step === 3) {
-      const bad = kinds.find((k) => prices[k].min && prices[k].max && Number(prices[k].min) > Number(prices[k].max));
+      if (!country) return setErrors({ location: "Pick your country." });
+      if ((geo?.regionsOf(country).length ?? 0) > 0 && !region) return setErrors({ location: "Pick your state or region." });
+      const bad = pricesLater ? undefined : kinds.find((k) => prices[k].min && prices[k].max && Number(prices[k].min) > Number(prices[k].max));
       if (bad) return setErrors({ [`pay_${bad}`]: "The minimum should be smaller than the maximum." });
     }
     if (step === 4) {
@@ -202,23 +207,49 @@ export default function Onboarding() {
             <>
               <h1 className="mb-6 text-2xl font-bold tracking-tight">Almost there</h1>
               <div className="space-y-4">
-                <LocationPicker
-                  value={{ country, region }}
-                  onChange={(v) => {
-                    setCountry(v.country);
-                    setRegion(v.region);
-                    setCurrency(v.currency);
-                  }}
-                />
-                {kinds.length > 0 ? (
-                  <PriceFields
-                    kinds={kinds}
-                    currency={currency || DEFAULT_CURRENCY}
-                    labels={{ video: isBiz ? "Your budget per video" : "What you charge per video" }}
-                    value={prices}
-                    onChange={(k, r) => { setPrices((p) => ({ ...p, [k]: r })); setErrors({}); }}
-                    errors={{ video: errors.pay_video, sale: errors.pay_sale, views: errors.pay_views }}
+                <div>
+                  <LocationPicker
+                    optional={false}
+                    value={{ country, region }}
+                    onChange={(v) => {
+                      setCountry(v.country);
+                      setRegion(v.region);
+                      setCurrency(v.currency);
+                      setErrors({});
+                    }}
                   />
+                  {errors.location && <p role="alert" className="animate-fade-up mt-2 text-[13px] text-danger">{errors.location}</p>}
+                </div>
+                {kinds.length > 0 ? (
+                  <>
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-checked={pricesLater}
+                      onClick={() => { setPricesLater((v) => !v); setErrors({}); }}
+                      className={`press group inline-flex h-10 origin-center items-center gap-2 rounded-full px-4 text-[14px] font-semibold transition-all duration-300 [transition-timing-function:var(--ease-spring)] active:scale-90 ${pricesLater ? "scale-105 border border-brand-400 bg-brand-50 text-brand-700 shadow-[0_6px_16px_-6px_rgb(14_122_92/0.45)] ring-4 ring-brand-100" : "border border-line bg-surface hover:-translate-y-0.5 hover:border-brand-300"}`}
+                    >
+                      <span className={`grid h-5 w-5 place-items-center rounded-md border-2 transition-all duration-300 ${pricesLater ? "scale-110 border-brand-600 bg-brand-600 text-white" : "border-line"}`} aria-hidden="true">
+                        {pricesLater && <Check className="animate-pop h-3.5 w-3.5" strokeWidth={3} />}
+                      </span>
+                      I&apos;ll think about it later
+                    </button>
+                    <div className={`grid transition-[grid-template-rows,opacity] duration-500 [transition-timing-function:var(--ease-spring)] ${pricesLater ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"}`} aria-hidden={pricesLater}>
+                      <div className="overflow-hidden">
+                        <div className="pt-1">
+                          <PriceFields
+                            kinds={kinds}
+                            currency={currency || DEFAULT_CURRENCY}
+                            labels={{ video: isBiz ? "Your budget per video" : "What you charge per video" }}
+                            value={prices}
+                            onChange={(k, r) => { setPrices((p) => ({ ...p, [k]: r })); setErrors({}); }}
+                            errors={{ video: errors.pay_video, sale: errors.pay_sale, views: errors.pay_views }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    {pricesLater && <p className="animate-fade-up text-[13px] text-muted">No problem. Add your prices any time from Edit Profile.</p>}
+                  </>
                 ) : (
                   <p className="text-[13px] text-muted">Free PR packages and product seeding are free, so there&apos;s no price to set.</p>
                 )}
