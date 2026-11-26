@@ -45,9 +45,9 @@ const nicheOpts = NICHES.map((n) => ({ id: n, label: n }));
 const earnOpts = EARNING_MODELS.map((m) => ({ id: m.id, label: m.label, hint: m.hint }));
 
 /** Photo tiles of one size. The grid reflows with the screen; the chosen tile zooms and ticks. */
-function PhotoPicker<T extends string>({ items, value, onChange }: { items: { id: T; label: string; photo: Photo }[]; value: string[]; onChange: (v: T[]) => void }) {
+function PhotoPicker<T extends string>({ items, value, onChange, cols, rows }: { items: { id: T; label: string; photo: Photo }[]; value: string[]; onChange: (v: T[]) => void; cols: "grid-cols-2" | "grid-cols-3"; rows: "grid-rows-[repeat(6,minmax(0,1fr))]" }) {
   return (
-    <ul className="grid grid-cols-4 gap-1.5 sm:grid-cols-4 sm:gap-2.5">
+    <ul className={`grid ${cols} ${rows} h-[calc(100dvh-19rem)] min-h-[26rem] gap-2 sm:h-auto sm:min-h-0 sm:grid-cols-4 sm:grid-rows-none sm:gap-2.5`}>
       {items.map(({ id, label, photo }) => {
         const on = value.includes(id);
         return (
@@ -56,13 +56,13 @@ function PhotoPicker<T extends string>({ items, value, onChange }: { items: { id
               type="button"
               aria-pressed={on}
               onClick={() => onChange(on ? (value.filter((x) => x !== id) as T[]) : ([...value, id] as T[]))}
-              className={`press group relative block aspect-square w-full origin-center overflow-hidden rounded-xl bg-elevated text-left sm:aspect-[4/3] sm:rounded-2xl transition-all duration-300 [transition-timing-function:var(--ease-spring)] active:scale-95 ${on ? "scale-[1.03] ring-2 ring-signal ring-offset-2 ring-offset-surface" : "hover:-translate-y-0.5"}`}
+              className={`press group relative block h-full min-h-0 w-full origin-center overflow-hidden rounded-2xl bg-elevated text-left sm:aspect-[4/3] sm:h-auto transition-all duration-300 [transition-timing-function:var(--ease-spring)] active:scale-95 ${on ? "scale-[1.03] ring-2 ring-signal ring-offset-2 ring-offset-surface" : "hover:-translate-y-0.5"}`}
             >
-              <Image src={photoSrc(photo, 640)} alt="" fill sizes="(min-width: 640px) 200px, 25vw" className={`object-cover transition duration-500 ${on ? "scale-110" : "grayscale-[25%] group-hover:scale-105"}`} />
+              <Image src={photoSrc(photo, 640)} alt="" fill sizes="(min-width: 640px) 200px, 50vw" className={`object-cover transition duration-500 ${on ? "scale-110" : "grayscale-[25%] group-hover:scale-105"}`} />
               <span className={`absolute inset-0 transition-colors duration-300 ${on ? "bg-black/20" : "bg-black/45 group-hover:bg-black/30"}`} aria-hidden="true" />
-              <span className="absolute inset-x-1 bottom-1 truncate text-[10px] font-semibold leading-tight text-white sm:inset-x-2.5 sm:bottom-2 sm:whitespace-normal sm:text-[14px]">{label}</span>
-              <span className={`absolute right-1 top-1 grid h-4 w-4 place-items-center rounded-full bg-signal text-on-signal sm:right-2 sm:top-2 sm:h-6 sm:w-6 transition-all duration-300 [transition-timing-function:var(--ease-spring)] ${on ? "scale-100 opacity-100" : "scale-50 opacity-0"}`} aria-hidden="true">
-                {on && <Check className="animate-pop h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" strokeWidth={3} />}
+              <span className="absolute inset-x-2.5 bottom-2.5 text-[15px] font-semibold leading-tight text-white sm:text-[14px]">{label}</span>
+              <span className={`absolute right-2.5 top-2.5 grid h-7 w-7 place-items-center rounded-full bg-signal text-on-signal sm:h-6 sm:w-6 transition-all duration-300 [transition-timing-function:var(--ease-spring)] ${on ? "scale-100 opacity-100" : "scale-50 opacity-0"}`} aria-hidden="true">
+                {on && <Check className="animate-pop h-3.5 w-3.5" strokeWidth={3} />}
               </span>
             </button>
           </li>
@@ -74,7 +74,7 @@ function PhotoPicker<T extends string>({ items, value, onChange }: { items: { id
 
 /** Niches: each one's own photo. */
 function NichePicker({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
-  return <PhotoPicker items={NICHES.map((n) => ({ id: n, label: n, photo: nichePhoto(n) }))} value={value} onChange={onChange} />;
+  return <PhotoPicker items={NICHES.map((n) => ({ id: n, label: n, photo: nichePhoto(n) }))} value={value} onChange={onChange} cols="grid-cols-3" rows="grid-rows-[repeat(6,minmax(0,1fr))]" />;
 }
 
 /** How you work: a photo for each way of earning. */
@@ -93,7 +93,7 @@ const EARN_PHOTO: Record<string, Photo> = {
 };
 
 function EarnPicker({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
-  return <PhotoPicker items={EARNING_MODELS.map((m) => ({ id: m.id, label: m.label, photo: EARN_PHOTO[m.id] ?? STORY.deal }))} value={value} onChange={onChange} />;
+  return <PhotoPicker items={EARNING_MODELS.map((m) => ({ id: m.id, label: m.label, photo: EARN_PHOTO[m.id] ?? STORY.deal }))} value={value} onChange={onChange} cols="grid-cols-2" rows="grid-rows-[repeat(6,minmax(0,1fr))]" />;
 }
 
 export default function Onboarding() {
