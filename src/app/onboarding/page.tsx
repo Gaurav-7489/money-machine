@@ -146,7 +146,7 @@ function Glider({ label, children }: { label: string; children: React.ReactNode 
             e.stopPropagation();
           }
         }}
-        className="no-scrollbar -mx-5 flex cursor-grab snap-x gap-2 overflow-x-auto scroll-smooth px-5 pb-1 select-none [scrollbar-width:thin] active:cursor-grabbing md:mx-0 md:px-10 md:[scrollbar-width:auto]"
+        className="no-scrollbar -mx-5 flex cursor-grab snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-5 py-2 select-none [scrollbar-width:thin] active:cursor-grabbing md:mx-0 md:px-10 md:[scrollbar-width:auto]"
       >
         {children}
       </div>
@@ -157,53 +157,62 @@ function Glider({ label, children }: { label: string; children: React.ReactNode 
   );
 }
 
-/** Country and state as horizontal sliders, with a search box for countries. */
+/** A flag fills the whole card; the name sits over a soft shade. */
+function FlagCard({ flag, name, on, index, onClick }: { flag: string; name: string; on: boolean; index: number; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={on}
+      onClick={onClick}
+      style={{ animationDelay: `${Math.min(index, 10) * 45}ms` }}
+      className={`animate-fade-up relative h-32 w-36 shrink-0 snap-center overflow-hidden rounded-2xl bg-elevated text-left text-white transition-all duration-500 [transition-timing-function:var(--ease-spring)] active:scale-95 ${on ? "scale-[1.04] shadow-xl ring-4 ring-brand-300 ring-offset-2 ring-offset-surface" : "hover:-translate-y-1 hover:shadow-lg"}`}
+    >
+      <span className={`absolute inset-0 grid place-items-center text-[120px] leading-none transition-transform duration-700 [transition-timing-function:var(--ease-out-expo)] ${on ? "scale-110" : "scale-100"}`} aria-hidden="true">{flag}</span>
+      <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" aria-hidden="true" />
+      <span className="absolute inset-x-3 bottom-2.5 text-[14px] font-semibold leading-tight">{name}</span>
+      {on && <span className="animate-pop absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-brand-600 text-white" aria-hidden="true"><Check className="h-3.5 w-3.5" strokeWidth={3} /></span>}
+    </button>
+  );
+}
+
+/** Country and state side by side, each as a glider of flag cards. */
 function LocationSlider({ value, onChange }: { value: { country: string; region: string }; onChange: (v: { country: string; region: string; currency: string }) => void }) {
   const geo = useGeo();
   const [q, setQ] = useState("");
   const needle = q.trim().toLowerCase();
   const countries = (geo?.countries ?? []).filter((c) => !needle || c.name.toLowerCase().includes(needle));
   const regions = geo && value.country ? geo.regionsOf(value.country) : [];
-  const chip = (on: boolean) =>
-    `press flex shrink-0 snap-start items-center gap-2 rounded-2xl border px-4 py-2.5 text-[14px] font-semibold transition-all duration-300 [transition-timing-function:var(--ease-spring)] active:scale-95 ${on ? "scale-[1.03] border-brand-400 bg-brand-50 text-brand-700 shadow-[0_6px_16px_-6px_rgb(14_122_92/0.45)] ring-4 ring-brand-100" : "border-line bg-surface hover:-translate-y-0.5 hover:border-brand-300"}`;
+  const flag = geo?.byName(value.country)?.flag ?? "🌍";
+
   return (
-    <div className="space-y-5">
-      <div className="space-y-2.5">
+    <div className="grid gap-6 md:grid-cols-2">
+      <section className="min-w-0 space-y-2.5">
+        <p className="text-[13px] font-medium text-muted">Country</p>
         <div className="relative">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
           <label htmlFor="country-q" className="sr-only">Search country</label>
           <input id="country-q" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search your country" autoComplete="off" className="h-11 w-full rounded-full border border-line bg-surface pl-10 pr-4 text-[15px] outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100" />
         </div>
         <Glider label="Country">
-          {countries.map((c) => {
-            const on = value.country === c.name;
-            return (
-              <button key={c.code} type="button" role="radio" aria-checked={on} onClick={() => { onChange({ country: c.name, region: "", currency: c.currency }); setQ(""); }} className={chip(on)}>
-                <span className={`text-[18px] leading-none transition-transform duration-300 ${on ? "scale-110" : ""}`} aria-hidden="true">{c.flag}</span>
-                {c.name}
-                {on && <Check className="animate-pop h-4 w-4 text-brand-600" strokeWidth={3} />}
-              </button>
-            );
-          })}
-          {countries.length === 0 && <p className="py-2 text-[13px] text-muted">No country matches “{q.trim()}”.</p>}
+          {countries.map((c, i) => (
+            <FlagCard key={c.code} flag={c.flag} name={c.name} index={i} on={value.country === c.name} onClick={() => { onChange({ country: c.name, region: "", currency: c.currency }); setQ(""); }} />
+          ))}
+          {countries.length === 0 && <p className="px-2 py-6 text-[13px] text-muted">No country matches “{q.trim()}”.</p>}
         </Glider>
-      </div>
-      {regions.length > 0 && (
-        <div className="animate-fade-up space-y-2.5">
-          <p className="text-[13px] font-medium text-muted">State / region</p>
+      </section>
+      <section className="min-w-0 space-y-2.5">
+        <p className="text-[13px] font-medium text-muted">State / region</p>
+        {regions.length > 0 ? (
           <Glider label="State or region">
-            {regions.map((r) => {
-              const on = value.region === r.name;
-              return (
-                <button key={r.code + r.name} type="button" role="radio" aria-checked={on} onClick={() => onChange({ country: value.country, region: r.name, currency: geo?.byName(value.country)?.currency ?? "" })} className={chip(on)}>
-                  {r.name}
-                  {on && <Check className="animate-pop h-4 w-4 text-brand-600" strokeWidth={3} />}
-                </button>
-              );
-            })}
+            {regions.map((r, i) => (
+              <FlagCard key={r.code + r.name} flag={flag} name={r.name} index={i} on={value.region === r.name} onClick={() => onChange({ country: value.country, region: r.name, currency: geo?.byName(value.country)?.currency ?? "" })} />
+            ))}
           </Glider>
-        </div>
-      )}
+        ) : (
+          <p className="rounded-2xl border border-dashed border-line px-4 py-8 text-center text-[13px] text-muted">{value.country ? "No states listed for this country." : "Pick a country to see its states."}</p>
+        )}
+      </section>
     </div>
   );
 }
