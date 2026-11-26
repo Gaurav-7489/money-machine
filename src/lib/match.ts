@@ -25,13 +25,15 @@ export interface MatchFilters {
   cities: string[];
   /** currency the price filters are written in; amounts in other currencies aren't compared */
   currency?: string;
-  /** pay per video in whole units of `currency` (null = not used) */
+  /** budget per video in whole units of `currency` (null = not used) */
   priceMin: number | null;
   priceMax: number | null;
-  /** affiliate commission %: brands paying at least this / creators asking at most this */
-  commission: number | null;
-  /** ₹ per sale: brands paying at least this / creators asking at most this */
-  perSale: number | null;
+  /** affiliate: price per sale, min to max */
+  saleMin: number | null;
+  saleMax: number | null;
+  /** UGC: price per 1,000 views, min to max */
+  viewsMin: number | null;
+  viewsMax: number | null;
   earningModels: string[];
   name: string;
   social: string;
@@ -45,8 +47,10 @@ export const EMPTY_FILTERS: MatchFilters = {
   cities: [],
   priceMin: null,
   priceMax: null,
-  commission: null,
-  perSale: null,
+  saleMin: null,
+  saleMax: null,
+  viewsMin: null,
+  viewsMax: null,
   earningModels: [],
   name: "",
   social: "",
@@ -66,8 +70,10 @@ export interface Matchable {
   currency?: string;
   priceFrom: number;
   priceTo: number;
-  perSale?: number;
-  commissionPercent?: number;
+  perSaleMin?: number;
+  perSaleMax?: number;
+  perThousandMin?: number;
+  perThousandMax?: number;
   earningModels: string[];
   socials: { instagram?: string; youtube?: string; x?: string };
 }
@@ -142,6 +148,18 @@ function nicheScore(p: Matchable, niches: string[], posts: PostIndex): { score: 
   return { score: 0 };
 }
 
+/** How well a profile's price range [from, to] fits the range the searcher asked for. */
+function rangeScore(min: number | null, max: number | null, from: number | undefined, to: number | undefined): { score: number; note?: string } {
+  if (from === undefined && to === undefined) return { score: 0, note: "no price set" };
+  const a = from ?? to!;
+  const b = to ?? from!;
+  const lo = min ?? 0;
+  const hi = max ?? Number.POSITIVE_INFINITY;
+  if (a <= hi && b >= lo) return { score: 1 };
+  if (a <= hi * 1.25 && b >= lo * 0.75) return { score: 0.5, note: "close to your range" };
+  return { score: 0 };
+}
+
 export function scoreProfile(p: Matchable, f: MatchFilters, posts: PostIndex = {}): { percent: number | null; checks: MatchCheck[]; foundIn?: "profile" | "posts"; snippet?: string } {
   const checks: MatchCheck[] = [];
   let foundIn: "profile" | "posts" | undefined;
@@ -169,30 +187,18 @@ export function scoreProfile(p: Matchable, f: MatchFilters, posts: PostIndex = {
   }
 
   const otherCurrency = !!f.currency && !!p.currency && f.currency !== p.currency;
-  if ((f.priceMin !== null || f.priceMax !== null) && otherCurrency) {
-    checks.push({ label: "Pay per video", score: 0.5, note: `priced in ${p.currency}` });
-  } else if (f.priceMin !== null || f.priceMax !== null) {
-    const lo = f.priceMin ?? 0;
-    const hi = f.priceMax ?? Number.POSITIVE_INFINITY;
-    const overlaps = p.priceFrom <= hi && p.priceTo >= lo;
-    const near = p.priceFrom <= hi * 1.25 && p.priceTo >= lo * 0.75;
-    checks.push({ label: "Pay per video", score: overlaps ? 1 : near ? 0.5 : 0, note: !overlaps && near ? "close to your range" : undefined });
-  }
-
-  if (f.commission !== null) {
-    const c = p.commissionPercent;
-    const ok = c !== undefined && (p.kind === "business" ? c >= f.commission : c <= f.commission);
-    const close = c !== undefined && (p.kind === "business" ? c >= f.commission * 0.8 : c <= f.commission * 1.25);
-    checks.push({ label: `Commission ${p.kind === "business" ? "≥" : "≤"} ${f.commission}%`, score: ok ? 1 : close ? 0.5 : 0 });
-  }
-
-  if (f.perSale !== null && otherCurrency) {
-    checks.push({ label: "Pay per sale", score: 0.5, note: `priced in ${p.currency}` });
-  } else if (f.perSale !== null) {
-    const s = p.perSale;
-    const ok = s !== undefined && (p.kind === "business" ? s >= f.perSale : s <= f.perSale);
-    const close = s !== undefined && (p.kind === "business" ? s >= f.perSale * 0.8 : s <= f.perSale * 1.25);
-    checks.push({ label: "Pay per sale", score: ok ? 1 : close ? 0.5 : 0 });
+  const ranges: [string, number | null, number | null, number | undefined, number | undefined][] = [
+    ["Budget per video", f.priceMin, f.priceMax, p.priceFrom, p.priceTo],
+    ["Price per sale", f.saleMin, f.saleMax, p.perSaleMin, p.perSaleMax],
+    ["Price per 1,000 views", f.viewsMin, f.viewsMax, p.perThousandMin, p.perThousandMax],
+  ];
+  for (const [label, min, max, from, to] of ranges) {
+    if (min === null && max === null) continue;
+    if (otherCurrency) {
+      checks.push({ label, score: 0.5, note: `priced in ${p.currency}` });
+      continue;
+    }
+    checks.push({ label, ...rangeScore(min, max, from, to) });
   }
 
   if (f.earningModels.length) {
@@ -238,8 +244,8 @@ export function activeFilterCount(f: MatchFilters): number {
     f.country,
     f.cities.length > 0,
     f.priceMin !== null || f.priceMax !== null,
-    f.commission !== null,
-    f.perSale !== null,
+    f.saleMin !== null || f.saleMax !== null,
+    f.viewsMin !== null || f.viewsMax !== null,
     f.earningModels.length > 0,
     f.name,
     f.social,
@@ -259,8 +265,10 @@ export function filtersFromParams(p: URLSearchParams): MatchFilters {
     cities: list(p.get("city")),
     priceMin: num(p.get("min")),
     priceMax: num(p.get("max")),
-    commission: num(p.get("pct")),
-    perSale: num(p.get("sale")),
+    saleMin: num(p.get("smin")),
+    saleMax: num(p.get("smax")),
+    viewsMin: num(p.get("vmin")),
+    viewsMax: num(p.get("vmax")),
     earningModels: list(p.get("earn")),
     name: p.get("name") ?? "",
     social: p.get("social") ?? "",
@@ -276,8 +284,10 @@ export function filtersToParams(f: MatchFilters, extra: Record<string, string> =
   if (f.cities.length) p.set("city", f.cities.join(","));
   if (f.priceMin !== null) p.set("min", String(f.priceMin));
   if (f.priceMax !== null) p.set("max", String(f.priceMax));
-  if (f.commission !== null) p.set("pct", String(f.commission));
-  if (f.perSale !== null) p.set("sale", String(f.perSale));
+  if (f.saleMin !== null) p.set("smin", String(f.saleMin));
+  if (f.saleMax !== null) p.set("smax", String(f.saleMax));
+  if (f.viewsMin !== null) p.set("vmin", String(f.viewsMin));
+  if (f.viewsMax !== null) p.set("vmax", String(f.viewsMax));
   if (f.earningModels.length) p.set("earn", f.earningModels.join(","));
   if (f.name) p.set("name", f.name);
   if (f.social) p.set("social", f.social);

@@ -16,7 +16,7 @@ ${SITE.name} (${SITE.tagline}) was founded by ${SITE.founder} and is built by ${
 
 ## Key features
 - Social feed and discovery of creators and brands
-- Affiliate programs: businesses create programs with commission and terms; creators apply; commissions are recorded only when the business confirms a sale
+- Affiliate programs: businesses create programs with a price per sale and terms; creators apply; commissions are recorded only when the business confirms a sale
 - Income tracking for creators and spending tracking for businesses, with self-reported and verified records kept separate
 - Achievement badges awarded from real activity
 - Direct messaging between creators and brands

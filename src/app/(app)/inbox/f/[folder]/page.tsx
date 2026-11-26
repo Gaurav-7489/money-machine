@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { use, useState } from "react";
 import { ChevronLeft, FolderX, Inbox as InboxIcon, Search } from "lucide-react";
-import { Photo } from "@/components/photo";
-import { ThreadList, folderIcon, folderPhoto } from "@/components/inbox/thread-list";
+import { ThreadList, folderIcon } from "@/components/inbox/thread-list";
 import { EmptyState } from "@/components/ui";
 import { folderIdFromSlug, useThreads } from "@/lib/threads";
 
@@ -35,22 +34,15 @@ export default function FolderPage({ params }: { params: Promise<{ folder: strin
 
   return (
     <div className="mx-auto max-w-3xl">
-      <header className="relative -mx-4 mb-6 overflow-hidden bg-primary text-on-primary md:mx-0 md:rounded-[22px]">
-        <div className="relative aspect-[16/9] md:aspect-[21/8]">
-          <Photo photo={folderPhoto(f)} sizes="(min-width: 768px) 768px, 100vw" priority decorative />
-          <span className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/15 to-black/75" aria-hidden="true" />
-          <Link href="/inbox" className="press glass absolute left-3 top-3 inline-flex h-9 items-center gap-1 rounded-full pl-2 pr-3.5 text-[13px] font-medium text-ink">
-            <ChevronLeft className="h-4 w-4" /> Folders
-          </Link>
-          <div className="absolute inset-x-4 bottom-4 md:inset-x-6 md:bottom-5">
-            <p className="flex items-center gap-1.5 text-[13px] opacity-85"><Icon className="h-4 w-4" /> Folder</p>
-            <h1 className="mt-1 text-xl font-bold tracking-tight">{f.label}</h1>
-            <p className="mt-2 text-[14px] tabular-nums opacity-85">
-              {inside.length} {inside.length === 1 ? "conversation" : "conversations"}
-              {unread > 0 && <> · <span className="font-semibold text-signal">{unread} unread</span></>}
-            </p>
-          </div>
-        </div>
+      <header className="mb-6">
+        <Link href="/inbox" className="press -ml-2 inline-flex h-9 items-center gap-1 rounded-full pl-2 pr-3.5 text-[13px] font-medium text-muted hover:bg-surface hover:text-ink">
+          <ChevronLeft className="h-4 w-4" /> Folders
+        </Link>
+        <h1 className="mt-2 flex items-center gap-2 text-xl font-bold tracking-tight"><Icon className="h-5 w-5 text-muted" /> {f.label}</h1>
+        <p className="mt-1 text-[14px] tabular-nums text-muted">
+          {inside.length} {inside.length === 1 ? "DM" : "DMs"}
+          {unread > 0 && <> · <span className="font-semibold text-ink">{unread} unread</span></>}
+        </p>
       </header>
 
       {inside.length > 3 && (

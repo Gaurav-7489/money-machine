@@ -34,7 +34,7 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "How do affiliate programs work on Money Machine?",
-    a: "A business creates a program with a commission percentage and terms. Creators apply, the business approves them, and commissions are recorded only when the business confirms a sale. Money Machine never estimates or invents affiliate earnings.",
+    a: "A business creates a program with a price per sale (minimum to maximum) and terms. Creators apply, the business approves them, and commissions are recorded only when the business confirms a sale. Money Machine never estimates or invents affiliate earnings.",
   },
   {
     q: "Can I track my creator income?",

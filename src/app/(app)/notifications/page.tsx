@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, CheckCheck, CheckCircle2, MessageCircle, Star, X } from "lucide-react";
+import { Bell, CheckCheck, CheckCircle2, Sparkles, Star, X } from "lucide-react";
 import { useFeedback } from "@/components/feedback";
 import { Button, EmptyState, PageHeader } from "@/components/ui";
 import { useBadges, usePrograms } from "@/lib/hooks";
 import { useStore } from "@/lib/store";
-import { useThreads } from "@/lib/threads";
 import { timeAgo } from "@/lib/format";
 
 export default function Notifications() {
@@ -15,10 +14,10 @@ export default function Notifications() {
   const { toast } = useFeedback();
   const programs = usePrograms();
   const name = (id: string) => programs.find((p) => p.id === id)?.name ?? "a program";
-  const unread = useThreads().all.filter((t) => t.unread && !t.trashed);
-
+  // Messages are not repeated here: they already show in DMs. Notifications are for
+  // reactions to your posts, new followers and news from Money Machine itself.
   const all = [
-    ...unread.map((t) => ({ key: `msg:${t.id}:${t.messages[t.messages.length - 1]?.id ?? "none"}`, icon: <MessageCircle className="h-4 w-4" />, text: `New message from ${t.profile.name}`, when: timeAgo(t.at), href: `/inbox/${t.id}` })),
+    ...(session ? [{ key: "mm:welcome", icon: <Sparkles className="h-4 w-4" />, text: "Welcome to Money Machine! Finish your profile so the right people find you.", when: timeAgo(session.createdAt), href: "/profile" }] : []),
     ...badges.map((b) => ({ key: `badge:${b.badge.id}`, icon: <Star className="h-4 w-4" />, text: `You earned the ${b.badge.name} badge`, when: "", href: "/badges" })),
     ...(session?.role === "creator"
       ? applications
@@ -44,7 +43,7 @@ export default function Notifications() {
       />
       {items.length === 0 ? (
         <div className="border-y border-line">
-          <EmptyState icon={<Bell className="h-5 w-5" />} title="You're all caught up" body="New messages, badges and application updates will show up here." />
+          <EmptyState icon={<Bell className="h-5 w-5" />} title="You're all caught up" body="Likes on your posts, new followers and news from Money Machine show up here." />
         </div>
       ) : (
         <ul className="divide-y divide-line border-y border-line">

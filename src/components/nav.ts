@@ -1,14 +1,13 @@
-import { Archive, Bell, Bookmark, Compass, Home, Inbox, Link2, MessageCircle, PlusSquare, Rocket, Search, Send, Star, Trash2, TrendingUp, User, Users, Wallet } from "lucide-react";
+import { Archive, Bell, Bookmark, Compass, Home, Inbox, Link2, MessageCircle, Rocket, Search, Send, Star, Trash2, TrendingUp, User, Users, Wallet } from "lucide-react";
 import type { Role } from "@/lib/types";
 
 type Item = { href: string; label: string; icon: typeof Home };
 
-/** Mobile bottom bar: the five things people do most. Labels differ for creators and businesses. */
+/** Mobile bottom bar: the four things people do most (posting lives on the Feed). Labels differ for creators and businesses. */
 export function primaryNav(role: Role | undefined): Item[] {
   return [
     { href: "/home", label: "Feed", icon: Home },
     { href: "/explore", label: role === "business" ? "Creators" : "Brands", icon: Search },
-    { href: "/create", label: "Create", icon: PlusSquare },
     { href: "/inbox", label: "DMs", icon: MessageCircle },
     { href: "/profile", label: "Profile", icon: User },
   ];

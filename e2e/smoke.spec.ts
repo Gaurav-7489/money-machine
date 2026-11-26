@@ -11,7 +11,8 @@ async function onboard(page: Page, role: "Creator" | "Business" = "Creator") {
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: role === "Business" ? "Skincare" : "Brand deals" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
-  await page.getByRole("button", { name: /show my matches/i }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: /skip for now/i }).click();
   await expect(page).toHaveURL(/\/home$/);
 }
 
@@ -47,11 +48,14 @@ test("business can publish an affiliate program", async ({ page }) => {
   await onboard(page, "Business");
   await page.goto("/affiliates/new");
   await page.getByLabel("Program name").fill("Test Brand Affiliate");
+  await page.getByLabel("Lowest price per sale").fill("100");
+  await page.getByLabel("Highest price per sale").fill("250");
   await page.getByLabel("Description").fill("Promote our products to your audience.");
   await page.getByLabel("Terms").fill("Commission on confirmed sales only.");
   await page.getByRole("button", { name: "Publish" }).click();
   await expect(page).toHaveURL(/\/affiliates$/);
   await expect(page.getByText("Test Brand Affiliate")).toBeVisible();
+  await expect(page.getByText("₹100 – ₹250 per sale").first()).toBeVisible();
 });
 
 test("app pages redirect to welcome without a profile", async ({ page }) => {

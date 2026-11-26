@@ -20,13 +20,19 @@ export const financialRecordInput = z.object({
 
 export const affiliateProgramInput = z.object({
   name: z.string().trim().min(3, "Program name needs at least 3 characters").max(60),
-  commissionPercent: z.coerce
-    .number({ message: "Enter a commission" })
-    .min(1, "Commission must be at least 1%")
-    .max(90, "Commission can't exceed 90%"),
+  perSaleMin: z.coerce
+    .number({ message: "Enter the lowest price per sale" })
+    .int("Use whole numbers")
+    .min(1, "Price per sale must be at least 1")
+    .max(10_000_000, "That amount looks too large"),
+  perSaleMax: z.coerce
+    .number({ message: "Enter the highest price per sale" })
+    .int("Use whole numbers")
+    .min(1, "Price per sale must be at least 1")
+    .max(10_000_000, "That amount looks too large"),
   description: z.string().trim().min(10, "Describe the program in a sentence or two").max(400),
   terms: z.string().trim().min(10, "Add the key terms creators agree to").max(1000),
-});
+}).refine((d) => d.perSaleMin <= d.perSaleMax, { message: "The minimum should be smaller than the maximum.", path: ["perSaleMax"] });
 
 export const applicationInput = z.object({
   message: z.string().trim().min(10, "Tell the brand a little about you").max(500),
@@ -77,12 +83,14 @@ export const profileInput = z
     category: z.string().transform((v) => v || undefined),
     niches: z.array(z.string()).max(16).default([]),
     lookingFor: z.array(z.string()).max(16).default([]),
-    commissionPercent: z.union([z.literal(""), z.coerce.number({ message: "Use numbers only" }).min(0, "Can't be below 0").max(90, "Commission can't exceed 90%")]).optional().transform((v) => (v === "" || v === undefined ? undefined : v)),
     country: z.string().transform((v) => v || undefined),
     city: z.string().transform((v) => v || undefined),
     priceFrom: optionalRupees,
     priceTo: optionalRupees,
-    perSale: optionalRupees,
+    perSaleMin: optionalRupees,
+    perSaleMax: optionalRupees,
+    perThousandMin: optionalRupees,
+    perThousandMax: optionalRupees,
     earningModels: z.array(z.string()).max(10),
     instagram: socialHandle,
     youtube: socialHandle,
@@ -95,6 +103,22 @@ export const profileInput = z
       .transform((v) => v || undefined),
   })
   .refine((d) => d.priceFrom === undefined || d.priceTo === undefined || d.priceFrom <= d.priceTo, {
-    message: "“From” should be smaller than “To”",
+    message: "The minimum should be smaller than the maximum.",
     path: ["priceTo"],
+  })
+  .refine((d) => d.perSaleMin === undefined || d.perSaleMax === undefined || d.perSaleMin <= d.perSaleMax, {
+    message: "The minimum should be smaller than the maximum.",
+    path: ["perSaleMax"],
+  })
+  .refine((d) => d.perThousandMin === undefined || d.perThousandMax === undefined || d.perThousandMin <= d.perThousandMax, {
+    message: "The minimum should be smaller than the maximum.",
+    path: ["perThousandMax"],
   });
+
+/** A link to a social media API / insights endpoint. Must be https. */
+export const apiLink = z
+  .string()
+  .trim()
+  .max(500)
+  .refine((v) => v === "" || /^https:\/\/[^\s]+\.[^\s]+$/i.test(v), "Paste the full https:// link")
+  .transform((v) => v || undefined);

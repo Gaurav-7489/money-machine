@@ -3,19 +3,20 @@
 import { use, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AtSign, ChevronLeft, Mail, MapPin, MessageCircle, Star, Tag, Trash2, Undo2, UserCheck, UserPlus, UserX } from "lucide-react";
+import { AtSign, Check, ChevronLeft, Eye, Minus, ShieldCheck, X, Mail, MapPin, MessageCircle, Star, Tag, Trash2, Undo2, UserCheck, UserPlus, UserX } from "lucide-react";
 import { Photo } from "@/components/photo";
 import { nichePhoto } from "@/lib/photos";
 import { Avatar, VerifiedMark } from "@/components/art";
 import { useFeedback } from "@/components/feedback";
 import { PostCard } from "@/components/feed/post-card";
-import { priceText } from "@/components/search/match-card";
+import { priceText, rangeText } from "@/components/search/match-card";
+import { priceKindsFor } from "@/lib/pricing";
 import { Button, ButtonLink, EmptyState, PageHeader, SampleTag } from "@/components/ui";
 import { earningLabel } from "@/lib/catalog";
 import { filtersFromProfile, matchLabel, scoreProfile } from "@/lib/match";
 import { usePostIndex } from "@/lib/search-index";
 import { useFeed } from "@/lib/feed";
-import { formatMoney } from "@/lib/format";
+import { formatCompact } from "@/lib/format";
 import { profileByHandle } from "@/lib/sample-data";
 import { useStore } from "@/lib/store";
 import { useThreads } from "@/lib/threads";
@@ -51,7 +52,9 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
   // Same side (creator↔creator, business↔business) is a peer: no rate card or match score.
   const peer = !!session && session.role === p.kind;
   const shared = peer ? p.niches.filter((n) => (session?.niches ?? []).includes(n)) : [];
-  const fit = session && !p.system && !peer ? scoreProfile(p, { ...filtersFromProfile(session), kind: "all" }, index).percent : null;
+  const fitResult = session && !p.system && !peer ? scoreProfile(p, { ...filtersFromProfile(session), kind: "all" }, index) : null;
+  const fit = fitResult?.percent ?? null;
+  const kinds = priceKindsFor(p.earningModels);
   const isCreator = p.kind === "creator";
   const socials = Object.entries(p.socials).filter(([, v]) => v) as [string, string][];
   const SOCIAL_NAMES: Record<string, string> = { instagram: "Instagram", youtube: "YouTube", x: "X" };
@@ -180,19 +183,64 @@ export default function PublicProfile({ params }: { params: Promise<{ handle: st
               </div>
             )}
             <dl className="divide-y divide-line border-b border-line text-[14px]">
-              <div className="flex items-baseline justify-between gap-4 py-3.5">
-                <dt className="text-muted">{isCreator ? "Charges per video" : "Pays per video"}</dt>
-                <dd className="font-semibold tabular-nums">{priceText(p)}</dd>
-              </div>
-              <div className="flex items-baseline justify-between gap-4 py-3.5">
-                <dt className="text-muted">{isCreator ? "Asks commission" : "Pays commission"}</dt>
-                <dd className="text-right font-semibold tabular-nums">{p.commissionPercent !== undefined ? `${p.commissionPercent}%` : "—"}{p.perSale !== undefined ? ` · ${formatMoney(p.perSale, p.currency)}/sale` : ""}</dd>
-              </div>
+              {isCreator && (
+                <div className="flex items-baseline justify-between gap-4 py-3.5">
+                  <dt className="inline-flex items-center gap-1.5 text-muted"><Eye className="h-4 w-4" /> Monthly views</dt>
+                  <dd className="font-semibold tabular-nums">{p.monthlyViews !== undefined ? formatCompact(p.monthlyViews) : "Not connected yet"}</dd>
+                </div>
+              )}
+              {!isCreator && (
+                <div className="flex items-baseline justify-between gap-4 py-3.5">
+                  <dt className="inline-flex items-center gap-1.5 text-muted"><ShieldCheck className="h-4 w-4" /> Sales tracking</dt>
+                  <dd className="text-right font-semibold">{p.gatewayConnected ? "Payments connected" : "Not connected yet"}</dd>
+                </div>
+              )}
+              {kinds.includes("video") && (
+                <div className="flex items-baseline justify-between gap-4 py-3.5">
+                  <dt className="text-muted">{isCreator ? "Charges per video" : "Budget per video"}</dt>
+                  <dd className="font-semibold tabular-nums">{priceText(p)}</dd>
+                </div>
+              )}
+              {kinds.includes("sale") && (
+                <div className="flex items-baseline justify-between gap-4 py-3.5">
+                  <dt className="text-muted">Price per sale</dt>
+                  <dd className="font-semibold tabular-nums">{rangeText(p.perSaleMin, p.perSaleMax, p.currency) ?? "—"}</dd>
+                </div>
+              )}
+              {kinds.includes("views") && (
+                <div className="flex items-baseline justify-between gap-4 py-3.5">
+                  <dt className="text-muted">Price per 1,000 views</dt>
+                  <dd className="font-semibold tabular-nums">{rangeText(p.perThousandMin, p.perThousandMax, p.currency) ?? "—"}</dd>
+                </div>
+              )}
+              {(p.earningModels.includes("pr_package") || p.earningModels.includes("seeding")) && (
+                <div className="flex items-baseline justify-between gap-4 py-3.5">
+                  <dt className="text-muted">Free PR package</dt>
+                  <dd className="font-semibold">{isCreator ? "Happy to receive" : "Sends them"}</dd>
+                </div>
+              )}
               <div className="flex items-baseline justify-between gap-4 py-3.5">
                 <dt className="text-muted">Works in</dt>
                 <dd className="text-right font-medium">{p.niche}</dd>
               </div>
             </dl>
+            {fitResult && fitResult.checks.length > 0 && (
+              <details className="group/why mt-3 text-[13px]">
+                <summary className="flex cursor-pointer list-none items-center gap-1 py-1 font-medium text-muted hover:text-ink [&::-webkit-details-marker]:hidden">
+                  Why {fit}%?
+                  <span className="transition-transform duration-300 group-open/why:rotate-90" aria-hidden="true">›</span>
+                </summary>
+                <ul className="mt-1.5 space-y-1">
+                  {fitResult.checks.map((c) => (
+                    <li key={c.label} className="flex items-center gap-1.5">
+                      {c.score === 1 ? <Check className="h-3.5 w-3.5 text-gain" /> : c.score > 0 ? <Minus className="h-3.5 w-3.5 text-accent-4" /> : <X className="h-3.5 w-3.5 text-loss" />}
+                      <span>{c.label}</span>
+                      <span className="text-muted">— {c.score === 1 ? "yes" : c.score > 0 ? c.note ?? "partly" : "no"}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
             <p className="mt-5 text-[13px] text-muted">Open to</p>
             <p className="mt-2 flex flex-wrap gap-1.5">
               {p.earningModels.map((m) => (

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
-import { Bell, ChevronRight, Menu, Plus, X } from "lucide-react";
+import { Suspense, useEffect, type ReactNode } from "react";
+import { Bell, ChevronRight, Plus } from "lucide-react";
 import { Logo, LogoMark } from "./logo";
 import { Avatar } from "./art";
 import { MESSAGE_FOLDERS, SOCIAL_NAV, isActive, primaryNav, toolsNav } from "./nav";
@@ -12,7 +12,7 @@ import { useThreads } from "@/lib/threads";
 import { InstallBanner } from "./install-prompt";
 import { ThemeToggle } from "./theme";
 
-const mainNav = (role: Parameters<typeof primaryNav>[0]) => primaryNav(role).filter((i) => i.href !== "/profile" && i.href !== "/create");
+const mainNav = (role: Parameters<typeof primaryNav>[0]) => primaryNav(role).filter((i) => i.href !== "/profile");
 
 function CountBadge({ n }: { n: number }) {
   if (n <= 0) return null;
@@ -106,7 +106,7 @@ function Rail() {
   const pathname = usePathname();
   const { unreadCount } = useThreads();
   const { session } = useStore();
-  const items = [...mainNav(session?.role), { href: "/create", label: "Create", icon: Plus }, ...SOCIAL_NAV.filter((i) => i.href !== "/notifications"), ...toolsNav(session?.role)];
+  const items = [...mainNav(session?.role), ...SOCIAL_NAV.filter((i) => i.href !== "/notifications"), ...toolsNav(session?.role)];
   return (
     <aside className="sticky top-0 hidden h-dvh w-[76px] shrink-0 flex-col items-center gap-2 overflow-y-auto border-r border-line bg-surface py-6 md:flex lg:hidden">
       <Link href="/home" className="mb-6" aria-label="Money Machine home">
@@ -143,97 +143,16 @@ function ProfileDot() {
   return <Avatar name={session.displayName} tone={session.role === "business" ? "violet" : "rose"} square={session.role === "business"} photoId={session.avatarId} />;
 }
 
-/**
- * Mobile: a simple full-screen menu with every page. A native <dialog> keeps
- * focus inside and closes on Escape.
- */
-function MenuOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const pathname = usePathname();
-  const { unreadCount } = useThreads();
-  const { session } = useStore();
-
-  useEffect(() => {
-    const d = ref.current;
-    if (!d) return;
-    if (open && !d.open) d.showModal();
-    if (!open && d.open) d.close();
-  }, [open]);
-
-  // Navigating closes the menu.
-  useEffect(() => {
-    onClose();
-  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const all = [...primaryNav(session?.role), ...SOCIAL_NAV, ...toolsNav(session?.role)];
-  return (
-    <dialog
-      ref={ref}
-      onCancel={(e) => {
-        e.preventDefault();
-        onClose();
-      }}
-      aria-label="Menu"
-      className="m-0 h-dvh max-h-none w-full max-w-none bg-canvas p-0 text-ink backdrop:bg-transparent"
-    >
-      <div className="flex min-h-full flex-col px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]">
-        <div className="flex items-center justify-between py-2">
-          <Logo />
-          <button onClick={onClose} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-surface" aria-label="Close menu">
-            <X className="h-[22px] w-[22px]" />
-          </button>
-        </div>
-        <nav aria-label="All pages" className="mt-4 flex-1">
-          <ul className="card divide-y divide-line overflow-hidden">
-            {all.map(({ href, label, icon: Icon }) => {
-              const active = isActive(pathname, href);
-              return (
-                <li key={href}>
-                  <Link href={href} aria-current={active ? "page" : undefined} className={`flex items-center gap-3 px-4 py-3.5 text-[15px] ${active ? "bg-brand-50 font-semibold text-brand-700" : "hover:bg-canvas"}`}>
-                    <Icon className="h-5 w-5" strokeWidth={active ? 2.4 : 1.9} />
-                    <span className="flex-1">{label}</span>
-                    {href === "/inbox" && <CountBadge n={unreadCount} />}
-                    <ChevronRight className="h-4 w-4 text-muted" />
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-        <div className="mt-6 flex items-center gap-3">
-          {session && (
-            <Link href="/profile" className="flex min-w-0 flex-1 items-center gap-3">
-              <ProfileDot />
-              <span className="min-w-0">
-                <span className="block truncate text-sm font-semibold">{session.handle}</span>
-                <span className="block text-xs capitalize text-muted">{session.role}</span>
-              </span>
-            </Link>
-          )}
-          <ThemeToggle withLabel className="shrink-0" />
-        </div>
-      </div>
-    </dialog>
-  );
-}
-
 function TopBar() {
-  const [menu, setMenu] = useState(false);
-  const { unreadCount } = useThreads();
   return (
     <header className="sticky top-0 z-30 flex items-center gap-1 border-b border-line/70 bg-surface/85 px-4 py-2.5 pt-safe backdrop-blur md:hidden">
       <Link href="/home" aria-label="Money Machine home">
         <LogoMark className="h-8 w-8" />
       </Link>
       <div className="flex-1" />
-      <Link href="/notifications" className="relative grid h-10 w-10 place-items-center rounded-full hover:bg-canvas" aria-label="Notifications">
+      <Link href="/notifications" className="grid h-10 w-10 place-items-center rounded-full hover:bg-canvas" aria-label="Notifications">
         <Bell className="h-[22px] w-[22px]" />
-        {unreadCount > 0 && <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-brand-500" aria-hidden="true" />}
       </Link>
-      <button onClick={() => setMenu(true)} className="grid h-10 w-10 place-items-center rounded-full hover:bg-canvas" aria-haspopup="dialog" aria-expanded={menu} aria-label="Menu">
-        <Menu className="h-[22px] w-[22px]" />
-      </button>
-      <MenuOverlay open={menu} onClose={() => setMenu(false)} />
     </header>
   );
 }

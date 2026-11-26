@@ -46,7 +46,7 @@ describe("evaluateBadges", () => {
         role: "business",
         handle: "me",
         records: [],
-        programs: [{ id: "p", name: "S", brand: "S", commissionPercent: 10, description: "", terms: "", status: "active", ownerHandle: "me", createdAt: "", sample: true }],
+        programs: [{ id: "p", name: "S", brand: "S", perSaleMin: 100, perSaleMax: 200, description: "", terms: "", status: "active", ownerHandle: "me", createdAt: "", sample: true }],
         applications: [],
       },
       today,

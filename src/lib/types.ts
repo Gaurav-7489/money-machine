@@ -12,7 +12,7 @@ export interface ProfileDetails {
   /** typical pay per video / reel in whole rupees */
   payPerVideoMin?: number;
   payPerVideoMax?: number;
-  /** affiliate commission in percent */
+  /** @deprecated replaced by perSaleMin / perSaleMax; kept so older saved profiles load */
   commissionPercent?: number;
   country?: string;
   /** state / province / region within the country (ISO 3166-2 name) */
@@ -26,8 +26,22 @@ export interface ProfileDetails {
   /** whole rupees per post / deliverable */
   priceFrom?: number;
   priceTo?: number;
-  /** whole rupees per confirmed sale (affiliate) */
+  /** @deprecated single per-sale price from older saves; read as perSaleMin */
   perSale?: number;
+  /** affiliate: price per confirmed sale, min to max, in the account currency */
+  perSaleMin?: number;
+  perSaleMax?: number;
+  /** UGC: price per 1,000 views, min to max, in the account currency */
+  perThousandMin?: number;
+  perThousandMax?: number;
+  /** creators: links to their social media API / insights feed, used to read monthly views */
+  socialApi?: { instagram?: string; youtube?: string };
+  /** monthly views read from the connected social accounts (only set by a real sync) */
+  monthlyViews?: number;
+  monthlyViewsAt?: string;
+  /** businesses: the connected payment gateway, used to verify sales and badges.
+   *  Only the provider and the key's last 4 characters are kept — never the key. */
+  paymentGateway?: { provider: string; keyHint: string; connectedAt: string };
   earningModels?: string[];
   instagram?: string;
   youtube?: string;
@@ -73,7 +87,12 @@ export interface AffiliateProgram {
   id: string;
   name: string;
   brand: string;
-  commissionPercent: number;
+  /** price paid per confirmed sale, min to max, in `currency` */
+  perSaleMin?: number;
+  perSaleMax?: number;
+  currency?: string;
+  /** @deprecated programs saved before per-sale pricing */
+  commissionPercent?: number;
   description: string;
   terms: string;
   status: ProgramStatus;

@@ -3,9 +3,13 @@
 import { BadgeMedal } from "@/components/badge-medal";
 import { PageHeader } from "@/components/ui";
 import { useBadges } from "@/lib/hooks";
+import { useStore } from "@/lib/store";
+import Link from "next/link";
+import { ChevronRight, ShieldCheck } from "lucide-react";
 
 export default function Badges() {
   const badges = useBadges();
+  const { session } = useStore();
   const earned = badges.filter((b) => b.earned);
   const featured = earned[earned.length - 1] ?? [...badges].filter((b) => !b.badge.requiresVerification).sort((a, b) => b.current / b.target - a.current / a.target)[0];
 
@@ -26,6 +30,14 @@ export default function Badges() {
             )}
           </div>
         </section>
+      )}
+
+      {session && !(session.role === "business" ? session.paymentGateway : session.socialApi?.instagram || session.socialApi?.youtube) && (
+        <Link href="/profile" className="mt-6 flex items-center gap-3 rounded-2xl border border-line p-4 text-[14px] hover:border-brand-300">
+          <ShieldCheck className="h-5 w-5 shrink-0 text-brand-700" />
+          <span className="flex-1">{session.role === "business" ? "Connect your payment gateway so your sales are tracked and your badges are verified." : "Connect your social media so your monthly views are tracked and your badges are verified."}</span>
+          <ChevronRight className="h-4 w-4 text-muted" />
+        </Link>
       )}
 
       <h2 className="font-text mb-4 mt-8 flex items-baseline justify-between text-[14px] font-semibold">

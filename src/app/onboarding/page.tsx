@@ -7,10 +7,13 @@ import Link from "next/link";
 import { Button, Field, inputCls, selectCls } from "@/components/ui";
 import { EARNING_MODELS, NICHES } from "@/lib/catalog";
 import { LocationPicker } from "@/components/location-picker";
-import { DEFAULT_CURRENCY, currencySymbol } from "@/lib/format";
+import { DEFAULT_CURRENCY } from "@/lib/format";
+import { EMPTY_PRICES, PriceFields, type PriceValues } from "@/components/price-fields";
+import { PaymentGatewayConnect, SocialApiFields } from "@/components/connect-accounts";
+import { priceKindsFor, type PriceKind } from "@/lib/pricing";
 import { useStore } from "@/lib/store";
-import { fieldErrors, onboardingInput, type FieldErrors } from "@/lib/validation";
-import type { Role } from "@/lib/types";
+import { apiLink, fieldErrors, onboardingInput, type FieldErrors } from "@/lib/validation";
+import type { Role, Session } from "@/lib/types";
 
 const ROLES: { id: Role; title: string; body: string; icon: typeof UserRound }[] = [
   { id: "creator", title: "Creator", body: "Create content, land deals and earn.", icon: UserRound },
@@ -48,11 +51,15 @@ export default function Onboarding() {
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
   const [currency, setCurrency] = useState("");
-  const [payMin, setPayMin] = useState("");
-  const [payMax, setPayMax] = useState("");
+  const [prices, setPrices] = useState<PriceValues>(EMPTY_PRICES);
+  const [api, setApi] = useState({ instagram: "", youtube: "" });
+  const [gateway, setGateway] = useState<Session["paymentGateway"]>();
   const [errors, setErrors] = useState<FieldErrors>({});
   const isBiz = role === "business";
-  const STEPS = 4;
+  const STEPS = 5;
+  const kinds = priceKindsFor(earning);
+  const num = (v: string) => (v ? Number(v) : undefined);
+  const priced = (k: PriceKind) => (kinds.includes(k) ? [num(prices[k].min), num(prices[k].max)] : [undefined, undefined]);
 
   function next(e: React.FormEvent) {
     e.preventDefault();
@@ -64,9 +71,18 @@ export default function Onboarding() {
     if (step === 1 && niches.length === 0) return setErrors({ niches: isBiz ? "Pick at least one so creators can find you." : "Pick at least one so brands can find you." });
     if (step === 2 && (isBiz ? lookingFor.length === 0 : earning.length === 0)) return setErrors({ step2: isBiz ? "Pick at least one type of creator." : "Pick at least one way to earn." });
     if (step === 3) {
-      const lo = payMin ? Number(payMin) : undefined;
-      const hi = payMax ? Number(payMax) : undefined;
-      if (lo !== undefined && hi !== undefined && lo > hi) return setErrors({ pay: "The minimum should be smaller than the maximum." });
+      const bad = kinds.find((k) => prices[k].min && prices[k].max && Number(prices[k].min) > Number(prices[k].max));
+      if (bad) return setErrors({ [`pay_${bad}`]: "The minimum should be smaller than the maximum." });
+    }
+    if (step === 4) {
+      const ig = apiLink.safeParse(api.instagram);
+      const yt = apiLink.safeParse(api.youtube);
+      if (!isBiz && (!ig.success || !yt.success)) return setErrors({ apiInstagram: ig.success ? "" : ig.error.issues[0]!.message, apiYoutube: yt.success ? "" : yt.error.issues[0]!.message });
+      const [lo, hi] = priced("video");
+      const [sLo, sHi] = priced("sale");
+      const [vLo, vHi] = priced("views");
+      const igLink = ig.success ? ig.data : undefined;
+      const ytLink = yt.success ? yt.data : undefined;
       const parsed = onboardingInput.parse({ role, displayName, handle });
       update((s) => ({
         ...s,
@@ -84,6 +100,12 @@ export default function Onboarding() {
           payPerVideoMax: hi,
           priceFrom: lo,
           priceTo: hi,
+          perSaleMin: sLo,
+          perSaleMax: sHi,
+          perThousandMin: vLo,
+          perThousandMax: vHi,
+          socialApi: !isBiz && (igLink || ytLink) ? { instagram: igLink, youtube: ytLink } : undefined,
+          paymentGateway: isBiz ? gateway : undefined,
         },
       }));
       router.replace("/home");
@@ -185,22 +207,39 @@ export default function Onboarding() {
                     setCurrency(v.currency);
                   }}
                 />
-                <div>
-                  <p className="mb-1.5 text-[13px] font-medium">{isBiz ? "Your budget per video" : "What you charge per video"} ({currencySymbol(currency || DEFAULT_CURRENCY)})</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <label><span className="sr-only">Minimum</span><input inputMode="numeric" className={inputCls} placeholder="Min" value={payMin} onChange={(e) => setPayMin(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!errors.pay} /></label>
-                    <label><span className="sr-only">Maximum</span><input inputMode="numeric" className={inputCls} placeholder="Max" value={payMax} onChange={(e) => setPayMax(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!errors.pay} /></label>
-                  </div>
-                  {errors.pay && <p role="alert" className="mt-1 text-[12px] text-danger">{errors.pay}</p>}
-                </div>
+                {kinds.length > 0 ? (
+                  <PriceFields
+                    kinds={kinds}
+                    currency={currency || DEFAULT_CURRENCY}
+                    labels={{ video: isBiz ? "Your budget per video" : "What you charge per video" }}
+                    value={prices}
+                    onChange={(k, r) => { setPrices((p) => ({ ...p, [k]: r })); setErrors({}); }}
+                    errors={{ video: errors.pay_video, sale: errors.pay_sale, views: errors.pay_views }}
+                  />
+                ) : (
+                  <p className="text-[13px] text-muted">Free PR packages and product seeding are free, so there&apos;s no price to set.</p>
+                )}
               </div>
+            </>
+          )}
+
+          {step === 4 && (
+            <>
+              <h1 className="text-2xl font-bold tracking-tight">{isBiz ? "Connect your payments" : "Connect your social media"}</h1>
+              <p className="mb-6 mt-1 text-sm text-muted">{isBiz ? "So we can track your sales and give you real badges." : "So brands can see your monthly views on your profile."}</p>
+              {isBiz ? (
+                <PaymentGatewayConnect value={gateway} onChange={setGateway} />
+              ) : (
+                <SocialApiFields value={api} onChange={(v) => { setApi(v); setErrors({}); }} errors={{ instagram: errors.apiInstagram || undefined, youtube: errors.apiYoutube || undefined }} />
+              )}
+              <p className="mt-4 text-[12px] text-muted">You can skip this and do it later from Edit Profile.</p>
             </>
           )}
         </div>
 
         <div className="fixed inset-x-0 bottom-0 border-t border-line bg-surface/95 px-5 py-3 pb-safe backdrop-blur md:static md:mt-8 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
           <Button type="submit" size="lg" className="mx-auto w-full max-w-md">
-            {step === 3 ? <><Sparkles className="h-5 w-5" /> Show my matches</> : "Continue"}
+            {step === 4 ? <><Sparkles className="h-5 w-5" /> {(isBiz ? gateway : api.instagram || api.youtube) ? "Show my matches" : "Skip for now"}</> : "Continue"}
           </Button>
         </div>
       </form>

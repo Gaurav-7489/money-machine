@@ -5,8 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { Inbox as InboxIcon, PenSquare, Pin, Search, Star, Trash2 } from "lucide-react";
-import { Photo } from "@/components/photo";
-import { ThreadList, folderIcon, folderPhoto } from "@/components/inbox/thread-list";
+import { ThreadList } from "@/components/inbox/thread-list";
 import { Avatar } from "@/components/art";
 import { useFeedback } from "@/components/feedback";
 import { Button, EmptyState, SampleTag, Sheet } from "@/components/ui";
@@ -49,40 +48,20 @@ function NewMessage({ open, onClose }: { open: boolean; onClose: () => void }) {
   );
 }
 
-/** A folder on the shelf: its photo, its name, who's inside and what's new. Opens the folder. */
+/** A folder: just its name and how many DMs are in it. Opens the folder. */
 function FolderTile({ f, threads }: { f: FolderDef; threads: ThreadView[] }) {
-  const Icon = folderIcon(f);
   const unread = threads.filter((t) => t.unread).length;
-  const latest = threads[0];
-  const strong = f.kind === "mm" || f.kind === "owner";
   return (
     <li>
-      <Link href={folderHref(f.id)} className="group relative block overflow-hidden rounded-[22px] bg-primary text-on-primary" aria-label={`${f.label}: ${threads.length} ${threads.length === 1 ? "chat" : "chats"}${unread ? `, ${unread} unread` : ""}`}>
-        <span className="relative block aspect-[16/9] sm:aspect-[5/4]">
-          <Photo photo={folderPhoto(f)} sizes="(min-width: 1024px) 300px, 50vw" className="photo-zoom" decorative />
-          <span className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-black/80" aria-hidden="true" />
-          {/* folder tab: always a solid chip so it reads on any photo, in either theme */}
-          <span className={`absolute left-3 top-3 inline-flex h-7 items-center gap-1.5 rounded-full pl-2.5 text-[12px] font-semibold shadow-[0_2px_10px_rgb(0_0_0/0.25)] ${unread > 0 ? "pr-1" : "pr-2.5"} ${f.kind === "owner" ? "bg-signal text-on-signal" : "bg-white text-[#0f1a14]"}`}>
-            <Icon className="h-3.5 w-3.5" strokeWidth={2.2} />
-            {f.kind === "mm" ? "Official" : f.kind === "owner" ? "Founder" : f.kind === "deal" ? "Deals" : "Chats"}
-            {f.kind === "mm" && <Pin className="h-3 w-3" />}
-            {unread > 0 && (
-              <span className={`ml-0.5 grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[11px] font-bold tabular-nums ${f.kind === "owner" ? "bg-[#0f1a14] text-signal" : "bg-signal text-on-signal"}`} aria-hidden="true">{unread}</span>
-            )}
-          </span>
-          <span className="absolute inset-x-3 bottom-3">
-            <span className="font-display block text-lg">{f.label}</span>
-            <span className="mt-1.5 flex items-center gap-2">
-              <span className="flex -space-x-1.5" aria-hidden="true">
-                {threads.slice(0, 3).map((t) => (
-                  <span key={t.id} className="rounded-full ring-2 ring-black/40"><Avatar name={t.profile.name} tone={t.profile.tone} size="xs" square={t.profile.kind === "business"} /></span>
-                ))}
-              </span>
-              <span className="text-[12px] tabular-nums text-white/85">{threads.length} {threads.length === 1 ? "chat" : "chats"}</span>
-            </span>
-            {latest && <span className="mt-1.5 block truncate text-[12px] text-white/80">{latest.profile.name}: {latest.preview}</span>}
-          </span>
-        </span>
+      <Link
+        href={folderHref(f.id)}
+        className="press flex h-14 items-center gap-2 rounded-2xl border border-line bg-surface px-4 transition-colors hover:border-brand-300"
+        aria-label={`${f.label}: ${threads.length} ${threads.length === 1 ? "DM" : "DMs"}${unread ? `, ${unread} unread` : ""}`}
+      >
+        {f.kind === "mm" && <Pin className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden="true" />}
+        <span className="min-w-0 flex-1 truncate text-[15px] font-semibold">{f.label}</span>
+        {unread > 0 && <span className="h-2 w-2 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />}
+        <span className={`grid h-7 min-w-7 shrink-0 place-items-center rounded-full px-2 text-[13px] font-bold tabular-nums ${unread > 0 ? "bg-primary text-on-primary" : "bg-elevated text-ink"}`} aria-hidden="true">{threads.length}</span>
       </Link>
     </li>
   );
@@ -159,7 +138,7 @@ function InboxInner() {
 
       {showShelf ? (
         <section aria-label="Folders">
-          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid max-w-2xl grid-cols-1 gap-2 sm:grid-cols-2">
             {shelf.map(({ f, threads }) => <FolderTile key={f.id} f={f} threads={threads} />)}
           </ul>
         </section>

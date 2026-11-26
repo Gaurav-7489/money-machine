@@ -13,12 +13,12 @@ const base: Matchable = {
   city: "Pune",
   priceFrom: 4000,
   priceTo: 9000,
-  perSale: 100,
-  commissionPercent: 10,
+  perSaleMin: 100,
+  perSaleMax: 150,
   earningModels: ["brand_deal", "affiliate"],
   socials: { instagram: "asha.cooks.ig" },
 };
-const brand: Matchable = { ...base, handle: "spiceco", name: "SpiceCo", kind: "business", bio: "Small-batch goods.", niches: ["Wellness"], category: "Wellness", city: "Mumbai", commissionPercent: 15, socials: {} };
+const brand: Matchable = { ...base, handle: "spiceco", name: "SpiceCo", kind: "business", bio: "Small-batch goods.", niches: ["Wellness"], category: "Wellness", city: "Mumbai", perSaleMin: 200, perSaleMax: 300, socials: {} };
 const posts = { spiceco: ["Our new skincare serum is here! #skincare"] };
 
 describe("match scoring", () => {
@@ -56,11 +56,15 @@ describe("match scoring", () => {
     expect(scoreProfile(brand, { ...EMPTY_FILTERS, niches: ["Skincare"] }).percent).toBe(0);
   });
 
-  it("reads commission as 'pays at least' for brands and 'asks at most' for creators", () => {
-    const f = { ...EMPTY_FILTERS, commission: 12 };
+  it("compares price per sale and price per 1,000 views as min–max ranges", () => {
+    const f = { ...EMPTY_FILTERS, saleMin: 120, saleMax: 250 };
     expect(scoreProfile(brand, f).percent).toBe(100);
     expect(scoreProfile(base, f).percent).toBe(100);
-    expect(scoreProfile({ ...base, commissionPercent: 30 }, f).percent).toBe(0);
+    expect(scoreProfile({ ...base, perSaleMin: 500, perSaleMax: 900 }, f).percent).toBe(0);
+    expect(scoreProfile({ ...base, perSaleMin: undefined, perSaleMax: undefined }, f).checks[0]!.note).toBe("no price set");
+    const v = { ...EMPTY_FILTERS, viewsMin: 100, viewsMax: 300 };
+    expect(scoreProfile({ ...base, perThousandMin: 200, perThousandMax: 400 }, v).percent).toBe(100);
+    expect(scoreProfile({ ...base, perThousandMin: 340, perThousandMax: 400 }, v).percent).toBe(50);
   });
 
   it("treats type, name and social handle as hard filters", () => {
@@ -88,9 +92,9 @@ describe("match scoring", () => {
   });
 
   it("round-trips filters through the URL", () => {
-    const f = { ...EMPTY_FILTERS, kind: "creator" as const, niches: ["Makeup", "Home Decor"], cities: ["Pune", "Goa"], priceMin: 1000, commission: 10, earningModels: ["affiliate", "ugc"], social: "x" };
+    const f = { ...EMPTY_FILTERS, kind: "creator" as const, niches: ["Makeup", "Home Decor"], cities: ["Pune", "Goa"], priceMin: 1000, saleMin: 50, saleMax: 90, viewsMax: 400, earningModels: ["affiliate", "ugc"], social: "x" };
     expect(filtersFromParams(new URLSearchParams(filtersToParams(f)))).toEqual(f);
-    expect(activeFilterCount(f)).toBe(6);
+    expect(activeFilterCount(f)).toBe(7);
   });
 
   it("builds 'matched to you' filters from the profile", () => {

@@ -1,5 +1,6 @@
 "use client";
 
+import { programPayText } from "@/lib/pricing";
 import Link from "next/link";
 import { useState } from "react";
 import { Inbox, Link2, Plus, Receipt } from "lucide-react";
@@ -30,7 +31,7 @@ function ProgramRow({ p, right }: { p: AffiliateProgram; right: React.ReactNode 
           <p className="flex flex-wrap items-center gap-2 text-[17px] font-semibold leading-tight">
             {p.name} {p.sample && <SampleTag />}
           </p>
-          <p className="font-display mt-1 text-2xl leading-tight tabular-nums">{p.commissionPercent}%<span className="font-text ml-1.5 text-[13px] font-medium text-muted">commission</span></p>
+          <p className="font-display mt-1 text-2xl leading-tight tabular-nums">{programPayText(p)}</p>
           <p className="mt-1 text-sm text-muted">{p.description}</p>
           <details className="mt-2 text-sm">
             <summary className="cursor-pointer text-[13px] font-medium text-ink">Terms</summary>
@@ -179,7 +180,7 @@ function BusinessView() {
             <EmptyState
               icon={<Link2 className="h-5 w-5" />}
               title="No affiliate programs yet"
-              body="Create a program with your commission and terms. Creators can then discover and apply."
+              body="Create a program with your price per sale and terms. Creators can then discover and apply."
               action={<ButtonLink href="/affiliates/new" size="sm"><Plus className="h-4 w-4" /> Create Program</ButtonLink>}
             />
           </div>

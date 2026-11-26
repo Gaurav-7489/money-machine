@@ -15,7 +15,8 @@ async function onboard(page: Page, role: "Creator" | "Business" = "Creator") {
     await page.getByRole("button", { name: "Affiliate marketing" }).click();
   }
   await page.getByRole("button", { name: "Continue" }).click();
-  await page.getByRole("button", { name: /show my matches/i }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: /skip for now/i }).click();
   await expect(page).toHaveURL(/\/home$/);
 }
 
@@ -30,16 +31,38 @@ test("onboarding asks for niches before continuing", async ({ page }) => {
 
 test("search finds a brand by its posts, not just its bio", async ({ page }) => {
   await onboard(page);
-  await page.goto("/explore?q=skincare&mode=custom");
-  const card = page.getByRole("article", { name: "Dewdrop Labs" });
-  await expect(card).toBeVisible();
-  await expect(card.getByText("Found in their posts:")).toBeVisible();
+  await page.goto("/explore?q=skincare");
+  await expect(page.getByRole("link", { name: /Dewdrop Labs/ })).toBeVisible();
+});
+
+test("search: free-text bar opens the options, prices follow the way of working", async ({ page }) => {
+  await onboard(page, "Business");
+  await page.goto("/explore");
+  // "All" is the default and shows every creator.
+  await expect(page.getByRole("radio", { name: /^All/ })).toHaveAttribute("aria-checked", "true");
+  await expect(page.getByRole("link", { name: /Kavya Fit/ })).toBeVisible();
+  await page.getByPlaceholder(/Search e\.g\. makeup/).click();
+  const options = page.locator("#search-options");
+  await expect(options).toBeVisible();
+  await expect(options.getByText("Budget per video")).toHaveCount(0);
+  await options.getByRole("button", { name: "Brand deals" }).click();
+  await expect(options.getByText("Budget per video (₹)")).toBeVisible();
+  await options.getByRole("button", { name: "Affiliate marketing" }).click();
+  await expect(options.getByText("Price per sale (₹)")).toBeVisible();
+  await options.getByRole("button", { name: "UGC" }).click();
+  await expect(options.getByText("Price per 1,000 views (₹)")).toBeVisible();
+  await options.getByRole("button", { name: /Show \d+ creators?/ }).click();
+  await expect(options).toBeHidden();
+  await expect(page).toHaveURL(/earn=/);
+  // Results are small tiles; tapping one opens the full profile.
+  await page.getByRole("link", { name: /Kavya Fit/ }).click();
+  await expect(page).toHaveURL(/\/u\/kavya\.fit$/);
+  await expect(page.getByText("Monthly views")).toBeVisible();
 });
 
 test("business: matched creators, match levels, select all and bulk DM once every 10 days", async ({ page }) => {
   await onboard(page, "Business");
   await page.goto("/explore");
-  await expect(page.getByText(/Showing creators for your setup/)).toBeVisible();
   await page.getByRole("radio", { name: /90%\+/ }).click();
   await expect(page).toHaveURL(/match=90/);
   await page.getByRole("radio", { name: /^All/ }).click();
@@ -59,18 +82,26 @@ test("business: matched creators, match levels, select all and bulk DM once ever
   await expect(page.getByText(/Your next bulk DM unlocks in 10 days/)).toBeVisible();
 });
 
-test("search card: star and remove from results", async ({ page }) => {
+test("profile: star and remove from search results", async ({ page }) => {
   await onboard(page, "Business");
-  await page.goto("/explore?mode=custom");
-  const card = page.getByRole("article", { name: "Kavya Fit" });
-  await card.getByRole("button", { name: "Star Kavya Fit" }).click();
+  await page.goto("/u/kavya.fit");
+  await page.getByRole("button", { name: "Star Kavya Fit" }).click();
   await expect(page.getByText("Kavya Fit starred ⭐")).toBeVisible();
-  await card.getByRole("button", { name: "Remove Kavya Fit from results" }).click();
-  await expect(page.getByRole("article", { name: "Kavya Fit" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Remove Kavya Fit from search" }).click();
+  await page.goto("/explore");
+  await expect(page.getByRole("link", { name: /Kavya Fit/ })).toHaveCount(0);
   await page.getByRole("button", { name: /Restore 1 removed profile/ }).click();
-  await expect(page.getByRole("article", { name: "Kavya Fit" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Kavya Fit/ })).toBeVisible();
   await page.goto("/saved");
   await expect(page.getByText("Kavya Fit")).toBeVisible();
+});
+
+test("opportunities can be searched", async ({ page }) => {
+  await onboard(page);
+  await page.getByRole("tab", { name: "Opportunities" }).click();
+  await page.getByLabel("Search opportunities").fill("earbuds");
+  await expect(page.getByRole("article", { name: "Earbuds long-term review" })).toBeVisible();
+  await expect(page.getByRole("article", { name: "Winter shred campaign" })).toHaveCount(0);
 });
 
 test("creator DMs: Money Machine, founder and deal folders", async ({ page }) => {
@@ -110,6 +141,9 @@ test("feed: post a thought with a GIF, react, comment with a GIF, repost", async
   await onboard(page);
   await page.getByLabel("Write a post").fill("Hello from the e2e test #testing");
   await page.getByRole("button", { name: "Add GIF" }).click();
+  await page.getByLabel("Search GIFs").fill("money");
+  await expect(page.getByRole("button", { name: "Use GIF CHA-CHING" })).toBeVisible();
+  await page.getByLabel("Search GIFs").fill("hype");
   await page.getByRole("button", { name: "Use GIF LET'S GO" }).click();
   await page.getByRole("button", { name: "Post", exact: true }).click();
   await expect(page.getByText("Your thought is live! ✨")).toBeVisible();

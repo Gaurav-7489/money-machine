@@ -7,30 +7,9 @@ import { useFeedback } from "@/components/feedback";
 import { SampleTag } from "@/components/ui";
 import { earningShort } from "@/lib/catalog";
 import { timeAgo } from "@/lib/format";
-import { NICHE_PHOTOS, STORY, type Photo } from "@/lib/photos";
 import { useStore } from "@/lib/store";
 import type { FolderDef, ThreadView } from "@/lib/threads";
 
-/** The photograph on each folder's cover. */
-const DEAL_PHOTO: Record<string, Photo> = {
-  brand_deal: STORY.deal,
-  affiliate: STORY.shop,
-  ugc: STORY.camera,
-  pr_package: STORY.rack,
-  sponsored: STORY.filming,
-  review: NICHE_PHOTOS.Tech!,
-  shoutout: STORY.creatorRed,
-  ambassador: STORY.creatorPortrait,
-  partnership: STORY.team,
-  seeding: NICHE_PHOTOS.Skincare!,
-  event: STORY.studio,
-};
-export function folderPhoto(f: FolderDef): Photo {
-  if (f.kind === "mm") return STORY.phone;
-  if (f.kind === "owner") return STORY.meeting;
-  if (f.kind === "general") return STORY.kitchen;
-  return (f.dealType && DEAL_PHOTO[f.dealType]) || STORY.deal;
-}
 export function folderIcon(f: FolderDef) {
   return f.kind === "mm" ? BadgeCheck : f.kind === "owner" ? Crown : f.kind === "general" ? MessageSquareText : f.dealType === "affiliate" ? Link2 : Handshake;
 }

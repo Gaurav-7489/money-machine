@@ -1,5 +1,6 @@
 "use client";
 
+import { programPayText } from "@/lib/pricing";
 import Link from "next/link";
 import { ArrowRight, ChevronRight, Link2, Rocket, Star, Wallet } from "lucide-react";
 import { Avatar } from "./art";
@@ -70,7 +71,7 @@ export function ProgramsCard() {
                 <Avatar name={program.brand} tone={owner?.tone ?? "violet"} square />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold">{program.name}</span>
-                  <span className="block text-xs text-muted">{program.commissionPercent}% Commission</span>
+                  <span className="block text-xs text-muted">{programPayText(program)}</span>
                 </span>
                 {program.sample && mine.length === 0 ? <SampleTag /> : <StatusPill status={status} />}
               </Link>

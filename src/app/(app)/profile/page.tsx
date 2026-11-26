@@ -4,7 +4,7 @@ import { TabIndicator } from "@/components/motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AtSign, Bookmark, Camera, ChevronRight, Grid3x3, Link2, LogOut, Mail, MapPin, Palette, Pencil, Repeat2, Rocket, Settings, Smartphone, Star, Users, Wallet } from "lucide-react";
+import { AtSign, Bookmark, Camera, ChevronRight, CreditCard, Eye, ShieldCheck, Grid3x3, Link2, LogOut, Mail, MapPin, Palette, Pencil, Repeat2, Rocket, Settings, Smartphone, Star, Users, Wallet } from "lucide-react";
 import { Photo } from "@/components/photo";
 import { nichePhoto } from "@/lib/photos";
 import { Avatar, TONES } from "@/components/art";
@@ -16,12 +16,15 @@ import { Button, EmptyState, Field, Sheet, inputCls, selectCls } from "@/compone
 import { EARNING_MODELS, NICHES, earningLabel } from "@/lib/catalog";
 import { LocationPicker } from "@/components/location-picker";
 import { ImageSlot, MediaImage } from "@/components/image-slot";
-import { DEFAULT_CURRENCY, currencySymbol, formatMoney } from "@/lib/format";
+import { DEFAULT_CURRENCY, currencySymbol, formatCompact, formatMoney } from "@/lib/format";
 import { useFeed } from "@/lib/feed";
 import { useBadges, useGrowth, useMoney, useMyPrograms } from "@/lib/hooks";
 import { useStore } from "@/lib/store";
 import type { Session } from "@/lib/types";
-import { fieldErrors, profileInput, type FieldErrors } from "@/lib/validation";
+import { apiLink, fieldErrors, profileInput, type FieldErrors } from "@/lib/validation";
+import { priceKindsFor } from "@/lib/pricing";
+import { PriceFields } from "@/components/price-fields";
+import { PaymentGatewayConnect, SocialApiFields } from "@/components/connect-accounts";
 
 type Form = {
   displayName: string;
@@ -29,14 +32,16 @@ type Form = {
   category: string;
   niches: string[];
   lookingFor: string[];
-  commissionPercent: string;
   country: string;
   region: string;
   city: string;
   currency: string;
   priceFrom: string;
   priceTo: string;
-  perSale: string;
+  perSaleMin: string;
+  perSaleMax: string;
+  perThousandMin: string;
+  perThousandMax: string;
   earningModels: string[];
   instagram: string;
   youtube: string;
@@ -52,14 +57,16 @@ function toForm(s: Session): Form {
     category: s.category ?? "",
     niches: s.niches ?? (s.category ? [s.category] : []),
     lookingFor: s.lookingFor ?? [],
-    commissionPercent: str(s.commissionPercent),
     country: s.country ?? "",
     region: s.region ?? "",
     city: s.city ?? "",
     currency: s.currency ?? DEFAULT_CURRENCY,
     priceFrom: str(s.priceFrom),
     priceTo: str(s.priceTo),
-    perSale: str(s.perSale),
+    perSaleMin: str(s.perSaleMin ?? s.perSale),
+    perSaleMax: str(s.perSaleMax ?? s.perSale),
+    perThousandMin: str(s.perThousandMin),
+    perThousandMax: str(s.perThousandMax),
     earningModels: s.earningModels ?? [],
     instagram: s.instagram ?? "",
     youtube: s.youtube ?? "",
@@ -74,9 +81,12 @@ function completeness(s: Session) {
     { done: !!s.bio, label: "Add a short bio" },
     { done: (s.niches ?? []).length > 0 || !!s.category, label: "Pick your niches" },
     { done: !!s.country, label: "Add where you're based" },
-    { done: s.priceFrom !== undefined || s.priceTo !== undefined, label: "Add your pay per video" },
     { done: (s.earningModels ?? []).length > 0, label: s.role === "business" ? "Choose how you work with creators" : "Choose how you earn" },
+    { done: s.priceFrom !== undefined || s.priceTo !== undefined || s.perSaleMin !== undefined || s.perThousandMin !== undefined || priceKindsFor(s.earningModels ?? []).length === 0, label: "Add your prices" },
     { done: !!(s.instagram || s.youtube || s.x), label: "Add a social media handle" },
+    s.role === "business"
+      ? { done: !!s.paymentGateway, label: "Connect your payment gateway" }
+      : { done: !!(s.socialApi?.instagram || s.socialApi?.youtube), label: "Connect your social media API" },
   ];
   return { percent: Math.round((steps.filter((x) => x.done).length / steps.length) * 100), next: steps.find((x) => !x.done) };
 }
@@ -104,22 +114,47 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
   const { toast } = useFeedback();
   const [form, setForm] = useState<Form>(() => toForm(session));
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [api, setApi] = useState({ instagram: session.socialApi?.instagram ?? "", youtube: session.socialApi?.youtube ?? "" });
+  const [gateway, setGateway] = useState(session.paymentGateway);
   const set = (k: keyof Form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm((f) => ({ ...f, [k]: e.target.value }));
     setErrors((x) => ({ ...x, [k]: "" }));
   };
   const isBiz = session.role === "business";
   const sym = currencySymbol(form.currency);
+  const kinds = priceKindsFor(form.earningModels);
 
   function save(e: React.FormEvent) {
     e.preventDefault();
     const parsed = profileInput.safeParse(form);
-    if (!parsed.success) {
-      setErrors(fieldErrors(parsed.error));
+    const ig = apiLink.safeParse(api.instagram);
+    const yt = apiLink.safeParse(api.youtube);
+    if (!parsed.success || !ig.success || !yt.success) {
+      setErrors({ ...(parsed.success ? {} : fieldErrors(parsed.error)), ...(ig.success ? {} : { apiInstagram: ig.error.issues[0]!.message }), ...(yt.success ? {} : { apiYoutube: yt.error.issues[0]!.message }) });
       toast("Please fix the highlighted fields.", "error");
       return;
     }
-    update((s) => (s.session ? { ...s, session: { ...s.session, ...parsed.data, region: form.region || undefined, currency: form.currency || DEFAULT_CURRENCY, category: parsed.data.niches[0] ?? parsed.data.category, payPerVideoMin: parsed.data.priceFrom, payPerVideoMax: parsed.data.priceTo } } : s));
+    const socialApi = ig.data || yt.data ? { instagram: ig.data, youtube: yt.data } : undefined;
+    update((s) =>
+      s.session
+        ? {
+            ...s,
+            session: {
+              ...s.session,
+              ...parsed.data,
+              commissionPercent: undefined,
+              perSale: undefined,
+              socialApi: isBiz ? undefined : socialApi,
+              paymentGateway: isBiz ? gateway : undefined,
+              region: form.region || undefined,
+              currency: form.currency || DEFAULT_CURRENCY,
+              category: parsed.data.niches[0] ?? parsed.data.category,
+              payPerVideoMin: parsed.data.priceFrom,
+              payPerVideoMax: parsed.data.priceTo,
+            },
+          }
+        : s,
+    );
     toast("Profile saved!");
     onDone();
   }
@@ -151,22 +186,6 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
         <h3 className="flex items-center gap-1 text-sm font-bold">
           Working together
         </h3>
-        <div className="grid grid-cols-2 gap-2">
-          <Field label={`${isBiz ? "Budget per video from" : "Pay per video from"} ${sym}`} optional error={errors.priceFrom}>
-            <input inputMode="numeric" className={inputCls} placeholder="e.g. 2000" value={form.priceFrom} onChange={set("priceFrom")} aria-invalid={!!errors.priceFrom} />
-          </Field>
-          <Field label={`To ${sym}`} optional error={errors.priceTo}>
-            <input inputMode="numeric" className={inputCls} placeholder="e.g. 10000" value={form.priceTo} onChange={set("priceTo")} aria-invalid={!!errors.priceTo} />
-          </Field>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          <Field label={isBiz ? "Commission you pay %" : "Commission you ask %"} optional error={errors.commissionPercent}>
-            <input inputMode="numeric" className={inputCls} placeholder="e.g. 15" value={form.commissionPercent} onChange={set("commissionPercent")} aria-invalid={!!errors.commissionPercent} />
-          </Field>
-          <Field label={`${isBiz ? "You pay per sale" : "You ask per sale"} ${sym}`} optional error={errors.perSale}>
-            <input inputMode="numeric" className={inputCls} placeholder="e.g. 100" value={form.perSale} onChange={set("perSale")} aria-invalid={!!errors.perSale} />
-          </Field>
-        </div>
         <div>
           <p className="mb-1.5 text-[13px] font-medium">{isBiz ? "How you work with creators" : "Means of earning"}</p>
           <div className="flex flex-wrap gap-1.5">
@@ -187,6 +206,22 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
             })}
           </div>
         </div>
+        {kinds.length > 0 ? (
+          <PriceFields
+            kinds={kinds}
+            currency={form.currency}
+            labels={{ video: isBiz ? "Budget per video" : "Price per video" }}
+            value={{ video: { min: form.priceFrom, max: form.priceTo }, sale: { min: form.perSaleMin, max: form.perSaleMax }, views: { min: form.perThousandMin, max: form.perThousandMax } }}
+            onChange={(k, r) => {
+              const keys = { video: ["priceFrom", "priceTo"], sale: ["perSaleMin", "perSaleMax"], views: ["perThousandMin", "perThousandMax"] }[k] as [keyof Form, keyof Form];
+              setForm((f) => ({ ...f, [keys[0]]: r.min, [keys[1]]: r.max }));
+              setErrors((x) => ({ ...x, [keys[0]]: "", [keys[1]]: "" }));
+            }}
+            errors={{ video: errors.priceTo || errors.priceFrom, sale: errors.perSaleMax || errors.perSaleMin, views: errors.perThousandMax || errors.perThousandMin }}
+          />
+        ) : (
+          form.earningModels.length > 0 && <p className="text-[13px] text-muted">Free PR packages and product seeding are free, so there&apos;s no price to set.</p>
+        )}
       </section>
 
       <section className="space-y-4 border-t border-line pt-4">
@@ -205,6 +240,15 @@ function EditProfile({ session, onDone }: { session: Session; onDone: () => void
         <Field label="Public email" optional error={errors.email}>
           <input type="email" className={inputCls} autoCapitalize="none" placeholder="name@example.com" value={form.email} onChange={set("email")} aria-invalid={!!errors.email} />
         </Field>
+      </section>
+
+      <section className="space-y-4 border-t border-line pt-4">
+        <h3 className="text-sm font-bold">{isBiz ? "Payment gateway" : "Monthly views"}</h3>
+        {isBiz ? (
+          <PaymentGatewayConnect value={gateway} onChange={setGateway} />
+        ) : (
+          <SocialApiFields value={api} onChange={(v) => { setApi(v); setErrors((x) => ({ ...x, apiInstagram: "", apiYoutube: "" })); }} errors={{ instagram: errors.apiInstagram, youtube: errors.apiYoutube }} />
+        )}
       </section>
 
       <div className="sticky bottom-0 -mx-5 flex gap-2 border-t border-line bg-surface px-5 py-3">
@@ -306,6 +350,21 @@ export default function Profile() {
               {session.earningModels!.map((m) => <span key={m} className="rounded-full border border-line px-2.5 py-0.5 text-[12px] font-medium text-muted">{earningLabel(m)}</span>)}
             </p>
           )}
+          <p className="mt-4 flex items-center gap-2 text-[13px]">
+            {isBiz ? (
+              session.paymentGateway ? (
+                <><ShieldCheck className="h-4 w-4 text-brand-700" /> <span><span className="font-semibold">{session.paymentGateway.provider}</span> connected, sales are tracked</span></>
+              ) : (
+                <><CreditCard className="h-4 w-4 text-muted" /> <button onClick={() => setEditing(true)} className="link-draw font-medium">Connect your payment gateway</button></>
+              )
+            ) : session.monthlyViews !== undefined ? (
+              <><Eye className="h-4 w-4 text-brand-700" /> <span><span className="font-semibold tabular-nums">{formatCompact(session.monthlyViews)}</span> monthly views</span></>
+            ) : session.socialApi?.instagram || session.socialApi?.youtube ? (
+              <><Eye className="h-4 w-4 text-muted" /> <span className="text-muted">Social media connected. Your monthly views show here after the first sync.</span></>
+            ) : (
+              <><Eye className="h-4 w-4 text-muted" /> <button onClick={() => setEditing(true)} className="link-draw font-medium">Connect your social media to show monthly views</button></>
+            )}
+          </p>
           <dl className="mt-8 grid max-w-sm grid-cols-3 border-y border-line">
             <div className="flex flex-col py-3"><dt className="text-[12px] text-muted">Posts</dt><dd className="font-display order-first text-xl leading-tight tabular-nums">{myPosts.length}</dd></div>
             <div className="flex flex-col border-l border-line py-3 pl-4"><dt className="text-[12px] text-muted">Reposts</dt><dd className="font-display order-first text-xl leading-tight tabular-nums">{reposts.length}</dd></div>

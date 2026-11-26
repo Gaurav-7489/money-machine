@@ -32,7 +32,7 @@ export const EARNING_MODELS = [
   { id: "affiliate", label: "Affiliate marketing", short: "Affiliate", hint: "Money for every sale made through your link or code." },
   { id: "ugc", label: "UGC", short: "UGC", hint: "Videos or photos made for a brand to use in its own ads." },
   { id: "brand_deal", label: "Brand deals", short: "Brand deals", hint: "A paid collaboration with a brand." },
-  { id: "pr_package", label: "PR packages", short: "PR packages", hint: "Free products sent to you to try and share." },
+  { id: "pr_package", label: "Free PR package", short: "Free PR", hint: "Free products sent to you to try and share. No money changes hands." },
   { id: "sponsored", label: "Sponsored content", short: "Sponsored", hint: "A post, reel or video paid for by a brand." },
   { id: "review", label: "Product reviews", short: "Reviews", hint: "An honest review of a product." },
   { id: "shoutout", label: "Shoutouts", short: "Shoutouts", hint: "A quick mention of a brand or account." },

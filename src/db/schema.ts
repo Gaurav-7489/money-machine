@@ -14,7 +14,6 @@ import {
   index,
   integer,
   jsonb,
-  numeric,
   pgEnum,
   pgTable,
   primaryKey,
@@ -189,14 +188,17 @@ export const affiliatePrograms = pgTable(
     name: varchar("name", { length: 60 }).notNull(),
     description: text("description").notNull(),
     terms: text("terms").notNull(),
-    commissionPercent: numeric("commission_percent", { precision: 5, scale: 2 }).notNull(),
+    /** price paid per confirmed sale, minimum to maximum, in whole units of `currency` */
+    perSaleMin: integer("per_sale_min").notNull(),
+    perSaleMax: integer("per_sale_max").notNull(),
+    currency: varchar("currency", { length: 3 }).notNull().default("INR"),
     cookieWindowDays: integer("cookie_window_days").notNull().default(30),
     landingUrl: text("landing_url"),
     status: programStatusEnum("status").notNull().default("draft"),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (t) => [check("commission_range", sql`${t.commissionPercent} > 0 AND ${t.commissionPercent} <= 90`)],
+  (t) => [check("per_sale_range", sql`${t.perSaleMin} > 0 AND ${t.perSaleMin} <= ${t.perSaleMax}`)],
 );
 
 export const affiliateApplications = pgTable(

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { profileInput } from "./validation";
 
-const base = { displayName: "Asha", bio: "", category: "", country: "", city: "", priceFrom: "", priceTo: "", perSale: "", earningModels: [], instagram: "", youtube: "", x: "", email: "" };
+const base = { displayName: "Asha", bio: "", category: "", country: "", city: "", priceFrom: "", priceTo: "", perSaleMin: "", perSaleMax: "", perThousandMin: "", perThousandMax: "", earningModels: [], instagram: "", youtube: "", x: "", email: "" };
 
 describe("profileInput", () => {
   it("turns empty optional fields into undefined", () => {
@@ -19,5 +19,6 @@ describe("profileInput", () => {
   it("rejects a bad email and a reversed price range", () => {
     expect(profileInput.safeParse({ ...base, email: "nope" }).success).toBe(false);
     expect(profileInput.safeParse({ ...base, priceFrom: "900", priceTo: "100" }).success).toBe(false);
+    expect(profileInput.safeParse({ ...base, perSaleMin: "300", perSaleMax: "100" }).success).toBe(false);
   });
 });

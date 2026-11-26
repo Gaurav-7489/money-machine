@@ -4,6 +4,7 @@ import { Minus, Plus, X } from "lucide-react";
 import { DELIVERABLE_TYPES, EARNING_MODELS, deliverablesText, earningLabel, type Deliverable } from "@/lib/catalog";
 import { DEFAULT_CURRENCY, currencySymbol, formatMoney } from "@/lib/format";
 import type { DealOffer } from "@/lib/types";
+import { PRICE_LABEL, PRICE_UNIT, priceKindOf } from "@/lib/pricing";
 import { Field, inputCls, selectCls } from "./ui";
 
 export interface DealDraft {
@@ -30,8 +31,9 @@ const n = (v: string) => (v.trim() === "" ? undefined : Number(v));
 /** Validates a draft. Returns an error message per field, or the offer. */
 export function checkDeal(d: DealDraft, { noteRequired = true, currency = DEFAULT_CURRENCY }: { noteRequired?: boolean; currency?: string } = {}): { errors: Record<string, string>; offer?: DealOffer } {
   const errors: Record<string, string> = {};
-  const lo = n(d.budgetMin);
-  const hi = n(d.budgetMax);
+  const free = priceKindOf(d.type) === null;
+  const lo = free ? undefined : n(d.budgetMin);
+  const hi = free ? undefined : n(d.budgetMax);
   if (lo !== undefined && hi !== undefined && lo > hi) errors.budget = "The minimum should be smaller than the maximum.";
   if (noteRequired && d.note.trim().length < 5) errors.note = "Write a short message (at least 5 characters).";
   if (d.note.length > 1000) errors.note = "Keep the message under 1000 characters.";
@@ -40,11 +42,14 @@ export function checkDeal(d: DealDraft, { noteRequired = true, currency = DEFAUL
   return { errors, offer: { type: d.type, budgetMin: lo, budgetMax: hi, deliverables, note: d.note.trim(), currency } };
 }
 
-export function budgetText(min?: number, max?: number, currency: string = DEFAULT_CURRENCY): string {
+export function budgetText(min?: number, max?: number, currency: string = DEFAULT_CURRENCY, type?: string): string {
   const f = (v: number) => formatMoney(v, currency);
-  if (min === undefined && max === undefined) return "Budget open";
-  if (min !== undefined && max !== undefined) return min === max ? f(min) : `${f(min)} – ${f(max)}`;
-  return min !== undefined ? `From ${f(min)}` : `Up to ${f(max!)}`;
+  const kind = type ? priceKindOf(type) : "video";
+  if (!kind) return "Free";
+  const unit = type ? ` ${PRICE_UNIT[kind]}` : "";
+  if (min === undefined && max === undefined) return "Price open";
+  if (min !== undefined && max !== undefined) return (min === max ? f(min) : `${f(min)} – ${f(max)}`) + unit;
+  return (min !== undefined ? `From ${f(min)}` : `Up to ${f(max!)}`) + unit;
 }
 
 /** The fields of a deal: type, budget range, deliverables and a note. */
@@ -53,6 +58,7 @@ export function DealFields({ draft, onChange, errors, noteLabel = "Note / messag
   const set = <K extends keyof DealDraft>(k: K, v: DealDraft[K]) => onChange({ ...draft, [k]: v });
   const used = new Set(draft.deliverables.map((d) => d.type));
   const nextType = DELIVERABLE_TYPES.find((t) => !used.has(t));
+  const kind = priceKindOf(draft.type);
 
   return (
     <div className="space-y-4">
@@ -62,8 +68,9 @@ export function DealFields({ draft, onChange, errors, noteLabel = "Note / messag
         </select>
       </Field>
 
+      {kind ? (
       <div>
-        <p className="mb-1.5 text-[13px] font-medium">Budget ({sym}), min to max</p>
+        <p className="mb-1.5 text-[13px] font-medium">{PRICE_LABEL[kind]} ({sym}), min to max</p>
         <div className="grid grid-cols-2 gap-2">
           <label>
             <span className="sr-only">Minimum budget ({sym})</span>
@@ -76,6 +83,9 @@ export function DealFields({ draft, onChange, errors, noteLabel = "Note / messag
         </div>
         {errors.budget && <p role="alert" className="mt-1 text-[12px] text-danger">{errors.budget}</p>}
       </div>
+      ) : (
+        <p className="rounded-xl bg-elevated px-3 py-2 text-[13px] text-muted">This one is free, so there&apos;s no price to add.</p>
+      )}
 
       <div>
         <p className="mb-1.5 flex items-baseline justify-between text-[13px] font-medium">
@@ -129,8 +139,8 @@ export function DealSummary({ deal, compact = false }: { deal: DealOffer; compac
       </div>
       <dl className="grid grid-cols-2 gap-2 px-3.5 py-3 text-[13px]">
         <div>
-          <dt className="text-[11px] text-muted">Budget</dt>
-          <dd className="font-semibold">{budgetText(deal.budgetMin, deal.budgetMax, deal.currency)}</dd>
+          <dt className="text-[11px] text-muted">{priceKindOf(deal.type) ? PRICE_LABEL[priceKindOf(deal.type)!] : "Price"}</dt>
+          <dd className="font-semibold">{budgetText(deal.budgetMin, deal.budgetMax, deal.currency, deal.type)}</dd>
         </div>
         <div>
           <dt className="text-[11px] text-muted">Deliverables</dt>

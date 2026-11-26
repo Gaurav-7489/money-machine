@@ -31,10 +31,16 @@ export interface Profile {
   /** creators: what they charge per video; businesses: their usual budget per video (whole ₹) */
   priceFrom: number;
   priceTo: number;
-  /** ₹ per confirmed sale: what a creator asks / what a business pays */
-  perSale?: number;
-  /** affiliate commission %: what a creator asks / what a business pays */
-  commissionPercent?: number;
+  /** price per confirmed sale (affiliate), min to max: what a creator asks / what a business pays */
+  perSaleMin?: number;
+  perSaleMax?: number;
+  /** UGC price per 1,000 views, min to max */
+  perThousandMin?: number;
+  perThousandMax?: number;
+  /** creators: monthly views from their connected social accounts (sample) */
+  monthlyViews?: number;
+  /** businesses: a payment gateway is connected, so sales are verified (sample) */
+  gatewayConnected?: boolean;
   earningModels: string[];
   socials: { instagram?: string; youtube?: string; x?: string };
   email?: string;
@@ -43,31 +49,49 @@ export interface Profile {
 }
 
 const CITY_REGION: Record<string, string> = { Mumbai: "Maharashtra", Pune: "Maharashtra", Bengaluru: "Karnataka", Delhi: "Delhi", Hyderabad: "Telangana", Chennai: "Tamil Nadu", Jaipur: "Rajasthan", Dubai: "Dubai", London: "England" };
-const P = (p: Omit<Profile, "category" | "currency"> & { category?: string }): Profile => ({ ...p, region: p.region ?? CITY_REGION[p.city], currency: "INR", category: p.category ?? p.niches[0]! });
+const r10 = (v: number) => Math.max(10, Math.round(v / 10) * 10);
+type Seed = Omit<Profile, "category" | "currency" | "perSaleMin" | "perSaleMax" | "perThousandMin" | "perThousandMax"> & { category?: string; perSale?: number; commissionPercent?: number; views?: number };
+/** Sample profiles: per-sale and per-1K-view prices are filled in from the seed so every way of working has a price. */
+const P = ({ perSale, commissionPercent: _c, views, ...p }: Seed): Profile => {
+  const affiliate = p.earningModels.includes("affiliate");
+  const ugc = p.earningModels.includes("ugc");
+  const sale = perSale ?? (affiliate ? r10(p.priceFrom / 50) : undefined);
+  return {
+    ...p,
+    region: p.region ?? CITY_REGION[p.city],
+    currency: "INR",
+    category: p.category ?? p.niches[0]!,
+    perSaleMin: sale,
+    perSaleMax: sale !== undefined ? r10(sale * 1.6) : undefined,
+    perThousandMin: ugc ? r10(p.priceFrom / 25) : undefined,
+    perThousandMax: ugc ? r10(p.priceTo / 25) : undefined,
+    monthlyViews: p.kind === "creator" ? views : undefined,
+  };
+};
 
 export const SAMPLE_PROFILES: Profile[] = [
   // ── creators ──
-  P({ handle: "aanya.creates", name: "Aanya Mehra", kind: "creator", niche: "Skincare · Makeup", tone: "rose", verified: true, bio: "Slow mornings and honest reviews.", niches: ["Skincare", "Makeup"], country: "India", city: "Mumbai", priceFrom: 8000, priceTo: 25000, perSale: 150, commissionPercent: 15, earningModels: ["brand_deal", "affiliate", "pr_package", "review"], socials: { instagram: "aanya.creates", youtube: "aanyacreates" } }),
-  P({ handle: "rohitvlogs", name: "Rohit Vlogs", kind: "creator", niche: "Travel · Vlogs", tone: "sky", bio: "Weekend trips and budget travel.", niches: ["Travel", "Lifestyle"], country: "India", city: "Pune", priceFrom: 5000, priceTo: 15000, earningModels: ["sponsored", "partnership", "event"], socials: { instagram: "rohitvlogs", youtube: "rohitvlogs" } }),
-  P({ handle: "kavya.fit", name: "Kavya Fit", kind: "creator", niche: "Fitness", tone: "lime", bio: "Home workouts that actually stick.", niches: ["Fitness", "Wellness"], country: "India", city: "Bengaluru", priceFrom: 3000, priceTo: 10000, perSale: 100, commissionPercent: 12, earningModels: ["affiliate", "ugc", "brand_deal", "ambassador"], socials: { instagram: "kavya.fit", x: "kavyafit" } }),
-  P({ handle: "meera.home", name: "Meera Nest", kind: "creator", niche: "Home Decor", tone: "amber", bio: "Small flats, big personality.", niches: ["Home Decor", "Lifestyle"], country: "India", city: "Delhi", priceFrom: 6000, priceTo: 18000, commissionPercent: 10, earningModels: ["ugc", "pr_package", "seeding", "review"], socials: { instagram: "meera.home" } }),
-  P({ handle: "zoya.glam", name: "Zoya Glam", kind: "creator", niche: "Makeup · Haircare", tone: "violet", verified: true, bio: "Bridal looks, 5-minute faces and everything in between.", niches: ["Makeup", "Haircare", "Fashion"], country: "United Arab Emirates", city: "Dubai", priceFrom: 15000, priceTo: 60000, perSale: 250, commissionPercent: 20, earningModels: ["brand_deal", "sponsored", "ambassador", "event"], socials: { instagram: "zoya.glam", youtube: "zoyaglam" } }),
-  P({ handle: "arjun.tech", name: "Arjun Unboxed", kind: "creator", niche: "Tech · Gadgets", tone: "sky", bio: "Gadgets tested for a month before I say a word.", niches: ["Tech", "Gaming"], country: "India", city: "Hyderabad", priceFrom: 10000, priceTo: 40000, perSale: 300, commissionPercent: 8, earningModels: ["review", "sponsored", "affiliate", "shoutout"], socials: { youtube: "arjununboxed", x: "arjuntech" } }),
-  P({ handle: "nisha.eats", name: "Nisha Eats", kind: "creator", niche: "Food", tone: "amber", bio: "15-minute dinners for busy people.", niches: ["Food", "Lifestyle"], country: "India", city: "Chennai", priceFrom: 4000, priceTo: 12000, commissionPercent: 10, earningModels: ["ugc", "brand_deal", "shoutout", "seeding"], socials: { instagram: "nisha.eats" } }),
-  P({ handle: "sana.skin", name: "Sana Derm Diaries", kind: "creator", niche: "Lifestyle", tone: "mint", bio: "Real life, real routines, no filters.", niches: ["Lifestyle", "Wellness"], country: "United Kingdom", city: "London", priceFrom: 9000, priceTo: 30000, perSale: 180, commissionPercent: 18, earningModels: ["affiliate", "ugc", "review", "pr_package"], socials: { instagram: "sana.skin" } }),
-  P({ handle: "dev.parent", name: "Dev & Tiny", kind: "creator", niche: "Parenting", tone: "lime", bio: "Dad of two, chaos documented.", niches: ["Parenting", "Home Decor"], country: "India", city: "Mumbai", priceFrom: 5000, priceTo: 14000, earningModels: ["brand_deal", "pr_package", "seeding"], socials: { instagram: "dev.parent", youtube: "devandtiny" } }),
-  P({ handle: "riya.style", name: "Riya Threads", kind: "creator", niche: "Fashion", tone: "rose", bio: "Thrift flips and capsule wardrobes.", niches: ["Fashion", "Lifestyle"], country: "India", city: "Jaipur", priceFrom: 3500, priceTo: 9000, perSale: 90, commissionPercent: 12, earningModels: ["affiliate", "ugc", "shoutout", "partnership"], socials: { instagram: "riya.style", x: "riyastyle" } }),
+  P({ handle: "aanya.creates", name: "Aanya Mehra", kind: "creator", views: 1240000, niche: "Skincare · Makeup", tone: "rose", verified: true, bio: "Slow mornings and honest reviews.", niches: ["Skincare", "Makeup"], country: "India", city: "Mumbai", priceFrom: 8000, priceTo: 25000, perSale: 150, commissionPercent: 15, earningModels: ["brand_deal", "affiliate", "pr_package", "review"], socials: { instagram: "aanya.creates", youtube: "aanyacreates" } }),
+  P({ handle: "rohitvlogs", name: "Rohit Vlogs", kind: "creator", views: 380000, niche: "Travel · Vlogs", tone: "sky", bio: "Weekend trips and budget travel.", niches: ["Travel", "Lifestyle"], country: "India", city: "Pune", priceFrom: 5000, priceTo: 15000, earningModels: ["sponsored", "partnership", "event"], socials: { instagram: "rohitvlogs", youtube: "rohitvlogs" } }),
+  P({ handle: "kavya.fit", name: "Kavya Fit", kind: "creator", views: 215000, niche: "Fitness", tone: "lime", bio: "Home workouts that actually stick.", niches: ["Fitness", "Wellness"], country: "India", city: "Bengaluru", priceFrom: 3000, priceTo: 10000, perSale: 100, commissionPercent: 12, earningModels: ["affiliate", "ugc", "brand_deal", "ambassador"], socials: { instagram: "kavya.fit", x: "kavyafit" } }),
+  P({ handle: "meera.home", name: "Meera Nest", kind: "creator", views: 460000, niche: "Home Decor", tone: "amber", bio: "Small flats, big personality.", niches: ["Home Decor", "Lifestyle"], country: "India", city: "Delhi", priceFrom: 6000, priceTo: 18000, commissionPercent: 10, earningModels: ["ugc", "pr_package", "seeding", "review"], socials: { instagram: "meera.home" } }),
+  P({ handle: "zoya.glam", name: "Zoya Glam", kind: "creator", views: 2900000, niche: "Makeup · Haircare", tone: "violet", verified: true, bio: "Bridal looks, 5-minute faces and everything in between.", niches: ["Makeup", "Haircare", "Fashion"], country: "United Arab Emirates", city: "Dubai", priceFrom: 15000, priceTo: 60000, perSale: 250, commissionPercent: 20, earningModels: ["brand_deal", "sponsored", "ambassador", "event"], socials: { instagram: "zoya.glam", youtube: "zoyaglam" } }),
+  P({ handle: "arjun.tech", name: "Arjun Unboxed", kind: "creator", views: 1750000, niche: "Tech · Gadgets", tone: "sky", bio: "Gadgets tested for a month before I say a word.", niches: ["Tech", "Gaming"], country: "India", city: "Hyderabad", priceFrom: 10000, priceTo: 40000, perSale: 300, commissionPercent: 8, earningModels: ["review", "sponsored", "affiliate", "shoutout"], socials: { youtube: "arjununboxed", x: "arjuntech" } }),
+  P({ handle: "nisha.eats", name: "Nisha Eats", kind: "creator", views: 290000, niche: "Food", tone: "amber", bio: "15-minute dinners for busy people.", niches: ["Food", "Lifestyle"], country: "India", city: "Chennai", priceFrom: 4000, priceTo: 12000, commissionPercent: 10, earningModels: ["ugc", "brand_deal", "shoutout", "seeding"], socials: { instagram: "nisha.eats" } }),
+  P({ handle: "sana.skin", name: "Sana Derm Diaries", kind: "creator", views: 820000, niche: "Lifestyle", tone: "mint", bio: "Real life, real routines, no filters.", niches: ["Lifestyle", "Wellness"], country: "United Kingdom", city: "London", priceFrom: 9000, priceTo: 30000, perSale: 180, commissionPercent: 18, earningModels: ["affiliate", "ugc", "review", "pr_package"], socials: { instagram: "sana.skin" } }),
+  P({ handle: "dev.parent", name: "Dev & Tiny", kind: "creator", views: 340000, niche: "Parenting", tone: "lime", bio: "Dad of two, chaos documented.", niches: ["Parenting", "Home Decor"], country: "India", city: "Mumbai", priceFrom: 5000, priceTo: 14000, earningModels: ["brand_deal", "pr_package", "seeding"], socials: { instagram: "dev.parent", youtube: "devandtiny" } }),
+  P({ handle: "riya.style", name: "Riya Threads", kind: "creator", views: 175000, niche: "Fashion", tone: "rose", bio: "Thrift flips and capsule wardrobes.", niches: ["Fashion", "Lifestyle"], country: "India", city: "Jaipur", priceFrom: 3500, priceTo: 9000, perSale: 90, commissionPercent: 12, earningModels: ["affiliate", "ugc", "shoutout", "partnership"], socials: { instagram: "riya.style", x: "riyastyle" } }),
 
   // ── businesses ──
-  P({ handle: "glowhabit", name: "Glow Habit", kind: "business", niche: "Skincare brand", tone: "rose", verified: true, bio: "Clean skincare for everyday glow.", niches: ["Skincare", "Wellness"], country: "India", city: "Mumbai", priceFrom: 5000, priceTo: 30000, perSale: 120, commissionPercent: 15, earningModels: ["affiliate", "pr_package", "brand_deal", "ugc"], socials: { instagram: "glowhabit" }, email: "collabs@glowhabit.example" }),
-  P({ handle: "fitlife", name: "FitLife", kind: "business", niche: "Fitness brand", tone: "mint", bio: "Supplements and gear for active living.", niches: ["Fitness", "Wellness"], country: "India", city: "Delhi", priceFrom: 2000, priceTo: 12000, perSale: 80, commissionPercent: 10, earningModels: ["affiliate", "ugc", "ambassador"], socials: { instagram: "fitlife", youtube: "fitlifeofficial" }, email: "partners@fitlife.example" }),
+  P({ handle: "glowhabit", name: "Glow Habit", kind: "business", gatewayConnected: true, niche: "Skincare brand", tone: "rose", verified: true, bio: "Clean skincare for everyday glow.", niches: ["Skincare", "Wellness"], country: "India", city: "Mumbai", priceFrom: 5000, priceTo: 30000, perSale: 120, commissionPercent: 15, earningModels: ["affiliate", "pr_package", "brand_deal", "ugc"], socials: { instagram: "glowhabit" }, email: "collabs@glowhabit.example" }),
+  P({ handle: "fitlife", name: "FitLife", kind: "business", gatewayConnected: true, niche: "Fitness brand", tone: "mint", bio: "Supplements and gear for active living.", niches: ["Fitness", "Wellness"], country: "India", city: "Delhi", priceFrom: 2000, priceTo: 12000, perSale: 80, commissionPercent: 10, earningModels: ["affiliate", "ugc", "ambassador"], socials: { instagram: "fitlife", youtube: "fitlifeofficial" }, email: "partners@fitlife.example" }),
   P({ handle: "brandco", name: "BrandCo", kind: "business", niche: "Lifestyle brand", tone: "violet", bio: "Everyday lifestyle essentials.", niches: ["Lifestyle", "Home Decor"], country: "United Arab Emirates", city: "Dubai", priceFrom: 10000, priceTo: 50000, perSale: 200, commissionPercent: 20, earningModels: ["sponsored", "partnership", "event"], socials: { instagram: "brandco", x: "brandco" } }),
   // Bio says nothing about skincare — only its posts do. Search still finds it.
   P({ handle: "dewdrop.labs", name: "Dewdrop Labs", kind: "business", niche: "Beauty lab", tone: "sky", bio: "Small-batch formulas, made in Pune.", niches: ["Wellness"], country: "India", city: "Pune", priceFrom: 4000, priceTo: 20000, commissionPercent: 18, earningModels: ["seeding", "pr_package", "affiliate", "review"], socials: { instagram: "dewdroplabs" } }),
   P({ handle: "nestandco", name: "Nest & Co", kind: "business", niche: "Home Decor brand", tone: "amber", bio: "Handmade cushions, lamps and throws.", niches: ["Home Decor"], country: "India", city: "Bengaluru", priceFrom: 3000, priceTo: 15000, commissionPercent: 12, earningModels: ["ugc", "seeding", "affiliate"], socials: { instagram: "nestandco" } }),
-  P({ handle: "lumen.audio", name: "Lumen Audio", kind: "business", niche: "Tech brand", tone: "violet", bio: "Earbuds and speakers tuned in Singapore.", niches: ["Tech"], country: "Singapore", city: "Singapore", priceFrom: 15000, priceTo: 80000, perSale: 400, commissionPercent: 8, earningModels: ["review", "sponsored", "affiliate", "ambassador"], socials: { youtube: "lumenaudio", x: "lumenaudio" } }),
+  P({ handle: "lumen.audio", name: "Lumen Audio", kind: "business", gatewayConnected: true, niche: "Tech brand", tone: "violet", bio: "Earbuds and speakers tuned in Singapore.", niches: ["Tech"], country: "Singapore", city: "Singapore", priceFrom: 15000, priceTo: 80000, perSale: 400, commissionPercent: 8, earningModels: ["review", "sponsored", "affiliate", "ambassador"], socials: { youtube: "lumenaudio", x: "lumenaudio" } }),
   P({ handle: "masala.box", name: "Masala Box", kind: "business", niche: "Food brand", tone: "lime", bio: "Spice kits delivered every month.", niches: ["Food"], country: "India", city: "Hyderabad", priceFrom: 2500, priceTo: 10000, perSale: 60, commissionPercent: 15, earningModels: ["ugc", "seeding", "shoutout", "affiliate"], socials: { instagram: "masalabox" } }),
-  P({ handle: "velvet.beauty", name: "Velvet Beauty", kind: "business", niche: "Makeup brand", tone: "rose", verified: true, bio: "Long-wear colour for every skin tone.", niches: ["Makeup", "Haircare"], country: "United Kingdom", city: "London", priceFrom: 12000, priceTo: 60000, perSale: 220, commissionPercent: 20, earningModels: ["brand_deal", "ambassador", "event", "pr_package"], socials: { instagram: "velvetbeauty" } }),
+  P({ handle: "velvet.beauty", name: "Velvet Beauty", kind: "business", gatewayConnected: true, niche: "Makeup brand", tone: "rose", verified: true, bio: "Long-wear colour for every skin tone.", niches: ["Makeup", "Haircare"], country: "United Kingdom", city: "London", priceFrom: 12000, priceTo: 60000, perSale: 220, commissionPercent: 20, earningModels: ["brand_deal", "ambassador", "event", "pr_package"], socials: { instagram: "velvetbeauty" } }),
 
   // ── system accounts (never in Search) ──
   P({ handle: ADMIN_HANDLE, name: "Money Machine", kind: "business", niche: "Official", tone: "violet", verified: true, bio: "The official Money Machine team. We connect creators and brands for you.", niches: ["Lifestyle"], country: "India", city: "Mumbai", priceFrom: 0, priceTo: 0, earningModels: [], socials: {}, system: "admin" }),
@@ -113,9 +137,9 @@ export const SAMPLE_COMMENTS = [
 ];
 
 export const SAMPLE_PROGRAMS: AffiliateProgram[] = [
-  { id: "s_prog_glow", name: "Glow Habit Affiliate", brand: "Glow Habit", commissionPercent: 15, description: "Share our everyday skincare range with your audience.", terms: "Commission on confirmed sales through your link. Disclose the partnership in every post.", status: "active", ownerHandle: "glowhabit", createdAt: hoursAgo(300), sample: true },
-  { id: "s_prog_fit", name: "FitLife Affiliate", brand: "FitLife", commissionPercent: 10, description: "Promote supplements and gear to fitness audiences.", terms: "Commission on confirmed sales. No medical claims.", status: "active", ownerHandle: "fitlife", createdAt: hoursAgo(500), sample: true },
-  { id: "s_prog_brandco", name: "BrandCo Affiliate", brand: "BrandCo", commissionPercent: 20, description: "Lifestyle essentials for home and travel.", terms: "Commission on confirmed sales within 30 days of click.", status: "active", ownerHandle: "brandco", createdAt: hoursAgo(800), sample: true },
+  { id: "s_prog_glow", name: "Glow Habit Affiliate", brand: "Glow Habit", perSaleMin: 120, perSaleMax: 200, currency: "INR", description: "Share our everyday skincare range with your audience.", terms: "Paid per confirmed sale through your link. Disclose the partnership in every post.", status: "active", ownerHandle: "glowhabit", createdAt: hoursAgo(300), sample: true },
+  { id: "s_prog_fit", name: "FitLife Affiliate", brand: "FitLife", perSaleMin: 80, perSaleMax: 150, currency: "INR", description: "Promote supplements and gear to fitness audiences.", terms: "Paid per confirmed sale. No medical claims.", status: "active", ownerHandle: "fitlife", createdAt: hoursAgo(500), sample: true },
+  { id: "s_prog_brandco", name: "BrandCo Affiliate", brand: "BrandCo", perSaleMin: 200, perSaleMax: 350, currency: "INR", description: "Lifestyle essentials for home and travel.", terms: "Paid per confirmed sale within 30 days of click.", status: "active", ownerHandle: "brandco", createdAt: hoursAgo(800), sample: true },
 ];
 
 export const SAMPLE_OPPORTUNITIES: Opportunity[] = [
@@ -150,7 +174,7 @@ export const SAMPLE_THREADS: SampleThread[] = [
     role: "creator",
     dealType: "affiliate",
     unread: true,
-    inbound: [{ body: "We'd love you in our affiliate program!", at: hoursAgo(1), deal: { type: "affiliate", deliverables: [{ count: 2, type: "Reels" }, { count: 3, type: "Photos" }], note: "15% on every sale through your code, plus a launch kit.", budgetMin: 5000, budgetMax: 12000 } }],
+    inbound: [{ body: "We'd love you in our affiliate program!", at: hoursAgo(1), deal: { type: "affiliate", deliverables: [{ count: 2, type: "Reels" }, { count: 3, type: "Photos" }], note: "₹150 on every sale through your code, plus a launch kit.", budgetMin: 5000, budgetMax: 12000 } }],
   },
   {
     id: "t_fit",

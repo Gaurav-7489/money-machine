@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { Briefcase, Check, Megaphone, Plus, Trash2 } from "lucide-react";
+import { Briefcase, Check, Megaphone, Plus, Search, SearchX, Trash2, X } from "lucide-react";
 import { Photo } from "./photo";
 import { ImageSlot, MediaImage } from "./image-slot";
 import { DEFAULT_CURRENCY } from "@/lib/format";
@@ -131,7 +131,7 @@ export function OpportunityCard({ o }: { o: Opportunity }) {
         <p className="mt-2 text-[14px]">{o.details}</p>
         <div className="mt-3 flex flex-wrap gap-1.5 text-[12px]">
           <span className="rounded-full bg-primary px-2.5 py-1 font-semibold text-on-primary">{earningLabel(o.type)}</span>
-          <span className="rounded-full bg-signal px-2.5 py-1 font-semibold tabular-nums text-on-signal">{budgetText(o.budgetMin, o.budgetMax, o.currency)}</span>
+          <span className="rounded-full bg-signal px-2.5 py-1 font-semibold tabular-nums text-on-signal">{budgetText(o.budgetMin, o.budgetMax, o.currency, o.type)}</span>
           {o.deliverables.length > 0 && <span className="rounded-full border border-line px-2.5 py-1 font-medium">{deliverablesText(o.deliverables)}</span>}
           {o.niches.map((n) => <span key={n} className="rounded-full bg-elevated px-2.5 py-1 font-medium">{n}</span>)}
         </div>
@@ -149,8 +149,17 @@ export function OpportunityList() {
   const { session } = useStore();
   const all = useOpportunities();
   const [posting, setPosting] = useState(false);
+  const [q, setQ] = useState("");
   const isBiz = session?.role === "business";
-  const mineFirst = isBiz ? [...all.filter((o) => o.ownerHandle === session?.handle), ...all.filter((o) => o.ownerHandle !== session?.handle)] : all;
+  const ordered = isBiz ? [...all.filter((o) => o.ownerHandle === session?.handle), ...all.filter((o) => o.ownerHandle !== session?.handle)] : all;
+  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const mineFirst = words.length
+    ? ordered.filter((o) => {
+        const owner = o.ownerHandle === session?.handle ? session.displayName : profileByHandle(o.ownerHandle)?.name ?? o.ownerHandle;
+        const text = [o.title, o.details, owner, o.ownerHandle, earningLabel(o.type), ...o.niches, deliverablesText(o.deliverables)].join(" ").toLowerCase();
+        return words.every((w) => text.includes(w));
+      })
+    : ordered;
 
   return (
     <div>
@@ -165,12 +174,29 @@ export function OpportunityList() {
       ) : (
         <p className="mb-4 flex items-center gap-2 border-l-2 border-signal pl-3 text-[13px] text-muted"><Briefcase className="h-4 w-4 shrink-0" /> Brands post paid work here. Tap <strong>Apply now</strong> and we send your application to their Messages.</p>
       )}
+      <div className="relative mb-4">
+        <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+        <label htmlFor="opp-q" className="sr-only">Search opportunities</label>
+        <input
+          id="opp-q"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          enterKeyHint="search"
+          placeholder="Search opportunities e.g. skincare, UGC, reels"
+          className="h-12 w-full rounded-full border border-line bg-surface pl-11 pr-11 text-[15px] outline-none transition-colors placeholder:text-muted/80 focus:border-brand-400"
+        />
+        {q && (
+          <button type="button" onClick={() => setQ("")} className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full text-muted hover:bg-elevated" aria-label="Clear search">
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
       {mineFirst.length ? (
         <ul className="stagger space-y-4">
           {mineFirst.map((o, i) => <li key={o.id} style={{ ["--i" as string]: Math.min(i, 6) }}><OpportunityCard o={o} /></li>)}
         </ul>
       ) : (
-        <EmptyState icon={<Briefcase className="h-5 w-5" />} title="No opportunities yet" body="New paid work from brands will appear here." />
+        <EmptyState icon={words.length ? <SearchX className="h-5 w-5" /> : <Briefcase className="h-5 w-5" />} title={words.length ? `Nothing found for “${q.trim()}”` : "No opportunities yet"} body={words.length ? "Try another word, like “fitness” or “reels”." : "New paid work from brands will appear here."} />
       )}
       {isBiz && <PostOpportunity open={posting} onClose={() => setPosting(false)} />}
     </div>
