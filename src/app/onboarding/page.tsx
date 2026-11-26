@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BadgeIndianRupee, Briefcase, Check, ChevronLeft, MapPin, Search, Sparkles, UserRound } from "lucide-react";
+import { BadgeIndianRupee, Briefcase, Check, ChevronLeft, ChevronRight, MapPin, Search, Sparkles, UserRound } from "lucide-react";
 import Link from "next/link";
 import { Button, Field, inputCls, selectCls } from "@/components/ui";
 import { EARNING_MODELS, NICHES } from "@/lib/catalog";
@@ -95,6 +95,68 @@ function EarnPicker({ value, onChange }: { value: string[]; onChange: (v: string
   return <PhotoPicker items={EARNING_MODELS.map((m) => ({ id: m.id, label: m.label, photo: EARN_PHOTO[m.id] ?? STORY.deal }))} value={value} onChange={onChange} cols="grid-cols-2" wide="sm:grid-cols-3 lg:grid-cols-4" />;
 }
 
+/**
+ * A horizontal glider: the mouse wheel moves it sideways, you can drag it with
+ * the mouse, and on larger screens there are left and right arrows.
+ */
+function Glider({ label, children }: { label: string; children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const wheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }
+    };
+    el.addEventListener("wheel", wheel, { passive: false });
+    return () => el.removeEventListener("wheel", wheel);
+  }, []);
+
+  const by = (dir: number) => ref.current?.scrollBy({ left: dir * 260, behavior: "smooth" });
+
+  return (
+    <div className="group relative">
+      <button type="button" onClick={() => by(-1)} aria-label={`Scroll ${label} left`} className="absolute left-0 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-line bg-surface shadow-sm transition hover:scale-105 md:grid">
+        <ChevronLeft className="h-4 w-4" />
+      </button>
+      <div
+        ref={ref}
+        role="radiogroup"
+        aria-label={label}
+        onPointerDown={(e) => {
+          if (e.pointerType !== "mouse") return;
+          drag.current = { x: e.clientX, left: ref.current?.scrollLeft ?? 0, moved: false };
+        }}
+        onPointerMove={(e) => {
+          const d = drag.current;
+          if (!d || !ref.current) return;
+          const dx = e.clientX - d.x;
+          if (Math.abs(dx) > 4) d.moved = true;
+          ref.current.scrollLeft = d.left - dx;
+        }}
+        onPointerUp={() => setTimeout(() => (drag.current = null), 0)}
+        onPointerLeave={() => (drag.current = null)}
+        onClickCapture={(e) => {
+          if (drag.current?.moved) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }}
+        className="no-scrollbar -mx-5 flex cursor-grab snap-x gap-2 overflow-x-auto scroll-smooth px-5 pb-1 select-none [scrollbar-width:thin] active:cursor-grabbing md:mx-0 md:px-10 md:[scrollbar-width:auto]"
+      >
+        {children}
+      </div>
+      <button type="button" onClick={() => by(1)} aria-label={`Scroll ${label} right`} className="absolute right-0 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-line bg-surface shadow-sm transition hover:scale-105 md:grid">
+        <ChevronRight className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
+
 /** Country and state as horizontal sliders, with a search box for countries. */
 function LocationSlider({ value, onChange }: { value: { country: string; region: string }; onChange: (v: { country: string; region: string; currency: string }) => void }) {
   const geo = useGeo();
@@ -112,7 +174,7 @@ function LocationSlider({ value, onChange }: { value: { country: string; region:
           <label htmlFor="country-q" className="sr-only">Search country</label>
           <input id="country-q" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search your country" autoComplete="off" className="h-11 w-full rounded-full border border-line bg-surface pl-10 pr-4 text-[15px] outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100" />
         </div>
-        <div className="no-scrollbar -mx-5 flex snap-x gap-2 overflow-x-auto px-5 pb-1" role="radiogroup" aria-label="Country">
+        <Glider label="Country">
           {countries.map((c) => {
             const on = value.country === c.name;
             return (
@@ -124,12 +186,12 @@ function LocationSlider({ value, onChange }: { value: { country: string; region:
             );
           })}
           {countries.length === 0 && <p className="py-2 text-[13px] text-muted">No country matches “{q.trim()}”.</p>}
-        </div>
+        </Glider>
       </div>
       {regions.length > 0 && (
         <div className="animate-fade-up space-y-2.5">
           <p className="text-[13px] font-medium text-muted">State / region</p>
-          <div className="no-scrollbar -mx-5 flex snap-x gap-2 overflow-x-auto px-5 pb-1" role="radiogroup" aria-label="State or region">
+          <Glider label="State or region">
             {regions.map((r) => {
               const on = value.region === r.name;
               return (
@@ -139,7 +201,7 @@ function LocationSlider({ value, onChange }: { value: { country: string; region:
                 </button>
               );
             })}
-          </div>
+          </Glider>
         </div>
       )}
     </div>
