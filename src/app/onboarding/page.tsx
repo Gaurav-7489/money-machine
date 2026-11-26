@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Briefcase, Check, ChevronLeft, Sparkles, UserRound } from "lucide-react";
+import { BadgeIndianRupee, Briefcase, Check, ChevronLeft, MapPin, Sparkles, UserRound } from "lucide-react";
 import Link from "next/link";
 import { Button, Field, inputCls, selectCls } from "@/components/ui";
 import { EARNING_MODELS, NICHES } from "@/lib/catalog";
@@ -253,8 +253,14 @@ export default function Onboarding() {
 
           {step === 3 && (
             <>
-              <h1 className="mb-6 text-2xl font-bold tracking-tight">Almost there</h1>
-              <div className="space-y-4">
+              <div className="animate-fade-up relative mb-6 aspect-[16/7] overflow-hidden rounded-2xl bg-elevated md:aspect-[16/6]">
+                <Image src={photoSrc(STORY.shop, 900)} alt="" fill sizes="(min-width: 1024px) 768px, 100vw" priority className="object-cover" />
+                <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" aria-hidden="true" />
+                <h1 className="absolute inset-x-4 bottom-3.5 text-2xl font-bold tracking-tight text-white md:text-3xl">Almost there</h1>
+              </div>
+              <div className="space-y-6">
+                <section className="space-y-3">
+                  <p className="flex items-center gap-2 text-[14px] font-semibold"><span className="grid h-7 w-7 place-items-center rounded-full bg-brand-50 text-brand-600"><MapPin className="h-4 w-4" /></span> Where are you based?</p>
                 <div>
                   <LocationPicker
                     optional={false}
@@ -268,6 +274,9 @@ export default function Onboarding() {
                   />
                   {errors.location && <p role="alert" className="animate-fade-up mt-2 text-[13px] text-danger">{errors.location}</p>}
                 </div>
+                </section>
+                <section className="space-y-3">
+                  <p className="flex items-center gap-2 text-[14px] font-semibold"><span className="grid h-7 w-7 place-items-center rounded-full bg-brand-50 text-brand-600"><BadgeIndianRupee className="h-4 w-4" /></span> {isBiz ? "Your budget" : "Your rate"}</p>
                 {kinds.length > 0 ? (
                   <>
                     <button
@@ -301,6 +310,7 @@ export default function Onboarding() {
                 ) : (
                   <p className="text-[13px] text-muted">Free PR packages and product seeding are free, so there&apos;s no price to set.</p>
                 )}
+                </section>
               </div>
             </>
           )}
