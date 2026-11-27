@@ -2,17 +2,13 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Plus, UsersRound } from "lucide-react";
-import { Avatar } from "@/components/art";
+import { UsersRound } from "lucide-react";
 import { Composer } from "@/components/feed/composer";
 import { PostCard, type FeedPost } from "@/components/feed/post-card";
 import { OpportunityList } from "@/components/opportunities";
 import { GrowthCard, ProgramsCard, TabletQuickCards } from "@/components/side-panels";
 import { EmptyState } from "@/components/ui";
 import { useFeed } from "@/lib/feed";
-import { filtersFromProfile, findMatches } from "@/lib/match";
-import { SEARCHABLE_PROFILES } from "@/lib/sample-data";
-import { usePostIndex } from "@/lib/search-index";
 import { useStore } from "@/lib/store";
 
 const TABS = [
@@ -21,38 +17,6 @@ const TABS = [
   { id: "opps", label: "Opportunities" },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
-
-/** "Matched for you": story-style avatars of the people Money Machine thinks you should meet. */
-function MatchedRow() {
-  const { session } = useStore();
-  const posts = usePostIndex();
-  const list = useMemo(() => (session ? findMatches(SEARCHABLE_PROFILES, filtersFromProfile(session), 50, posts).slice(0, 12) : []), [session, posts]);
-  if (!session) return null;
-  return (
-    <div className="no-scrollbar -mx-4 mb-4 flex gap-4 overflow-x-auto px-4 pb-1 md:hidden" aria-label="Matched for you">
-      <Link href="/create" className="flex w-16 shrink-0 flex-col items-center gap-1">
-        <span className="relative">
-          <Avatar name={session.displayName} tone="rose" size="lg" photoId={session.avatarId} />
-          <span className="absolute bottom-0 right-0 grid h-5 w-5 place-items-center rounded-full bg-brand-600 text-white ring-2 ring-canvas">
-            <Plus className="h-3 w-3" strokeWidth={3} />
-          </span>
-        </span>
-        <span className="text-[11px]">Your post</span>
-      </Link>
-      {list.map(({ profile: p, percent }) => (
-        <Link key={p.handle} href={`/u/${p.handle}`} className="flex w-16 shrink-0 flex-col items-center gap-1" aria-label={`${p.name}${percent !== null ? `, ${percent}% match` : ""}`}>
-          <span className="relative rounded-full bg-gradient-to-tr from-brand-500 via-aqua to-lime p-[2px]">
-            <span className="block rounded-full bg-canvas p-[2px]">
-              <Avatar name={p.name} tone={p.tone} size="lg" square={p.kind === "business"} />
-            </span>
-            {percent !== null && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-brand-600 px-1.5 text-[10px] font-bold tabular-nums text-white ring-2 ring-canvas">{percent}%</span>}
-          </span>
-          <span className="w-full truncate text-center text-[11px]">{p.handle}</span>
-        </Link>
-      ))}
-    </div>
-  );
-}
 
 /** For you: entertainment first. Newer posts and posts with more conversation rise. */
 function rank(feed: FeedPost[]): FeedPost[] {
@@ -76,7 +40,6 @@ export default function Home() {
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[minmax(0,1fr)_240px] lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="mx-auto w-full max-w-xl">
         <h1 className="sr-only">Feed</h1>
-        <MatchedRow />
         <div role="tablist" aria-label="Feed" className="mb-4 flex border-b border-line">
           {TABS.map((t) => (
             <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={`relative flex-1 pb-3 text-sm transition md:flex-none md:px-5 ${tab === t.id ? "font-semibold text-ink" : "text-muted hover:text-ink"}`}>
