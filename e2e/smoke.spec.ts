@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 async function onboard(page: Page, role: "Creator" | "Business" = "Creator") {
   await page.goto("/");
-  await page.getByRole("link", { name: /get started/i }).first().click();
+  await page.goto("/onboarding");
   await page.getByText(role, { exact: true }).click();
   await page.getByLabel(role === "Business" ? "Brand name" : "Your name").fill(role === "Business" ? "Test Brand" : "Test Creator");
   await page.getByLabel("Username").fill(role === "Business" ? "testbrand" : "testcreator");

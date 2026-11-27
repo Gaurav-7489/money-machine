@@ -414,3 +414,25 @@ dialog.menu-overlay[open] .menu-item { animation: fade-up 0.6s var(--ease-out-ex
 :root[data-theme="dark"] :is(.bg-brand-500, .bg-brand-600, .bg-brand-700, .bg-aurora, .bg-aurora-flow).text-white {
   color: var(--color-on-primary);
 }
+
+/* ── Landing: creator + business deal animation ─────────────────────────── */
+.deal-left { animation: deal-in-left 5.6s ease-in-out infinite; }
+.deal-right { animation: deal-in-right 5.6s ease-in-out infinite; }
+.deal-arms { transform-origin: 180px 136px; animation: deal-pump 0.32s ease-in-out infinite; }
+.deal-plus { transform-origin: 180px 92px; animation: deal-pop 2.8s ease-out infinite; }
+.deal-spark { animation: deal-spark 2.8s ease-out infinite; }
+@keyframes deal-in-left { 0%, 100% { transform: translateX(-12px); } 25%, 80% { transform: none; } }
+@keyframes deal-in-right { 0%, 100% { transform: translateX(12px); } 25%, 80% { transform: none; } }
+@keyframes deal-pump { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+@keyframes deal-pop {
+  0% { opacity: 0; transform: translateY(18px) scale(0.2); }
+  18% { opacity: 1; transform: translateY(0) scale(1.15); }
+  30% { transform: translateY(0) scale(1); }
+  80% { opacity: 1; transform: translateY(-12px) scale(1); }
+  100% { opacity: 0; transform: translateY(-22px) scale(0.9); }
+}
+@keyframes deal-spark {
+  0%, 15% { opacity: 0; transform: translateY(14px); }
+  40% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-26px); }
+}

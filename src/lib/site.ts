@@ -50,6 +50,6 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Is Money Machine free?",
-    a: "The preview is free to try. Pricing for premium features has not been announced yet.",
+    a: "Your first month costs $1. After that it is $19 a month for content creators and $29 a month for business owners. You can cancel at any time.",
   },
 ];

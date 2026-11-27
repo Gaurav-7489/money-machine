@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BadgeIndianRupee, Briefcase, Check, ChevronLeft, MapPin, Sparkles, UserRound } from "lucide-react";
 import Link from "next/link";
@@ -101,6 +101,11 @@ export default function Onboarding() {
   const { update } = useStore();
   const [step, setStep] = useState(0);
   const [role, setRole] = useState<Role>("creator");
+  // Arriving from the landing page: start on the side they chose and paid for.
+  useEffect(() => {
+    const r = new URLSearchParams(window.location.search).get("role");
+    if (r === "creator" || r === "business") setRole(r);
+  }, []);
   const [displayName, setDisplayName] = useState("");
   const [handle, setHandle] = useState("");
   const [niches, setNiches] = useState<string[]>([]);
