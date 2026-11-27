@@ -209,6 +209,9 @@ function DesktopHeader() {
 export function AppShell({ children }: { children: ReactNode }) {
   const { session, ready, saveOk } = useStore();
   const router = useRouter();
+  const pathname = usePathname();
+  // A single conversation (/inbox/<id>, not the folder pages) has its own composer and no bottom menu.
+  const inChat = /^\/inbox\/(?!f(?:\/|$))[^/]+\/?$/.test(pathname);
 
   useEffect(() => {
     if (ready && !session) router.replace("/");
@@ -244,9 +247,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             This device&apos;s storage is full, so your latest changes can&apos;t be saved. Try removing a photo post.
           </p>
         )}
-        <main id="main" className="mx-auto w-full max-w-6xl px-4 pb-28 pt-4 md:px-6 md:pb-10 md:pt-6">{children}</main>
+        <main id="main" className={`mx-auto w-full max-w-6xl px-4 pt-4 md:px-6 md:pb-10 md:pt-6 ${inChat ? "pb-0" : "pb-28"}`}>{children}</main>
       </div>
-      <BottomNav />
+      {!inChat && <BottomNav />}
     </div>
   );
 }

@@ -108,6 +108,9 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
   const [dealErrors, setDealErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
+  const composerRef = useRef<HTMLFormElement>(null);
+  const [composerH, setComposerH] = useState(0);
+  const [kb, setKb] = useState(0);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const count = thread?.messages.length ?? 0;
 
@@ -118,6 +121,35 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
   }, [count]);
+
+  // Measure the composer so the message list can leave room for it on phones.
+  const haveThread = !!thread;
+  useEffect(() => {
+    const el = composerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setComposerH(el.offsetHeight));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [haveThread]);
+
+  // Follow the on-screen keyboard: the visible viewport shrinks when it opens.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => setKb(Math.max(0, window.innerHeight - vv.height - vv.offsetTop));
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+    };
+  }, []);
+
+  const keyboardOpen = kb > 0;
+  useEffect(() => {
+    if (keyboardOpen) endRef.current?.scrollIntoView({ block: "end" });
+  }, [keyboardOpen]);
 
   if (!thread) {
     return (
@@ -219,9 +251,10 @@ export default function Thread({ params }: { params: Promise<{ id: string }> }) 
         </Link>
         <div className="flex-1 space-y-3" aria-live="polite">
           {thread.messages.map((m) => <Bubble key={m.id} m={m} name={p.name} tone={p.tone} square={p.kind === "business"} onReply={reply} />)}
-          <div ref={endRef} />
         </div>
-        <form onSubmit={submit} className="sticky bottom-20 mt-3 md:bottom-4" noValidate>
+        <div className="md:hidden" style={{ height: composerH }} aria-hidden="true" />
+        <div ref={endRef} />
+        <form ref={composerRef} onSubmit={submit} className="fixed inset-x-0 bottom-[var(--kb,0px)] z-40 border-t border-line bg-canvas px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 md:sticky md:bottom-4 md:z-auto md:mt-3 md:border-0 md:bg-transparent md:px-0 md:pb-0 md:pt-0" style={{ "--kb": `${kb}px` } as React.CSSProperties} noValidate>
           {photo && (
             <div className="relative mb-2 inline-block">
               <MediaImage id={photo} alt="Photo to send" className="h-28 w-auto rounded-[18px]" />
