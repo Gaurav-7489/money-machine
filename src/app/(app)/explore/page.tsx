@@ -215,6 +215,21 @@ function ExploreInner() {
           <p className="ml-auto text-sm tabular-nums text-muted" aria-live="polite">{loading ? "Searching…" : `${results.length} ${results.length === 1 ? who.slice(0, -1) : who}`}</p>
         </div>
 
+        {selected.length > 0 && (
+          <div className="animate-fade-up sticky top-16 z-30 mb-3 flex items-center gap-2 rounded-full bg-primary p-1.5 pl-5 text-on-primary shadow-lift md:top-20">
+            <span className="mr-auto text-sm font-bold">{selected.length} selected</span>
+            <button onClick={() => { setMany("starredProfiles", selected, true); toast(`${selected.length} starred ⭐`); }} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-canvas/10" aria-label="Star selected" title="Star selected">
+              <Star className="h-5 w-5" />
+            </button>
+            <button onClick={() => setSelected([])} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-canvas/10" aria-label="Clear selection" title="Clear selection">
+              <X className="h-5 w-5" />
+            </button>
+            <button onClick={() => setBulkOpen(true)} className="press inline-flex h-10 items-center gap-1.5 rounded-full bg-signal px-4 text-sm font-bold text-on-signal">
+              <Send className="h-4 w-4" /> Bulk DM{bulkDaysLeft > 0 ? ` · ${bulkDaysLeft}d` : ""}
+            </button>
+          </div>
+        )}
+
         {loading ? (
           <div className="grid gap-2 sm:grid-cols-2">{[0, 1, 2, 3].map((i) => <MatchRowSkeleton key={i} />)}</div>
         ) : results.length ? (
@@ -242,21 +257,6 @@ function ExploreInner() {
           </button>
         )}
       </section>
-
-      {selected.length > 0 && (
-        <div className="animate-fade-up fixed inset-x-3 bottom-24 z-40 mx-auto flex max-w-xl items-center gap-2 rounded-full bg-primary p-1.5 pl-5 text-on-primary shadow-2xl md:bottom-6">
-          <span className="mr-auto text-sm font-bold">{selected.length} selected</span>
-          <button onClick={() => { setMany("starredProfiles", selected, true); toast(`${selected.length} starred ⭐`); }} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-canvas/10" aria-label="Star selected" title="Star selected">
-            <Star className="h-5 w-5" />
-          </button>
-          <button onClick={() => setSelected([])} className="press grid h-10 w-10 place-items-center rounded-full hover:bg-canvas/10" aria-label="Clear selection" title="Clear selection">
-            <X className="h-5 w-5" />
-          </button>
-          <button onClick={() => setBulkOpen(true)} className="press inline-flex h-10 items-center gap-1.5 rounded-full bg-signal px-4 text-sm font-bold text-on-signal">
-            <Send className="h-4 w-4" /> Bulk DM{bulkDaysLeft > 0 ? ` · ${bulkDaysLeft}d` : ""}
-          </button>
-        </div>
-      )}
 
       <BulkDm open={bulkOpen} onClose={() => setBulkOpen(false)} recipients={recipients} onSent={() => setSelected([])} />
     </div>

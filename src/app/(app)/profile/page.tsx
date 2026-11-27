@@ -363,7 +363,7 @@ export default function Profile() {
             <Button variant="secondary" size="lg" onClick={() => setEditing(true)}>
               <Pencil className="h-4 w-4" /> Edit Profile
             </Button>
-            <Button variant="ghost" size="lg" className="text-danger" onClick={signOut}>
+            <Button variant="ghost" size="lg" className="text-danger! hover:bg-danger/10" onClick={signOut}>
               <LogOut className="h-4 w-4" /> Log out
             </Button>
           </div>

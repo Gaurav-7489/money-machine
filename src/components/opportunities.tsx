@@ -163,7 +163,7 @@ export function OpportunityList() {
 
   return (
     <div>
-      {isBiz ? (
+      {isBiz && (
         <button onClick={() => setPosting(true)} className="press mb-4 flex w-full items-center gap-3 rounded-[var(--radius-card)] bg-signal p-4 text-left text-on-signal hover:brightness-105">
           <span className="grid h-11 w-11 place-items-center rounded-full bg-on-signal text-signal"><Plus className="h-6 w-6" /></span>
           <span>
@@ -171,8 +171,6 @@ export function OpportunityList() {
             <span className="block text-[13px] opacity-75">Tell creators what you need. Applications land in your Messages.</span>
           </span>
         </button>
-      ) : (
-        <p className="mb-4 flex items-center gap-2 border-l-2 border-signal pl-3 text-[13px] text-muted"><Briefcase className="h-4 w-4 shrink-0" /> Brands post paid work here. Tap <strong>Apply now</strong> and we send your application to their Messages.</p>
       )}
       <div className="relative mb-4">
         <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
