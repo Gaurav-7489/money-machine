@@ -4,14 +4,12 @@ import { TabIndicator } from "@/components/motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AtSign, Bookmark, Camera, ChevronRight, CreditCard, Eye, ShieldCheck, Grid3x3, Link2, LogOut, Mail, MapPin, Palette, Pencil, Repeat2, Rocket, Settings, Smartphone, Star, Users, Wallet } from "lucide-react";
+import { AtSign, Bookmark, ChevronRight, CreditCard, Eye, ShieldCheck, Grid3x3, Link2, LogOut, Mail, MapPin, Pencil, Repeat2, Rocket, Star, Users, Wallet } from "lucide-react";
 import { Photo } from "@/components/photo";
 import { nichePhoto } from "@/lib/photos";
 import { Avatar, TONES } from "@/components/art";
 import { useFeedback } from "@/components/feedback";
 import { PostCard } from "@/components/feed/post-card";
-import { InstallGuide } from "@/components/install-prompt";
-import { ThemePicker } from "@/components/theme";
 import { Button, EmptyState, Field, Sheet, inputCls, selectCls } from "@/components/ui";
 import { EARNING_MODELS, NICHES, earningLabel } from "@/lib/catalog";
 import { LocationPicker } from "@/components/location-picker";
@@ -269,7 +267,6 @@ export default function Profile() {
   const router = useRouter();
   const { confirm } = useFeedback();
   const [editing, setEditing] = useState(false);
-  const [settings, setSettings] = useState(false);
   const [tab, setTab] = useState<"posts" | "reposts">("posts");
 
   if (!session) return null;
@@ -309,14 +306,6 @@ export default function Profile() {
       <div className="relative -mx-4 aspect-[16/9] overflow-hidden bg-elevated md:mx-0 md:aspect-[21/7] md:rounded-[22px]">
         <MediaImage id={session.coverId} alt="Your cover photo" className="absolute inset-0 h-full w-full" fallback={<Photo photo={nichePhoto(session.niches?.[0] ?? session.category)} sizes="(min-width: 1024px) 1024px, 100vw" priority decorative />} />
         <span className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/15" aria-hidden="true" />
-        <div className="absolute right-3 top-3 flex gap-2">
-          <Button variant="ghost" size="sm" onClick={() => setEditing(true)} className="glass h-9 px-3.5 text-[13px]" aria-label="Change profile and cover photos">
-            <Camera className="h-4 w-4" /> Photos
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => setSettings(true)} className="glass h-9 px-3.5 text-[13px]">
-            <Settings className="h-4 w-4" /> Settings
-          </Button>
-        </div>
       </div>
 
       <div className="grid gap-10 md:grid-cols-12 md:gap-12">
@@ -370,9 +359,14 @@ export default function Profile() {
             <div className="flex flex-col border-l border-line py-3 pl-4"><dt className="text-[12px] text-muted">Reposts</dt><dd className="font-display order-first text-xl leading-tight tabular-nums">{reposts.length}</dd></div>
             <Link href="/friends" className="flex flex-col border-l border-line py-3 pl-4 transition-colors hover:bg-elevated"><dt className="text-[12px] text-muted">Friends</dt><dd className="font-display order-first text-xl leading-tight tabular-nums">{following.length}</dd></Link>
           </dl>
-          <Button variant="secondary" size="lg" className="mt-6" onClick={() => setEditing(true)}>
-            <Pencil className="h-4 w-4" /> Edit Profile
-          </Button>
+          <div className="mt-6 flex flex-wrap gap-2">
+            <Button variant="secondary" size="lg" onClick={() => setEditing(true)}>
+              <Pencil className="h-4 w-4" /> Edit Profile
+            </Button>
+            <Button variant="ghost" size="lg" className="text-danger" onClick={signOut}>
+              <LogOut className="h-4 w-4" /> Log out
+            </Button>
+          </div>
         </section>
 
         <aside className="space-y-8 md:col-span-5 md:pt-14" aria-label="Your tools">
@@ -473,23 +467,6 @@ export default function Profile() {
         {editing && <EditProfile session={session} onDone={() => setEditing(false)} />}
       </Sheet>
 
-      <Sheet open={settings} onClose={() => setSettings(false)} title="Settings">
-        <div className="space-y-6">
-          <section>
-            <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold"><Palette className="h-4 w-4" /> Theme</h3>
-            <ThemePicker />
-          </section>
-          <section className="border-t border-line pt-4">
-            <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold"><Smartphone className="h-4 w-4" /> Add to Home Screen</h3>
-            <InstallGuide />
-          </section>
-          <section className="space-y-3 border-t border-line pt-4">
-            <Button variant="secondary" className="w-full text-danger" onClick={signOut}>
-              <LogOut className="h-4 w-4" /> Sign out & clear preview data
-            </Button>
-          </section>
-        </div>
-      </Sheet>
     </div>
   );
 }
